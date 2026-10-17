@@ -23,9 +23,9 @@
     "imagem": "/img/meditacao-560.webp",
     "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
     "pilares": [
-      { "titulo": "Dores de costas", "texto": "Fisioterapia, Pilates clínico, para recuperar, reforçar e prevenir.", "botao": "Marcar fisioterapia", "tratamento": "fisio" },
-      { "titulo": "Drenagens", "texto": "Drenagem linfática e outros tratamentos para eliminar líquidos em excesso e activar circulação.", "botao": "Ver tratamentos", "tratamento": "" },
-      { "titulo": "Relaxamento", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil" }
+      { "titulo": "Cuidar", "texto": "Dores de costas, corrigir postura, reforço muscular.", "botao": "Marcar fisioterapia", "tratamento": "fisio" },
+      { "titulo": "Tratar", "texto": "Retenção líquidos, contraturas e lesões para recuperar.", "botao": "Ver tratamentos", "tratamento": "" },
+      { "titulo": "Relaxar", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil" }
     ],
     "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
   },
