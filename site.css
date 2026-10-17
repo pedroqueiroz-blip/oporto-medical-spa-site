@@ -576,3 +576,13 @@ blockquote.d, .trust p { font-style: italic; }
 /* 6. Quatro terapeutas numa linha */
 .team { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 900px) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Correções do Pedro, 17/10 (2.º lote) */
+/* Spa, morada e horário alinhados com a base da foto; as terapias passam a correr logo abaixo */
+.hero2__grid { align-items: stretch; }
+.hero2__grid > div:first-child { display: flex; flex-direction: column; }
+.hero2__grid .hero2__facts { margin-top: auto; padding-top: 18px; gap: 8px 28px; justify-content: flex-start; }
+.hero2__grid .hero2__cta { margin-bottom: 40px; }
+.hero2 .marquee { margin-top: clamp(28px, 4vw, 56px); }
+.hero2 { padding-bottom: 0; }
+.frame { align-self: start; }
