@@ -590,3 +590,4 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band { background: #351A13; border-block: 1px solid rgba(217, 168, 108, .22); }
 .trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
 .trust-band .trust p span { color: #CDB99C; }
+.trust-band .seal { background: var(--night); box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .8); }
