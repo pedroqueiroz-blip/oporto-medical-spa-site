@@ -100,8 +100,7 @@
         { "@type": "Person", "name": "CONFIRMAR: Ana Ribeiro (nome ilustrativo)", "jobTitle": "Fisioterapeuta", "knowsAbout": ["Reeducação postural", "Pilates clínico"], "hasCredential": { "@type": "EducationalOccupationalCredential", "credentialCategory": "Cédula profissional", "identifier": "CONFIRMAR", "recognizedBy": { "@type": "Organization", "name": "Ordem dos Fisioterapeutas" } } },
         { "@type": "Person", "name": "CONFIRMAR: Marta Sousa (nome ilustrativo)", "jobTitle": "Fisioterapeuta", "knowsAbout": ["Fisioterapia dermato-funcional", "Drenagem linfática manual"], "hasCredential": { "@type": "EducationalOccupationalCredential", "credentialCategory": "Cédula profissional", "identifier": "CONFIRMAR", "recognizedBy": { "@type": "Organization", "name": "Ordem dos Fisioterapeutas" } } },
         { "@type": "Person", "name": "CONFIRMAR: Inês Carvalho (nome ilustrativo)", "jobTitle": "Massoterapeuta", "knowsAbout": ["Massagem de relaxamento"] },
-        { "@type": "Person", "name": "CONFIRMAR: Sofia Lemos (nome ilustrativo)", "jobTitle": "Massoterapeuta", "knowsAbout": ["World Therapy", "Aromaterapia"] },
-        { "@type": "Person", "name": "CONFIRMAR: Rui Matos (nome ilustrativo)", "jobTitle": "Fisioterapeuta", "knowsAbout": ["Reabilitação", "Pilates com aparelhos"], "hasCredential": { "@type": "EducationalOccupationalCredential", "credentialCategory": "Cédula profissional", "identifier": "CONFIRMAR", "recognizedBy": { "@type": "Organization", "name": "Ordem dos Fisioterapeutas" } } }
+        { "@type": "Person", "name": "CONFIRMAR: Sofia Lemos (nome ilustrativo)", "jobTitle": "Massoterapeuta", "knowsAbout": ["World Therapy", "Aromaterapia"] }
       ]
     },
     {
@@ -195,10 +194,10 @@
         <p class="kicker">A casa</p>
         <h2 class="d" style="font-size:clamp(40px,5vw,76px)">O corpo, o rosto <em>e também a alma.</em></h2>
         <p class="house2__lead">Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Fisioterapeutas e terapeutas especializadas trabalham lado a lado, para que cada visita seja ao mesmo tempo prazer e tratamento.</p>
-        <ol class="pillars">
-          <li><span class="pillars__n" aria-hidden="true">I</span><h3>O corpo</h3><p>Fisioterapia, drenagem linfática e Pilates clínico, para recuperar e prevenir.</p><button type="button" data-book="fisio">Marcar fisioterapia <span aria-hidden="true">→</span></button></li>
-          <li><span class="pillars__n" aria-hidden="true">II</span><h3>O rosto</h3><p>Tratamentos de rosto pensados para a sua pele, com mãos que conhecem cada gesto.</p><a href="#rituais">Ver tratamentos <span aria-hidden="true">→</span></a></li>
-          <li><span class="pillars__n" aria-hidden="true">III</span><h3>A alma</h3><p>Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.</p><button type="button" data-book="oil">Marcar ritual <span aria-hidden="true">→</span></button></li>
+        <ol class="pillars" data-select>
+          <li tabindex="0" aria-selected="false"><span class="pillars__n" aria-hidden="true">I</span><h3>O corpo</h3><p>Fisioterapia, drenagem linfática e Pilates clínico, para recuperar e prevenir.</p><button type="button" data-book="fisio">Marcar fisioterapia <span aria-hidden="true">→</span></button></li>
+          <li tabindex="0" aria-selected="false"><span class="pillars__n" aria-hidden="true">II</span><h3>O rosto</h3><p>Tratamentos de rosto pensados para a sua pele, com mãos que conhecem cada gesto.</p><a href="#rituais">Ver tratamentos <span aria-hidden="true">→</span></a></li>
+          <li tabindex="0" aria-selected="false"><span class="pillars__n" aria-hidden="true">III</span><h3>A alma</h3><p>Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.</p><button type="button" data-book="oil">Marcar ritual <span aria-hidden="true">→</span></button></li>
         </ol>
         <blockquote class="d house2__quote">“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”</blockquote>
       </div>
@@ -263,9 +262,10 @@
         <div>
           <h2 class="d" style="font-size:clamp(30px,3.4vw,46px)">Que tratamento <em>escolher?</em></h2>
           <p class="prose" style="margin:16px 0 0">Se procura sobretudo descanso, escolha uma massagem. Se tem dor ou uma limitação, comece pela fisioterapia. O Pilates clínico mantém o resultado.</p>
+          <button type="button" class="more-btn" aria-expanded="false" aria-controls="cmp" data-toggle="cmp" data-open-label="Saiba −">Saiba +</button>
         </div>
       </div>
-      <div class="cmp-wrap" tabindex="0" role="region" aria-label="Comparação de tratamentos">
+      <div class="cmp-wrap" id="cmp" tabindex="0" role="region" aria-label="Comparação de tratamentos" hidden>
         <table class="cmp">
           <caption>Preços e durações em vigor no Oporto Medical Spa, Porto.</caption>
           <thead><tr><th scope="col">Tratamento</th><th scope="col">Indicado para</th><th scope="col">Como é</th><th scope="col">Duração</th><th scope="col">Preço</th></tr></thead>
@@ -284,17 +284,19 @@
 
   <section class="section visit" id="visita">
     <div class="wrap">
-      <div class="visit-head">
-        <div><p class="kicker">A sua visita</p><h2 class="d">Tudo começa <em>com um chá.</em></h2>
-        <p class="prose">Cada pessoa é recebida individualmente e em total exclusividade. Este é o percurso de uma visita, do primeiro gole ao último suspiro.</p></div>
-        <figure class="tea"><img src="img/ritual-cha-520.webp" srcset="img/ritual-cha-520.webp 520w, img/ritual-cha-960.webp 960w" sizes="(max-width: 860px) 80vw, 30vw" width="520" height="520" alt="Taça de cerâmica escura com folhas de chá verde, junto a um bule" loading="lazy" decoding="async"></figure>
+      <div class="visit2">
+        <div class="visit2__text">
+          <p class="kicker">A sua visita</p><h2 class="d">Tudo começa <em>com um chá.</em></h2>
+          <p class="prose">Cada pessoa é recebida individualmente e em total exclusividade. Este é o percurso de uma visita, do primeiro gole ao último suspiro.</p>
+          <ol class="steps-sm">
+            <li><span class="n" aria-hidden="true">I</span><h3>Chá ou infusão</h3><p>Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera.</p></li>
+            <li><span class="n" aria-hidden="true">II</span><h3>Escuta</h3><p>Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje.</p></li>
+            <li><span class="n" aria-hidden="true">III</span><h3>O tratamento</h3><p>Luz baixa, mãos especializadas e todo o tempo do mundo.</p></li>
+            <li><span class="n" aria-hidden="true">IV</span><h3>Repouso</h3><p>Uns minutos só seus antes de voltar à cidade.</p></li>
+          </ol>
+        </div>
+        <figure class="tea"><img src="img/ritual-cha-520.webp" srcset="img/ritual-cha-520.webp 520w, img/ritual-cha-960.webp 960w" sizes="(max-width: 860px) 60vw, 300px" width="520" height="520" alt="Taça de cerâmica escura com folhas de chá verde, junto a um bule" loading="lazy" decoding="async"></figure>
       </div>
-      <ol class="steps4">
-        <li><span class="n" aria-hidden="true">I</span><h3>Chá ou infusão</h3><p>Chega dez a quinze minutos antes. Muda de roupa com calma, com roupão, toalhas e chinelos à sua espera.</p></li>
-        <li><span class="n" aria-hidden="true">II</span><h3>Escuta</h3><p>Uma conversa com a sua terapeuta: o que o corpo lhe pede hoje, as suas preferências, os óleos que escolhe.</p></li>
-        <li><span class="n" aria-hidden="true">III</span><h3>O tratamento</h3><p>Luz baixa, mãos especializadas e todo o tempo do mundo. Nada interrompe o seu ritual.</p></li>
-        <li><span class="n" aria-hidden="true">IV</span><h3>Repouso</h3><p>Uns minutos só seus antes de voltar à cidade. Saia devagar: o tempo, aqui, é seu.</p></li>
-      </ol>
     </div>
   </section>
 
@@ -330,7 +332,6 @@
         <article class="person"><div class="person__ph pms-tone-2">Retrato</div><p class="person__role">Fisioterapeuta</p><h3>Marta Sousa</h3><p>Fisioterapia dermato-funcional e drenagem</p><p class="cred">Cédula OF n.º <mark class="tbc">confirmar</mark></p><button type="button" data-book-with="marta">Marcar com Marta</button></article>
         <article class="person"><div class="person__ph pms-tone-3">Retrato</div><p class="person__role">Massoterapeuta</p><h3>Inês Carvalho</h3><p>Rituais de tranquilidade</p><p class="cred">Formação <mark class="tbc">confirmar</mark></p><button type="button" data-book-with="ines">Marcar com Inês</button></article>
         <article class="person"><div class="person__ph pms-tone-4">Retrato</div><p class="person__role">Massoterapeuta</p><h3>Sofia Lemos</h3><p>World Therapy e aromaterapia</p><p class="cred">Formação <mark class="tbc">confirmar</mark></p><button type="button" data-book-with="sofia">Marcar com Sofia</button></article>
-        <article class="person"><div class="person__ph pms-tone-5">Retrato</div><p class="person__role">Fisioterapeuta</p><h3>Rui Matos</h3><p>Reabilitação e Pilates com aparelhos</p><p class="cred">Cédula OF n.º <mark class="tbc">confirmar</mark></p><button type="button" data-book-with="rui">Marcar com Rui</button></article>
       </div>
     </div>
   </section>
@@ -404,19 +405,22 @@
         <h2 class="d" style="font-size:clamp(36px,4vw,60px)">Antes de vir.</h2>
         <p class="prose">Reserve aqui, pelo <a href="tel:+351226163030">22 616 30 30</a> ou por <a href="mailto:reservas@oportomedicalspa.com">reservas@oportomedicalspa.com</a>. Recomendamos dois dias de antecedência.</p>
       </div>
-      <div class="faq">
+      <div class="faq" id="faq">
         <details open><summary><h3>Onde fica o Oporto Medical Spa?</h3></summary><p>Na Rua São João de Brito, 610 - S/3, 4100-453 Porto, na zona ocidental da cidade, entre a Boavista e a Foz. Abre de segunda a sexta das 9h às 20h e ao sábado das 9h às 13h. <mark class="tbc">acrescentar distância medida a um ponto de referência</mark></p></details>
-        <details><summary><h3>Quanto custa uma massagem no Oporto Medical Spa?</h3></summary><p>As massagens de relaxamento custam entre 65 € (Aromaterapia, 60 min) e 88 € (World Therapy, 75 min). A Massagem Oil &amp; Candle custa 74 € (60 min).</p></details>
-        <details><summary><h3>Quanto custa uma sessão de fisioterapia?</h3></summary><p>Uma sessão de Fisioterapia e Reeducação Postural custa 90 € e dura 50 minutos. A Drenagem Linfática Manual custa 90 € (60 min) e o Pilates Clínico 50 € (50 min).</p></details>
-        <details><summary><h3>Quem faz os tratamentos?</h3></summary><p>Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.</p></details>
-        <details><summary><h3>Há estacionamento?</h3></summary><p><mark class="tbc">confirmar: estacionamento próprio, parque próximo ou rua</mark></p></details>
-        <details><summary><h3>Falam inglês e espanhol?</h3></summary><p><mark class="tbc">confirmar idiomas da equipa</mark></p></details>
-        <details><summary><h3>Quando devo chegar?</h3></summary><p>Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.</p></details>
-        <details><summary><h3>E se não puder vir?</h3></summary><p>Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.</p></details>
-        <details><summary><h3>Preciso de exame médico?</h3></summary><p>Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.</p></details>
-        <details><summary><h3>O que devo trazer?</h3></summary><p>Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.</p></details>
-        <details><summary><h3>O que significa medical spa?</h3></summary><p>Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.</p></details>
-        <details><summary><h3>Posso oferecer uma massagem?</h3></summary><p>Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.</p></details>
+        <div class="faq__more" id="faq-more" hidden>
+          <details><summary><h3>Quanto custa uma massagem no Oporto Medical Spa?</h3></summary><p>As massagens de relaxamento custam entre 65 € (Aromaterapia, 60 min) e 88 € (World Therapy, 75 min). A Massagem Oil &amp; Candle custa 74 € (60 min).</p></details>
+          <details><summary><h3>Quanto custa uma sessão de fisioterapia?</h3></summary><p>Uma sessão de Fisioterapia e Reeducação Postural custa 90 € e dura 50 minutos. A Drenagem Linfática Manual custa 90 € (60 min) e o Pilates Clínico 50 € (50 min).</p></details>
+          <details><summary><h3>Quem faz os tratamentos?</h3></summary><p>Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.</p></details>
+          <details><summary><h3>Há estacionamento?</h3></summary><p><mark class="tbc">confirmar: estacionamento próprio, parque próximo ou rua</mark></p></details>
+          <details><summary><h3>Falam inglês e espanhol?</h3></summary><p><mark class="tbc">confirmar idiomas da equipa</mark></p></details>
+          <details><summary><h3>Quando devo chegar?</h3></summary><p>Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.</p></details>
+          <details><summary><h3>E se não puder vir?</h3></summary><p>Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.</p></details>
+          <details><summary><h3>Preciso de exame médico?</h3></summary><p>Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.</p></details>
+          <details><summary><h3>O que devo trazer?</h3></summary><p>Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.</p></details>
+          <details><summary><h3>O que significa medical spa?</h3></summary><p>Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.</p></details>
+          <details><summary><h3>Posso oferecer uma massagem?</h3></summary><p>Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.</p></details>
+        </div>
+        <button type="button" class="more-btn" aria-expanded="false" aria-controls="faq-more" data-toggle="faq-more" data-open-label="Ver menos">Ver todas as perguntas</button>
       </div>
     </div>
   </section>
