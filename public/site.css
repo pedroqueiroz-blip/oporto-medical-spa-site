@@ -604,3 +604,13 @@ blockquote.d, .trust p { font-style: italic; }
 /* A sua visita: cada passo do circuito ganha fundo escuro ao passar o rato */
 .steps-sm li { transition: background .2s, border-color .2s; }
 .steps-sm li:hover { background: var(--night); border-color: rgba(217, 168, 108, .5); }
+/* Telemóvel: título, imagem, texto, botões e, no fim, spa, morada e horário */
+@media (max-width: 900px) {
+  .hero2__grid { display: flex; flex-direction: column; gap: 0; }
+  .hero2__grid > div:first-child { display: contents; }
+  .hero2__grid h1 { order: 1; }
+  .hero2__grid .frame { order: 2; margin: 28px 0 0; }
+  .hero2__grid .hero2__lead { order: 3; }
+  .hero2__grid .hero2__cta { order: 4; margin-bottom: 0; }
+  .hero2__grid .hero2__facts { order: 5; margin-top: 32px; }
+}
