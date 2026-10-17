@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Backoffice · Oporto Medical Spa</title>
+<link rel="icon" href="/logo-brown.svg">
+</head>
+<body>
+<script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
+<script>
+  /* Pré-visualização da campanha do mês com o aspeto do site */
+  CMS.registerPreviewStyle('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap');
+  CMS.registerPreviewStyle('/site.css');
+  CMS.registerPreviewStyle('body{background:#0D0A08;color:#E8DCC8}.section{padding:40px 0}', { raw: true });
+
+  var h = window.h;
+  function inline(s) {
+    return String(s || '').replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; })
+      .replace(/\[\[(.+?)\]\]/g, '<mark class="tbc">$1</mark>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+  var CampanhaPreview = createClass({
+    render: function () {
+      var e = this.props.entry, get = function (k) { return e.getIn(['data', k]); };
+      if (!get('ativa')) return h('p', { style: { padding: '40px', fontFamily: 'sans-serif' } }, 'A campanha está desligada e não aparece no site.');
+      var img = get('imagem') ? this.props.getAsset(get('imagem')) : null;
+      var inclui = (get('inclui') || []).toJS ? get('inclui').toJS() : (get('inclui') || []);
+      var preco = get('preco');
+      return h('section', { className: 'section month2' },
+        h('div', { className: 'wrap split' },
+          img ? h('figure', { className: 'arch arch--photo' }, h('img', { src: img.toString(), alt: '' }))
+              : h('figure', { className: 'arch' }, h('figcaption', {}, 'Fotografia · a enviar')),
+          h('div', { style: { display: 'grid', gap: '24px' } },
+            h('p', { className: 'kicker', style: { margin: 0 } }, get('etiqueta')),
+            h('h2', { className: 'd sig-title' }, get('titulo') + ' ', get('titulo_destaque') ? h('em', {}, get('titulo_destaque')) : null,
+              get('assinatura') ? h('span', { className: 'sig-by' }, get('assinatura')) : null),
+            h('p', { style: { margin: 0, fontSize: '18px', maxWidth: '46ch' }, dangerouslySetInnerHTML: { __html: inline(get('texto')) } }),
+            get('selo') ? h('p', { className: 'sig-seal' }, h('span', { className: 'sig-seal__r' }, '®'), h('span', {}, get('selo_texto'), h('br'), h('b', {}, get('selo_numero')))) : null,
+            inclui.length || get('duracao') ? h('ul', {},
+              inclui.map(function (x, i) { return h('li', { key: i, dangerouslySetInnerHTML: { __html: inline(x) } }); }),
+              get('duracao') ? h('li', {}, 'Duração: ' + get('duracao') + ' min') : null) : null,
+            h('div', { style: { display: 'flex', gap: '18px 28px', alignItems: 'center' } },
+              h('span', { className: 'price-d' }, preco ? String(preco).replace('.', ',') + ' €' : 'preço do tratamento escolhido'),
+              h('span', { className: 'btn btn--primary' }, 'Reservar'))
+          )
+        )
+      );
+    }
+  });
+  CMS.registerPreviewTemplate('campanha', CampanhaPreview);
+</script>
+</body>
+</html>
