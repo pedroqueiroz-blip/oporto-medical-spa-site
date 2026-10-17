@@ -595,7 +595,8 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band { background: var(--cacao); border-block: 1px solid rgba(217, 168, 108, .22); }
 .trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
 .trust-band .trust p span { color: #CDB99C; }
-/* Selos: interior preto, contorno igual ao dos botões, linhas e letras na cor do texto dos botões */
-.trust-band .seal { background: var(--night); border: 1px solid rgba(232, 220, 200, .35); }
-.trust-band .seal, .trust-band .seal strong, .trust-band .seal__lotus { color: var(--linen); }
-.trust-band .seal::before { border-color: var(--linen); }
+/* Selos: interior preto; círculos, linhas e textos pequenos no dourado do botão "Ver todas as perguntas"; IMSA e SIA a branco */
+.trust-band .seal { background: var(--night); border: 1px solid var(--flame); color: var(--flame); }
+.trust-band .seal::before { border-color: var(--flame); }
+.trust-band .seal__lotus { color: var(--flame); }
+.trust-band .seal strong { color: #fff; }
