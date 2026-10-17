@@ -22,6 +22,28 @@
     var w = e.target.closest('[data-book-with]'); if (w && !w.closest('#booking')) goBook({ therapist: w.getAttribute('data-book-with') });
   });
 
+  // Pilares de "A casa": um selecionado de cada vez, como as opções de Reservar
+  document.querySelectorAll('[data-select]').forEach(function (list) {
+    function pick(li) {
+      list.querySelectorAll('li').forEach(function (x) { x.setAttribute('aria-selected', x === li ? 'true' : 'false'); });
+    }
+    list.addEventListener('click', function (e) { var li = e.target.closest('li'); if (li) pick(li); });
+    list.addEventListener('keydown', function (e) {
+      if ((e.key === 'Enter' || e.key === ' ') && e.target.tagName === 'LI') { e.preventDefault(); pick(e.target); }
+    });
+  });
+
+  // "Saiba +" e "Ver todas as perguntas": mostram e escondem o conteúdo
+  document.querySelectorAll('[data-toggle]').forEach(function (btn) {
+    var target = document.getElementById(btn.getAttribute('data-toggle')), closed = btn.textContent;
+    btn.addEventListener('click', function () {
+      var open = target.hidden;
+      target.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? btn.getAttribute('data-open-label') : closed;
+    });
+  });
+
   // Brilho de vela que segue o cursor
   var hero = $('#hero'), glow = $('#glow');
   if (hero && glow && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

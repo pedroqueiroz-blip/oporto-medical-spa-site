@@ -267,7 +267,7 @@ body { margin: 0; }
 
 /* Hero avançado */
 .hero2 { position: relative; isolation: isolate; padding: clamp(48px, 7vw, 110px) 0 clamp(40px, 5vw, 80px); overflow: hidden; }
-.hero2__bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(640px circle at var(--x, 62%) var(--y, 38%), rgba(217, 168, 108, .20), rgba(217, 168, 108, 0) 65%), radial-gradient(900px circle at 100% 110%, rgba(59, 41, 25, .95), rgba(59, 41, 25, 0) 60%); }
+.hero2__bg { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(320px circle at var(--x, 62%) var(--y, 38%), rgba(217, 168, 108, .20), rgba(217, 168, 108, 0) 65%), radial-gradient(900px circle at 100% 110%, rgba(59, 41, 25, .95), rgba(59, 41, 25, 0) 60%); }
 .hero2__grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: clamp(40px, 6vw, 96px); align-items: end; }
 .hero2 h1 { margin: 0; font-weight: 400; }
 .hero2 .h1-kicker { display: flex; align-items: center; gap: 16px; margin-bottom: 30px; font: 400 11px/1.6 var(--body); letter-spacing: .32em; text-transform: uppercase; color: var(--oat); }
@@ -545,3 +545,34 @@ blockquote.d, .trust p { font-style: italic; }
 .foot { padding-top: 35px; }
 /* Hero: a linha "Medical spa no Porto" alinha com o topo da foto */
 .hero2__grid { align-items: start; }
+
+/* Correções do Pedro, 17/10 */
+/* 1. Título do hero com o mesmo tamanho do título de "A casa" */
+.hero2 .h1-title { font-size: clamp(40px, 5vw, 76px); }
+/* 3. Pilares I, II, III selecionáveis, como as opções de Reservar */
+.pillars { gap: 12px; border-top: 0; }
+.pillars li, .pillars li + li { padding: 22px; border: 1px solid transparent; border-radius: 4px; cursor: pointer; transition: border-color .2s, background .2s; }
+.pillars a, .pillars button { text-align: left; }
+.pillars li:hover { background: var(--cacao); border-color: rgba(217, 168, 108, .5); }
+.pillars li:focus-visible { outline: 1px solid var(--flame); outline-offset: 2px; }
+.pillars li[aria-selected="true"] { border-color: var(--flame); background: linear-gradient(160deg, rgba(217, 168, 108, .14), var(--cacao) 60%); }
+@media (max-width: 640px) { .pillars li + li { border-top: 1px solid transparent; } }
+/* 4 e 7. Botões "Saiba +" e "Ver todas as perguntas" */
+.more-btn { display: inline-flex; align-items: center; margin-top: 22px; min-height: 44px; padding: 0 22px; border-radius: 999px; border: 1px solid var(--flame); background: transparent; color: var(--linen); font: 500 11px var(--body); letter-spacing: .22em; text-transform: uppercase; cursor: pointer; transition: background .2s, color .2s; }
+.more-btn:hover, .more-btn[aria-expanded="true"] { background: var(--flame); color: var(--night); }
+.faq .more-btn { margin-top: 26px; }
+/* 5. A sua visita: metade da altura, texto e circuito à esquerda, chá à direita */
+.visit2 { display: grid; grid-template-columns: minmax(0, 1fr) clamp(200px, 22vw, 300px); gap: clamp(32px, 5vw, 80px); align-items: center; }
+.visit2 .d { font-size: clamp(36px, 4.2vw, 60px); }
+.visit2 .prose { margin-top: 16px; }
+.visit2 .tea { max-width: 300px; }
+.steps-sm { list-style: none; margin: 26px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.steps-sm li { padding: 14px 16px; border: 1px solid var(--line); border-radius: 4px; display: grid; gap: 4px; align-content: start; }
+.steps-sm .n { font-family: var(--display); font-style: italic; font-size: 20px; line-height: 1; color: var(--flame); }
+.steps-sm h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 18px; line-height: 1.2; }
+.steps-sm p { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--oat); }
+@media (max-width: 1100px) { .steps-sm { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 860px) { .visit2 { grid-template-columns: 1fr; } .visit2 .tea { justify-self: center; max-width: 220px; grid-row: 1; } }
+/* 6. Quatro terapeutas numa linha */
+.team { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

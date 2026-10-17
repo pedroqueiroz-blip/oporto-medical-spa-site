@@ -31,10 +31,7 @@
       does: ['aroma', 'oil', 'world'], tone: 3 },
     { id: 'sofia', name: 'Sofia Lemos', role: 'Massoterapeuta', focus: 'World Therapy e aromaterapia',
       bio: 'Formada em técnicas orientais e ocidentais. Trabalha com calma e com intenção.',
-      does: ['aroma', 'world', 'oil'], tone: 4 },
-    { id: 'rui', name: 'Rui Matos', role: 'Fisioterapeuta', focus: 'Reabilitação e Pilates com aparelhos',
-      bio: 'Acompanha quem quer voltar ao movimento sem medo, um passo de cada vez.',
-      does: ['fisio', 'pilates', 'dren'], tone: 5 }
+      does: ['aroma', 'world', 'oil'], tone: 4 }
   ];
 
   var HOURS = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
