@@ -590,3 +590,14 @@ blockquote.d, .trust p { font-style: italic; }
 /* Fotografias carregadas no backoffice (campanha e equipa) */
 .arch--photo img, .person__ph--photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .person__ph--photo { overflow: hidden; padding: 0; }
+
+/* Faixa das afiliações (IMSA, SIA) com fundo castanho da marca (pedido do Pedro, 17/10) */
+.trust-band { background: var(--cacao); border-block: 1px solid rgba(217, 168, 108, .22); }
+.trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
+.trust-band .trust p span { color: #CDB99C; }
+/* Selos como carimbo: fundo castanho da faixa, contornos, linhas e letras a preto */
+.trust-band .seal, .trust-band .seal strong, .trust-band .seal__lotus { color: var(--night); }
+.trust-band .seal { background: transparent; border: 2px solid var(--night); font-weight: 600; }
+.trust-band .seal strong { font-weight: 500; }
+.trust-band .seal::before { border: 1px solid var(--night); }
+.trust-band .seal__lotus { stroke-width: 1.6; }

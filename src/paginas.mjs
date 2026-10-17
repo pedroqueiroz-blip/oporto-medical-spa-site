@@ -239,7 +239,7 @@ export function home(m) {
     </div>
   </section>
 
-  <section class="section" style="padding-top:0">
+  <section class="section trust-band">
     <div class="wrap trust">
       <div class="seals" aria-hidden="true">
         <div class="seal"><div>International<strong>IMSA</strong>Medical Spa</div></div>
