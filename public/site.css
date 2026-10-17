@@ -597,6 +597,5 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band .trust p span { color: #CDB99C; }
 /* Selos: interior preto; círculos, linhas e textos pequenos no dourado do botão "Ver todas as perguntas"; IMSA e SIA a branco */
 .trust-band .seal { background: var(--night); border: 1px solid var(--flame); color: var(--flame); }
-.trust-band .seal::before { border-color: var(--flame); }
 .trust-band .seal__lotus { color: var(--flame); }
 .trust-band .seal strong { color: #fff; }
