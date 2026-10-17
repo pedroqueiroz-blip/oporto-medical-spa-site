@@ -601,3 +601,6 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band .seal strong { color: #fff; }
 /* Hero: a definição de spa numa linha; por baixo a morada e, à direita, o horário */
 .hero2__grid .hero2__facts > :first-child { flex-basis: 100%; }
+/* A sua visita: cada passo do circuito ganha fundo escuro ao passar o rato */
+.steps-sm li { transition: background .2s, border-color .2s; }
+.steps-sm li:hover { background: var(--night); border-color: rgba(217, 168, 108, .5); }
