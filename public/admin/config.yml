@@ -37,7 +37,7 @@ collections:
         label: Campanha do mês
         file: content/campanha.json
         fields:
-          - { name: ativa, label: Mostrar a campanha no site, widget: boolean, default: true }
+          - { name: ativa, label: Mostrar a campanha no site, widget: boolean, required: false, default: true }
           - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = já em vigor.' }
           - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = sem data de fim. Depois desta data a campanha sai do site na publicação seguinte.' }
           - { name: etiqueta, label: Etiqueta por cima do título, widget: string }
@@ -51,7 +51,7 @@ collections:
           - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Se ficar vazio, o botão leva à agenda. Se escolher um tratamento, o preço e a duração vêm dele quando os campos abaixo estão vazios.' }
           - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
           - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
-          - { name: selo, label: Mostrar selo de marca registada, widget: boolean, default: false }
+          - { name: selo, label: Mostrar selo de marca registada, widget: boolean, required: false, default: false }
           - { name: selo_texto, label: Texto do selo, widget: string, required: false }
           - { name: selo_numero, label: Número do selo, widget: string, required: false }
           - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
@@ -265,7 +265,7 @@ collections:
               - { name: pressao, label: Pressão (massagens), widget: string, required: false }
               - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, hint: 'Ex.: Massagem de relaxamento, Fisioterapia' }
               - { name: descricao_seo, label: Descrição curta (Google), widget: string }
-              - { name: visivel, label: Mostrar no site, widget: boolean, default: true }
+              - { name: visivel, label: Mostrar no site, widget: boolean, required: false, default: true }
 
   - name: pessoas
     label: Equipa
@@ -291,7 +291,7 @@ collections:
               - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5).' }
               - { name: faz, label: Tratamentos que faz, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], multiple: true }
               - { name: conhece, label: Áreas de conhecimento (Google), widget: list, required: false, field: { name: area, label: Área, widget: string } }
-              - { name: confirmado, label: Dados confirmados, widget: boolean, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }
+              - { name: confirmado, label: Dados confirmados, widget: boolean, required: false, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }
 
   - name: geral
     label: Contactos, horário e Google
@@ -302,7 +302,6 @@ collections:
         label: Contactos, horário e Google
         file: content/definicoes.json
         fields:
-          - { name: indexar, label: Site visível no Google, widget: boolean, default: false, hint: 'Ligar só no lançamento. Enquanto estiver desligado, o Google não indexa o site.' }
           - { name: nome, label: Nome, widget: string }
           - { name: url, label: Endereço do site, widget: string }
           - { name: descricao_negocio, label: Descrição do negócio (Google e IA), widget: text }
@@ -324,7 +323,7 @@ collections:
             fields:
               - { name: semana_abre, label: Segunda a sexta abre, widget: string, pattern: ['^\d\d:\d\d$', 'Formato 09:00'] }
               - { name: semana_fecha, label: Segunda a sexta fecha, widget: string, pattern: ['^\d\d:\d\d$', 'Formato 20:00'] }
-              - { name: sabado_aberto, label: Abre ao sábado, widget: boolean, default: true }
+              - { name: sabado_aberto, label: Abre ao sábado, widget: boolean, required: false, default: true }
               - { name: sabado_abre, label: Sábado abre, widget: string, required: false }
               - { name: sabado_fecha, label: Sábado fecha, widget: string, required: false }
           - { name: areas_servidas, label: Zonas servidas, widget: list, field: { name: zona, label: Zona, widget: string } }
@@ -335,3 +334,4 @@ collections:
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: registo_ers, label: N.º de registo ERS, widget: string, required: false }
           - { name: frase_rodape, label: Frase do rodapé, widget: string, required: false }
+          - { name: indexar, label: Site visível no Google, widget: boolean, required: false, default: false, hint: 'Deixe desligado até ao lançamento. Pode guardar e publicar alterações com isto desligado: o site atualiza-se na mesma e continua escondido do Google.' }
