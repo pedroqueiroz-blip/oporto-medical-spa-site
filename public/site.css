@@ -595,9 +595,12 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band { background: var(--cacao); border-block: 1px solid rgba(217, 168, 108, .22); }
 .trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
 .trust-band .trust p span { color: #CDB99C; }
-/* Selos como carimbo: fundo castanho da faixa, contornos, linhas e letras a preto */
-.trust-band .seal, .trust-band .seal strong, .trust-band .seal__lotus { color: var(--night); }
-.trust-band .seal { background: transparent; border: 2px solid var(--night); font-weight: 600; }
-.trust-band .seal strong { font-weight: 500; }
-.trust-band .seal::before { border: 1px solid var(--night); }
-.trust-band .seal__lotus { stroke-width: 1.6; }
+/* Selos: interior preto; círculos, linhas e textos pequenos no dourado do botão "Ver todas as perguntas"; IMSA e SIA a branco */
+.trust-band .seal { background: var(--night); border: 1px solid var(--flame); color: var(--flame); }
+.trust-band .seal__lotus { color: var(--flame); }
+.trust-band .seal strong { color: #fff; }
+/* Hero: a definição de spa numa linha; por baixo a morada e, à direita, o horário */
+.hero2__grid .hero2__facts > :first-child { flex-basis: 100%; }
+/* A sua visita: cada passo do circuito ganha fundo escuro ao passar o rato */
+.steps-sm li { transition: background .2s, border-color .2s; }
+.steps-sm li:hover { background: var(--night); border-color: rgba(217, 168, 108, .5); }

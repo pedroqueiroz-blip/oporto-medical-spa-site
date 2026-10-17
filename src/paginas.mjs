@@ -16,12 +16,13 @@ const STARS = `<svg width="0" height="0" style="position:absolute" aria-hidden="
           <svg class="star" viewBox="0 0 24 24" aria-hidden="true"><use href="#omsStar" fill="url(#omsGold)"/></svg>
           <span class="star-lit" aria-hidden="true"><svg class="star" viewBox="0 0 24 24"><use href="#omsStar" fill="url(#omsGold)"/><g clip-path="url(#omsStarClip)"><g transform="rotate(22 12 12)"><rect class="star-sheen" x="-16" y="-6" width="9" height="36" fill="url(#omsSheen)"/></g></g></svg><span class="star-glint"></span></span>`;
 
-function faqHtml(items, { id, firstOpen = true, collapse = true }) {
+// Na página inicial mostram-se a primeira pergunta aberta e as duas seguintes fechadas; as restantes ficam atrás do botão
+function faqHtml(items, { id, firstOpen = true, collapse = true, visible = 3 }) {
   const d = (x, open) => `<details${open ? ' open' : ''}><summary><h3>${esc(x.q)}</h3></summary><p>${x.html}</p></details>`;
-  if (!collapse || items.length <= 1) return `<div class="faq"${id ? ' id="' + id + '"' : ''}>\n        ${items.map((x, i) => d(x, firstOpen && i === 0)).join('\n        ')}\n      </div>`;
-  const [first, ...rest] = items;
+  if (!collapse || items.length <= visible) return `<div class="faq"${id ? ' id="' + id + '"' : ''}>\n        ${items.map((x, i) => d(x, firstOpen && i === 0)).join('\n        ')}\n      </div>`;
+  const shown = items.slice(0, visible), rest = items.slice(visible);
   return `<div class="faq" id="${id}">
-        ${d(first, firstOpen)}
+        ${shown.map((x, i) => d(x, firstOpen && i === 0)).join('\n        ')}
         <div class="faq__more" id="${id}-more" hidden>
           ${rest.map((x) => d(x)).join('\n          ')}
         </div>
