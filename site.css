@@ -586,3 +586,7 @@ blockquote.d, .trust p { font-style: italic; }
 .hero2 .marquee { margin-top: clamp(28px, 4vw, 56px); }
 .hero2 { padding-bottom: 0; }
 .frame { align-self: start; }
+/* Faixa das afiliações (IMSA, SIA) com fundo castanho da marca (pedido do Pedro, 17/10) */
+.trust-band { background: #351A13; border-block: 1px solid rgba(217, 168, 108, .22); }
+.trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
+.trust-band .trust p span { color: #CDB99C; }
