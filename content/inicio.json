@@ -17,15 +17,15 @@
   },
   "casa": {
     "etiqueta": "Cuidar de si",
-    "titulo": "O corpo, o rosto",
-    "titulo_destaque": "e também a alma.",
+    "titulo": "Dores de costas, drenagens linfáticas",
+    "titulo_destaque": "e também relaxamento.",
     "texto": "Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Dores de costas, reforço muscular, reabilitação são abordadas em cada massagem de relaxamento. Mas é com o Pilates clínico e a Osteopatia que reforçamos a sua saúde, para que cada visita seja ao mesmo tempo prazer e tratamento.",
     "imagem": "/img/meditacao-560.webp",
     "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
     "pilares": [
-      { "titulo": "O corpo", "texto": "Fisioterapia, drenagem linfática e Pilates clínico, para recuperar e prevenir.", "botao": "Marcar fisioterapia", "tratamento": "fisio" },
-      { "titulo": "O rosto", "texto": "Tratamentos de rosto pensados para a sua pele, com mãos que conhecem cada gesto.", "botao": "Ver tratamentos", "tratamento": "" },
-      { "titulo": "A alma", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil" }
+      { "titulo": "Dores de costas", "texto": "Fisioterapia, Pilates clínico, para recuperar, reforçar e prevenir.", "botao": "Marcar fisioterapia", "tratamento": "fisio" },
+      { "titulo": "Drenagens", "texto": "Drenagem linfática e outros tratamentos para eliminar líquidos em excesso e activar circulação.", "botao": "Ver tratamentos", "tratamento": "" },
+      { "titulo": "Relaxamento", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil" }
     ],
     "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
   },
