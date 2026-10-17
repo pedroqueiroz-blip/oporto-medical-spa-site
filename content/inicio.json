@@ -1,9 +1,175 @@
 {
-  "seo": {
-    "titulo": "Oporto Medical Spa · Massagem, Fisioterapia e Pilates no Porto",
-    "descricao": "",
-    "titulo_partilha": "Oporto Medical Spa · Aqui o tempo corre devagar",
-    "descricao_partilha": "Massagem, fisioterapia e Pilates clínico no Porto, feitos por fisioterapeutas e terapeutas especializadas."
+  "perguntas": {
+    "etiqueta": "Perguntas frequentes",
+    "titulo": "Antes de vir.",
+    "texto": "Reserve aqui, pelo {telefone} ou por {email}. Recomendamos dois dias de antecedência.",
+    "lista": [
+      {
+        "pergunta": "Onde fica o Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "morada",
+        "acrescento": "[[acrescentar distância medida a um ponto de referência]]"
+      },
+      {
+        "pergunta": "Quanto custa uma massagem no Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "precos_relaxar",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Quanto custa uma sessão de fisioterapia?",
+        "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "precos_fisio",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Quem faz os tratamentos?",
+        "resposta": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Há estacionamento?",
+        "resposta": "[[confirmar: estacionamento próprio, parque próximo ou rua]]",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Falam inglês e espanhol?",
+        "resposta": "[[confirmar idiomas da equipa]]",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Quando devo chegar?",
+        "resposta": "Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "E se não puder vir?",
+        "resposta": "Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Preciso de exame médico?",
+        "resposta": "Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "O que devo trazer?",
+        "resposta": "Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "O que significa medical spa?",
+        "resposta": "Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Posso oferecer uma massagem?",
+        "resposta": "Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.",
+        "automatica": "",
+        "acrescento": ""
+      }
+    ]
+  },
+  "como_chegar": {
+    "etiqueta": "Como chegar",
+    "titulo": "Entre a Boavista",
+    "titulo_destaque": "e a Foz.",
+    "texto": "Estacionamento: [[confirmar]]. De metro ou autocarro: [[confirmar paragem mais próxima]]."
+  },
+  "casa": {
+    "etiqueta": "CUIDAR DE SI",
+    "titulo": "O corpo, o rosto",
+    "titulo_destaque": "e também a alma.",
+    "texto": "Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Dores de costas, reforço muscular, reabilitação são abordadas em cada massagem de relaxamento. Mas é com o Pilates clínico e a Osteopata que reforçamos a sua saúde, para que cada visita seja ao mesmo tempo prazer e tratamento.",
+    "imagem": "/img/meditacao-560.webp",
+    "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
+    "pilares": [
+      {
+        "titulo": "O corpo",
+        "texto": "Fisioterapia, drenagem linfática e Pilates clínico, para recuperar e prevenir.",
+        "botao": "Marcar fisioterapia",
+        "tratamento": "fisio"
+      },
+      {
+        "titulo": "O rosto",
+        "texto": "Tratamentos de rosto pensados para a sua pele, com mãos que conhecem cada gesto.",
+        "botao": "Ver tratamentos",
+        "tratamento": ""
+      },
+      {
+        "titulo": "A alma",
+        "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.",
+        "botao": "Marcar ritual",
+        "tratamento": "oil"
+      }
+    ],
+    "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
+  },
+  "oferecer": {
+    "etiqueta": "Vouchers oferta",
+    "titulo": "Ofereça",
+    "titulo_destaque": "uma pausa.",
+    "texto": "Ofereça saúde, relaxamento e bem-estar. Um valor ou um ritual, em digital no mesmo instante ou numa caixa de linho entregue em casa.",
+    "nota": "Recebeu um voucher? Use o código no último passo da reserva."
+  },
+  "confianca": "Membro da International Medical SPA Association e da Spa Industry Association. Pioneiro em Portugal no conceito de medical spa.",
+  "equipa": {
+    "etiqueta": "Quem cuida de si",
+    "titulo": "Mãos",
+    "titulo_destaque": "que escutam.",
+    "texto": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Escolha com quem quer marcar."
+  },
+  "rituais": {
+    "texto": "Três caminhos, um só compromisso: que saia daqui mais leve do que entrou. Cada sessão começa com uma conversa e um chá.",
+    "escolher_texto": "Se procura sobretudo descanso, escolha uma massagem. Se tem dor ou uma limitação, comece pela fisioterapia. O Pilates clínico mantém o resultado.",
+    "titulo_destaque": "de cuidar de si.",
+    "imagem": "/img/corpo-480.webp",
+    "etiqueta": "Rituais e tratamentos",
+    "escolher_titulo": "Que tratamento",
+    "titulo": "Permita-se ao luxo",
+    "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo",
+    "escolher_destaque": "escolher?"
+  },
+  "visita": {
+    "etiqueta": "A sua visita",
+    "titulo": "Tudo começa",
+    "titulo_destaque": "com um chá.",
+    "texto": "Cada pessoa é recebida individualmente e em total exclusividade. Este é o percurso de uma visita, do primeiro gole ao último suspiro.",
+    "imagem": "/img/ritual-cha-520.webp",
+    "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule",
+    "passos": [
+      {
+        "titulo": "Chá ou infusão",
+        "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera."
+      },
+      {
+        "titulo": "Escuta",
+        "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje."
+      },
+      {
+        "titulo": "O tratamento",
+        "texto": "Luz baixa, mãos especializadas e todo o tempo do mundo."
+      },
+      {
+        "titulo": "Repouso",
+        "texto": "Uns minutos só seus antes de voltar à cidade."
+      }
+    ]
+  },
+  "reservar": {
+    "etiqueta": "Reservar",
+    "titulo": "O seu momento,",
+    "titulo_destaque": "à sua medida.",
+    "texto": "Escolha o ritual, quem o recebe e a hora que lhe faz sentido. Prefere falar connosco? Ligue para o {telefone} ou escreva por WhatsApp."
   },
   "hero": {
     "etiqueta": "Medical spa no Porto · massagem, fisioterapia e Pilates clínico",
@@ -15,89 +181,11 @@
     "imagem": "/img/massagem-pindas-760.webp",
     "imagem_alt": "Terapeuta a massajar as costas de uma cliente com pindas de ervas aquecidas"
   },
-  "casa": {
-    "etiqueta": "A casa",
-    "titulo": "O corpo, o rosto",
-    "titulo_destaque": "e também a alma.",
-    "texto": "Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Fisioterapeutas e terapeutas especializadas trabalham lado a lado, para que cada visita seja ao mesmo tempo prazer e tratamento.",
-    "imagem": "/img/meditacao-560.webp",
-    "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
-    "pilares": [
-      { "titulo": "O corpo", "texto": "Fisioterapia, drenagem linfática e Pilates clínico, para recuperar e prevenir.", "botao": "Marcar fisioterapia", "tratamento": "fisio" },
-      { "titulo": "O rosto", "texto": "Tratamentos de rosto pensados para a sua pele, com mãos que conhecem cada gesto.", "botao": "Ver tratamentos", "tratamento": "" },
-      { "titulo": "A alma", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil" }
-    ],
-    "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
+  "seo": {
+    "titulo": "Oporto Medical Spa · Massagem, Fisioterapia e Pilates no Porto",
+    "descricao": "",
+    "titulo_partilha": "Oporto Medical Spa · Aqui o tempo corre devagar",
+    "descricao_partilha": "Massagem, fisioterapia e Pilates clínico no Porto, feitos por fisioterapeutas e terapeutas especializadas."
   },
-  "rituais": {
-    "etiqueta": "Rituais e tratamentos",
-    "titulo": "Permita-se ao luxo",
-    "titulo_destaque": "de cuidar de si.",
-    "texto": "Três caminhos, um só compromisso: que saia daqui mais leve do que entrou. Cada sessão começa com uma conversa e um chá.",
-    "imagem": "/img/corpo-480.webp",
-    "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo",
-    "escolher_titulo": "Que tratamento",
-    "escolher_destaque": "escolher?",
-    "escolher_texto": "Se procura sobretudo descanso, escolha uma massagem. Se tem dor ou uma limitação, comece pela fisioterapia. O Pilates clínico mantém o resultado."
-  },
-  "visita": {
-    "etiqueta": "A sua visita",
-    "titulo": "Tudo começa",
-    "titulo_destaque": "com um chá.",
-    "texto": "Cada pessoa é recebida individualmente e em total exclusividade. Este é o percurso de uma visita, do primeiro gole ao último suspiro.",
-    "imagem": "/img/ritual-cha-520.webp",
-    "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule",
-    "passos": [
-      { "titulo": "Chá ou infusão", "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera." },
-      { "titulo": "Escuta", "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje." },
-      { "titulo": "O tratamento", "texto": "Luz baixa, mãos especializadas e todo o tempo do mundo." },
-      { "titulo": "Repouso", "texto": "Uns minutos só seus antes de voltar à cidade." }
-    ]
-  },
-  "equipa": {
-    "etiqueta": "Quem cuida de si",
-    "titulo": "Mãos",
-    "titulo_destaque": "que escutam.",
-    "texto": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Escolha com quem quer marcar."
-  },
-  "reservar": {
-    "etiqueta": "Reservar",
-    "titulo": "O seu momento,",
-    "titulo_destaque": "à sua medida.",
-    "texto": "Escolha o ritual, quem o recebe e a hora que lhe faz sentido. Prefere falar connosco? Ligue para o {telefone} ou escreva por WhatsApp."
-  },
-  "oferecer": {
-    "etiqueta": "Vouchers oferta",
-    "titulo": "Ofereça",
-    "titulo_destaque": "uma pausa.",
-    "texto": "Ofereça saúde, relaxamento e bem-estar. Um valor ou um ritual, em digital no mesmo instante ou numa caixa de linho entregue em casa.",
-    "nota": "Recebeu um voucher? Use o código no último passo da reserva."
-  },
-  "confianca": "Membro da International Medical SPA Association e da Spa Industry Association. Pioneiro em Portugal no conceito de medical spa.",
-  "confianca_nota": "Medical Spa significa, antes de mais, o compromisso pelos resultados terapêuticos.",
-  "perguntas": {
-    "etiqueta": "Perguntas frequentes",
-    "titulo": "Antes de vir.",
-    "texto": "Reserve aqui, pelo {telefone} ou por {email}. Recomendamos dois dias de antecedência.",
-    "lista": [
-      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "[[acrescentar distância medida a um ponto de referência]]" },
-      { "pergunta": "Quanto custa uma massagem no Oporto Medical Spa?", "resposta": "", "automatica": "precos_relaxar", "acrescento": "" },
-      { "pergunta": "Quanto custa uma sessão de fisioterapia?", "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_fisio", "acrescento": "" },
-      { "pergunta": "Quem faz os tratamentos?", "resposta": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Há estacionamento?", "resposta": "[[confirmar: estacionamento próprio, parque próximo ou rua]]", "automatica": "", "acrescento": "" },
-      { "pergunta": "Falam inglês e espanhol?", "resposta": "[[confirmar idiomas da equipa]]", "automatica": "", "acrescento": "" },
-      { "pergunta": "Quando devo chegar?", "resposta": "Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.", "automatica": "", "acrescento": "" },
-      { "pergunta": "E se não puder vir?", "resposta": "Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Preciso de exame médico?", "resposta": "Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.", "automatica": "", "acrescento": "" },
-      { "pergunta": "O que devo trazer?", "resposta": "Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.", "automatica": "", "acrescento": "" },
-      { "pergunta": "O que significa medical spa?", "resposta": "Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Posso oferecer uma massagem?", "resposta": "Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.", "automatica": "", "acrescento": "" }
-    ]
-  },
-  "como_chegar": {
-    "etiqueta": "Como chegar",
-    "titulo": "Entre a Boavista",
-    "titulo_destaque": "e a Foz.",
-    "texto": "Estacionamento: [[confirmar]]. De metro ou autocarro: [[confirmar paragem mais próxima]]."
-  }
+  "confianca_nota": "Medical Spa significa, antes de mais, o compromisso pelos resultados terapêuticos."
 }
