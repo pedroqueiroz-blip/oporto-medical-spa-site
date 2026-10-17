@@ -9,7 +9,7 @@
   --flame: #D9A86C;      /* luz de vela, acentos raros */
   --line: rgba(232, 220, 200, .14);
   --display: "EB Garamond", Garamond, Georgia, serif;
-  --body: "DM Sans", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
