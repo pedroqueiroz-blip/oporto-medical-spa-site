@@ -599,3 +599,5 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band .seal { background: var(--night); border: 1px solid var(--flame); color: var(--flame); }
 .trust-band .seal__lotus { color: var(--flame); }
 .trust-band .seal strong { color: #fff; }
+/* Hero: a definição de spa numa linha; por baixo a morada e, à direita, o horário */
+.hero2__grid .hero2__facts > :first-child { flex-basis: 100%; }
