@@ -8,7 +8,7 @@
   if (bookingEl && window.PMS) booking = PMS.mountBooking(bookingEl, { labels: ['Ritual', 'Terapeuta', 'Quando', 'Confirmar'] });
   function goBook(p) {
     if (booking) { booking.preset(p); $('#reservar').scrollIntoView(); }
-    else location.href = 'index.html#reservar';
+    else location.href = '/#reservar';
   }
   var voucherEl = $('#voucher');
   if (voucherEl && window.PMS) {

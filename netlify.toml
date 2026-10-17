@@ -1,2 +1,17 @@
+# O site é gerado a partir de content/ (editado no backoffice em /admin) e public/.
 [build]
-  publish = "."
+  command = "node src/build.mjs"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/massagens-porto.html"
+  to = "/massagens-porto/"
+  status = 301
+
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301

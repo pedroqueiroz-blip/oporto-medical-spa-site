@@ -4,7 +4,8 @@
 (function () {
   'use strict';
 
-  var TREATMENTS = [
+  var DATA = window.OMS_DATA || {};
+  var TREATMENTS = DATA.treatments || [
     { id: 'aroma', area: 'Relaxamento', name: 'Massagem com Aromaterapia', min: 60, price: 65,
       text: 'Óleos escolhidos de acordo com as suas preferências e um toque lento que devolve o corpo ao seu ritmo.' },
     { id: 'oil', area: 'Relaxamento', name: 'Massagem Oil & Candle', min: 60, price: 74,
@@ -19,7 +20,7 @@
       text: 'Sessão individual orientada por fisioterapeuta, para uma coluna forte e um corpo consciente.' }
   ];
 
-  var TEAM = [
+  var TEAM = DATA.team || [
     { id: 'ana', name: 'Ana Ribeiro', role: 'Fisioterapeuta', focus: 'Reeducação postural e Pilates clínico',
       bio: 'Acredita que cada corpo conta uma história. O trabalho dela é ouvi-la antes de a corrigir.',
       does: ['fisio', 'pilates'], tone: 1 },

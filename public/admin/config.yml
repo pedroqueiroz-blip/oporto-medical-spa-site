@@ -1,0 +1,337 @@
+# Backoffice do Oporto Medical Spa (Decap CMS).
+# Cada alteração fica num rascunho com pré-visualização no Netlify; "Publicar" põe-na no site.
+
+backend:
+  name: github
+  repo: pedroqueiroz-blip/oporto-medical-spa-site
+  branch: main
+  base_url: https://api.netlify.com
+  commit_messages:
+    create: 'Backoffice: cria {{collection}} «{{slug}}»'
+    update: 'Backoffice: atualiza {{collection}} «{{slug}}»'
+    delete: 'Backoffice: apaga {{collection}} «{{slug}}»'
+    uploadMedia: 'Backoffice: carrega imagem {{path}}'
+    deleteMedia: 'Backoffice: apaga imagem {{path}}'
+
+# Para testar no computador: npx decap-server e abrir http://localhost:8080/admin/
+local_backend: true
+
+publish_mode: editorial_workflow
+locale: pt
+logo_url: /logo-brown.svg
+
+media_folder: public/img/uploads
+public_folder: /img/uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+
+collections:
+  - name: campanha
+    label: Campanha do mês
+    description: O destaque do mês na página inicial. Muda o título, a fotografia, o preço e as datas. O Google e os assistentes de IA passam a mostrar a campanha nos dados do site.
+    editor: { preview: true }
+    files:
+      - name: campanha
+        label: Campanha do mês
+        file: content/campanha.json
+        fields:
+          - { name: ativa, label: Mostrar a campanha no site, widget: boolean, default: true }
+          - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = já em vigor.' }
+          - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = sem data de fim. Depois desta data a campanha sai do site na publicação seguinte.' }
+          - { name: etiqueta, label: Etiqueta por cima do título, widget: string }
+          - { name: titulo, label: Título, widget: string }
+          - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
+          - { name: assinatura, label: Assinatura por baixo do título, widget: string, required: false }
+          - { name: texto, label: Texto, widget: text, hint: &texto_hint 'Pode usar `*itálico*`, `**negrito**`, `[texto](https://...)` para uma ligação e `[[a confirmar]]` (aparece marcado no site e fica fora do Google). `{telefone}`, `{email}`, `{morada}` e `{horario}` são substituídos pelos contactos.' }
+          - { name: imagem, label: Fotografia, widget: image, required: false, hint: 'Vertical, de preferência com 1000 px de largura ou mais. O site cria as versões leves sozinho.' }
+          - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false, hint: 'O que se vê na foto, numa frase. Serve a quem não vê a imagem e ao Google.' }
+          - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
+          - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Se ficar vazio, o botão leva à agenda. Se escolher um tratamento, o preço e a duração vêm dele quando os campos abaixo estão vazios.' }
+          - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
+          - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
+          - { name: selo, label: Mostrar selo de marca registada, widget: boolean, default: false }
+          - { name: selo_texto, label: Texto do selo, widget: string, required: false }
+          - { name: selo_numero, label: Número do selo, widget: string, required: false }
+          - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
+
+  - name: paginas
+    label: Páginas
+    description: Títulos, textos e fotografias de cada página. Os preços e as perguntas sobre preços atualizam-se sozinhos a partir de «Tratamentos e preços».
+    editor: { preview: false }
+    files:
+      - name: inicio
+        label: Página inicial
+        file: content/inicio.json
+        fields:
+          - label: Google e partilhas
+            name: seo
+            widget: object
+            collapsed: true
+            fields:
+              - { name: titulo, label: Título no Google, widget: string, hint: 'Até cerca de 60 caracteres. Comece pelo que as pessoas procuram.' }
+              - { name: descricao, label: Descrição no Google, widget: text, required: false, hint: 'Deixe vazio para ser escrita sozinha com os preços atuais e a campanha do mês.' }
+              - { name: titulo_partilha, label: Título ao partilhar (WhatsApp, Facebook), widget: string, required: false }
+              - { name: descricao_partilha, label: Descrição ao partilhar, widget: text, required: false }
+          - label: Topo da página
+            name: hero
+            widget: object
+            fields:
+              - { name: etiqueta, label: Etiqueta por cima do título, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
+              - { name: resumo, label: Frase-resumo a negrito, widget: text, hint: 'Diz quem somos, onde e o que fazemos. É a frase que o Google e os assistentes de IA mais citam.' }
+              - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+              - { name: botao, label: Texto do botão, widget: string }
+              - { name: imagem, label: Fotografia, widget: image }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
+          - label: A casa
+            name: casa
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+              - { name: imagem, label: Fotografia, widget: image }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
+              - label: Pilares
+                name: pilares
+                widget: list
+                summary: '{{fields.titulo}}'
+                fields:
+                  - { name: titulo, label: Título, widget: string }
+                  - { name: texto, label: Texto, widget: text }
+                  - { name: botao, label: Texto do botão, widget: string }
+                  - { name: tratamento, label: O botão abre a agenda neste tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Vazio = leva à lista de tratamentos.' }
+              - { name: citacao, label: Citação, widget: text, required: false }
+          - label: Rituais e tratamentos
+            name: rituais
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+              - { name: imagem, label: Fotografia lateral, widget: image }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
+              - { name: escolher_titulo, label: 'Título de «Que tratamento escolher?»', widget: string }
+              - { name: escolher_destaque, label: Final em itálico, widget: string, required: false }
+              - { name: escolher_texto, label: Texto, widget: text }
+          - label: A sua visita
+            name: visita
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text }
+              - { name: imagem, label: Fotografia, widget: image }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
+              - label: Passos
+                name: passos
+                widget: list
+                summary: '{{fields.titulo}}'
+                fields:
+                  - { name: titulo, label: Título, widget: string }
+                  - { name: texto, label: Texto, widget: text }
+          - label: Equipa (introdução)
+            name: equipa
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text }
+          - label: Reservar (introdução)
+            name: reservar
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+          - label: Vouchers (introdução)
+            name: oferecer
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text }
+              - { name: nota, label: Nota por baixo, widget: string, required: false }
+          - { name: confianca, label: Afiliações (texto), widget: text }
+          - { name: confianca_nota, label: Afiliações (nota final), widget: string, required: false }
+          - label: Perguntas frequentes
+            name: perguntas
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+              - &perguntas
+                label: Perguntas
+                name: lista
+                widget: list
+                summary: '{{fields.pergunta}}'
+                hint: 'Entram no Google como perguntas frequentes (FAQ). Uma resposta com `[[a confirmar]]` aparece no site mas fica fora do Google.'
+                fields:
+                  - { name: pergunta, label: Pergunta, widget: string }
+                  - { name: pergunta_seo, label: Pergunta para o Google (opcional), widget: string, required: false, hint: 'Versão mais completa, ex.: «... no Porto, no Oporto Medical Spa?»' }
+                  - { name: automatica, label: Resposta automática, widget: select, required: false, default: '', options: [{ label: 'Não, escrevo a resposta', value: '' }, { label: 'Morada e horário', value: morada }, { label: 'Preços das massagens', value: precos_relaxar }, { label: 'Intervalo de preços das massagens', value: intervalo_relaxar }, { label: 'Preços de fisioterapia e Pilates', value: precos_fisio }], hint: 'As respostas automáticas acompanham os preços e os contactos.' }
+                  - { name: resposta, label: Resposta, widget: text, required: false, hint: *texto_hint }
+                  - { name: acrescento, label: Acrescento à resposta, widget: text, required: false }
+          - label: Como chegar
+            name: como_chegar
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Estacionamento e transportes, widget: text, required: false, hint: *texto_hint }
+
+      - name: massagens
+        label: Massagens no Porto
+        file: content/massagens.json
+        fields:
+          - label: Google e partilhas
+            name: seo
+            widget: object
+            collapsed: true
+            fields:
+              - { name: titulo, label: Título no Google, widget: string }
+              - { name: descricao, label: Descrição no Google, widget: text, required: false, hint: 'Deixe vazio para ser escrita sozinha com os preços atuais.' }
+              - { name: titulo_partilha, label: Título ao partilhar, widget: string, required: false }
+          - label: Topo da página
+            name: hero
+            widget: object
+            hint: 'A frase a negrito com as massagens e os preços escreve-se sozinha.'
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text }
+              - { name: botao, label: Texto do botão, widget: string }
+          - { name: citacao, label: Citação, widget: text, required: false, hint: *texto_hint }
+          - { name: escolher_titulo, label: Título da tabela, widget: string }
+          - { name: escolher_destaque, label: Final em itálico, widget: string, required: false }
+          - { name: nota_fisio, label: Nota por baixo da tabela, widget: text, required: false, hint: 'Use `{preco:fisio}` e `{duracao:fisio}` para o preço e a duração atuais de um tratamento (o código do tratamento vem depois dos dois pontos).' }
+          - label: Perguntas
+            name: perguntas
+            widget: object
+            collapsed: true
+            fields:
+              - { name: etiqueta, label: Etiqueta, widget: string }
+              - { name: titulo, label: Título, widget: string }
+              - *perguntas
+          - { name: onde_titulo, label: Título de «Onde estamos», widget: string }
+          - { name: onde_destaque, label: Final em itálico, widget: string, required: false }
+          - { name: onde_texto, label: Texto, widget: text, required: false, hint: *texto_hint }
+
+  - name: catalogo
+    label: Tratamentos e preços
+    description: A ordem da lista é a ordem no site. Os preços e durações atualizam a página inicial, a página de massagens, a agenda, os vouchers, as perguntas sobre preços e os dados para o Google.
+    editor: { preview: false }
+    files:
+      - name: tratamentos
+        label: Tratamentos e preços
+        file: content/tratamentos.json
+        fields:
+          - label: Tratamentos
+            name: lista
+            widget: list
+            summary: '{{fields.nome}} · {{fields.duracao}} min · {{fields.preco}} €'
+            fields:
+              - { name: nome, label: Nome curto, widget: string, hint: 'Ex.: Oil & Candle' }
+              - { name: nome_completo, label: Nome completo, widget: string, hint: 'Ex.: Massagem Oil & Candle. Usado na agenda, nos vouchers e no Google.' }
+              - { name: artigo, label: Artigo, widget: select, options: [{ label: a, value: a }, { label: o, value: o }], default: a, hint: '«a Drenagem», «o Pilates». Usado nas frases automáticas.' }
+              - { name: id, label: Código, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas, números e hífenes'], hint: 'Curto e sem acentos, ex.: drenagem. Não mude depois de publicado: a agenda e a equipa usam-no.' }
+              - { name: grupo, label: Grupo, widget: select, options: [Relaxar, Recuperar, Fortalecer], hint: 'Os de «Relaxar» também aparecem na página de massagens.' }
+              - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0 }
+              - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0 }
+              - { name: texto, label: Descrição no site, widget: text }
+              - { name: texto_massagens, label: Descrição na página de massagens, widget: text, required: false, hint: 'Vazio = a mesma descrição.' }
+              - { name: indicado_para, label: Indicado para, widget: string }
+              - { name: como_e, label: Como é, widget: string }
+              - { name: pressao, label: Pressão (massagens), widget: string, required: false }
+              - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, hint: 'Ex.: Massagem de relaxamento, Fisioterapia' }
+              - { name: descricao_seo, label: Descrição curta (Google), widget: string }
+              - { name: visivel, label: Mostrar no site, widget: boolean, default: true }
+
+  - name: pessoas
+    label: Equipa
+    description: Quem aparece na secção «Quem cuida de si» e na agenda.
+    editor: { preview: false }
+    files:
+      - name: equipa
+        label: Equipa
+        file: content/equipa.json
+        fields:
+          - label: Pessoas
+            name: lista
+            widget: list
+            summary: '{{fields.nome}} · {{fields.funcao}}'
+            fields:
+              - { name: nome, label: Nome, widget: string }
+              - { name: id, label: Código, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas, números e hífenes'], hint: 'O primeiro nome sem acentos, ex.: ines.' }
+              - { name: funcao, label: Função, widget: string }
+              - { name: foco, label: Especialidade, widget: string }
+              - { name: bio, label: Apresentação curta (agenda), widget: text }
+              - { name: credencial, label: Linha da credencial, widget: string, required: false, hint: 'Ex.: Cédula OF n.º 12345' }
+              - { name: cedula, label: N.º da cédula profissional (Google), widget: string, required: false }
+              - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5).' }
+              - { name: faz, label: Tratamentos que faz, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], multiple: true }
+              - { name: conhece, label: Áreas de conhecimento (Google), widget: list, required: false, field: { name: area, label: Área, widget: string } }
+              - { name: confirmado, label: Dados confirmados, widget: boolean, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }
+
+  - name: geral
+    label: Contactos, horário e Google
+    description: Nome, morada, telefone e horário (NAP). Mudam em todas as páginas, no rodapé, nos dados para o Google e no resumo para assistentes de IA.
+    editor: { preview: false }
+    files:
+      - name: definicoes
+        label: Contactos, horário e Google
+        file: content/definicoes.json
+        fields:
+          - { name: indexar, label: Site visível no Google, widget: boolean, default: false, hint: 'Ligar só no lançamento. Enquanto estiver desligado, o Google não indexa o site.' }
+          - { name: nome, label: Nome, widget: string }
+          - { name: url, label: Endereço do site, widget: string }
+          - { name: descricao_negocio, label: Descrição do negócio (Google e IA), widget: text }
+          - { name: rua, label: Rua, widget: string }
+          - { name: codigo_postal, label: Código postal, widget: string }
+          - { name: localidade, label: Localidade, widget: string }
+          - { name: regiao, label: Distrito, widget: string }
+          - { name: pais, label: País (código), widget: string, default: PT }
+          - { name: zona, label: Zona, widget: string, required: false, hint: 'Ex.: entre a Boavista e a Foz' }
+          - { name: latitude, label: Latitude, widget: string, required: false, hint: 'Copiar do pin do Google Business Profile.' }
+          - { name: longitude, label: Longitude, widget: string, required: false }
+          - { name: telefone, label: Telefone, widget: string }
+          - { name: telemovel, label: Telemóvel, widget: string, required: false }
+          - { name: whatsapp, label: WhatsApp, widget: string }
+          - { name: email, label: Email, widget: string }
+          - label: Horário
+            name: horario
+            widget: object
+            fields:
+              - { name: semana_abre, label: Segunda a sexta abre, widget: string, pattern: ['^\d\d:\d\d$', 'Formato 09:00'] }
+              - { name: semana_fecha, label: Segunda a sexta fecha, widget: string, pattern: ['^\d\d:\d\d$', 'Formato 20:00'] }
+              - { name: sabado_aberto, label: Abre ao sábado, widget: boolean, default: true }
+              - { name: sabado_abre, label: Sábado abre, widget: string, required: false }
+              - { name: sabado_fecha, label: Sábado fecha, widget: string, required: false }
+          - { name: areas_servidas, label: Zonas servidas, widget: list, field: { name: zona, label: Zona, widget: string } }
+          - { name: comodidades, label: Comodidades, widget: list, field: { name: item, label: Comodidade, widget: string } }
+          - { name: conhecimentos, label: Especialidades (Google), widget: list, field: { name: item, label: Especialidade, widget: string } }
+          - { name: afiliacoes, label: Associações de que é membro, widget: list, field: { name: item, label: Associação, widget: string } }
+          - { name: redes, label: Perfis (Google Business, Instagram, Facebook), widget: list, required: false, field: { name: url, label: Endereço, widget: string }, hint: 'Ligam o site aos perfis oficiais no Google.' }
+          - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
+          - { name: registo_ers, label: N.º de registo ERS, widget: string, required: false }
+          - { name: frase_rodape, label: Frase do rodapé, widget: string, required: false }
