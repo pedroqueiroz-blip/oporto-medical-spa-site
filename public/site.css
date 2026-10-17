@@ -614,3 +614,6 @@ blockquote.d, .trust p { font-style: italic; }
   .hero2__grid .hero2__cta { order: 4; margin-bottom: 0; }
   .hero2__grid .hero2__facts { order: 5; margin-top: 32px; }
 }
+/* Jost: letras pequenas do topo e de "A casa" com mais 1 ponto */
+.hero2__facts { font-size: 14px; }
+.pillars p { font-size: 15px; }
