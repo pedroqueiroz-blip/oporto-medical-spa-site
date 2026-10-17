@@ -595,9 +595,7 @@ blockquote.d, .trust p { font-style: italic; }
 .trust-band { background: var(--cacao); border-block: 1px solid rgba(217, 168, 108, .22); }
 .trust-band + .section { padding-top: clamp(35px, 5vw, 70px) !important; }
 .trust-band .trust p span { color: #CDB99C; }
-/* Selos como carimbo: fundo castanho da faixa, contornos, linhas e letras a preto */
-.trust-band .seal, .trust-band .seal strong, .trust-band .seal__lotus { color: var(--night); }
-.trust-band .seal { background: transparent; border: 2px solid var(--night); font-weight: 600; }
-.trust-band .seal strong { font-weight: 500; }
-.trust-band .seal::before { border: 1px solid var(--night); }
-.trust-band .seal__lotus { stroke-width: 1.6; }
+/* Selos: interior preto, contorno igual ao dos botões, linhas e letras na cor do texto dos botões */
+.trust-band .seal { background: var(--night); border: 1px solid rgba(232, 220, 200, .35); }
+.trust-band .seal, .trust-band .seal strong, .trust-band .seal__lotus { color: var(--linen); }
+.trust-band .seal::before { border-color: var(--linen); }
