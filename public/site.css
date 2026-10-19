@@ -617,3 +617,22 @@ blockquote.d, .trust p { font-style: italic; }
 /* Letras pequenas do topo e de "A casa" com mais 1 ponto */
 .hero2__facts { font-size: 14px; }
 .pillars p { font-size: 15px; }
+/* Cuidar de si: texto à esquerda, três quadrados com fotografia à direita; cada um leva ao tratamento na lista */
+.house3 { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
+.house3 .house2__quote { margin-top: 36px; }
+.pillars--cards { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.pillars--cards li, .pillars--cards li + li { padding: 0; border: 0; background: none; cursor: auto; }
+.pillars--cards li:hover { background: none; }
+.pillars--cards .pillar { align-self: stretch; margin: 0; display: flex; flex-direction: column; gap: 10px; height: 100%; padding: 14px 14px 20px; border: 1px solid var(--line); border-radius: 4px; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; text-decoration: none; transition: background .2s, border-color .2s; }
+.pillars--cards .pillar:hover, .pillars--cards .pillar:focus-visible { color: inherit; background: var(--cacao); border-color: rgba(217, 168, 108, .5); outline: none; }
+.pillar__img { display: block; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 2px; margin-bottom: 8px; }
+.pillar__img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+.pillar:hover .pillar__img img { transform: scale(1.04); }
+.pillar h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 26px; }
+.pillar p { margin: 0; font-size: 15px; color: var(--oat); flex: 1; }
+.pillar__cta { align-self: flex-start; margin-top: 8px; border-bottom: 1px solid var(--flame); padding-bottom: 3px; font: 500 11px var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--linen); }
+.pillar:hover .pillar__cta { color: var(--flame); }
+.ritual { scroll-margin-top: 110px; }
+.ritual:target { background: rgba(217, 168, 108, .08); box-shadow: inset 2px 0 0 var(--flame); }
+@media (max-width: 1100px) { .house3 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .pillars--cards { grid-template-columns: 1fr; } .pillar__img { aspect-ratio: 16 / 9; } }
