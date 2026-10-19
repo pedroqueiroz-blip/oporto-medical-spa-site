@@ -95,8 +95,6 @@ collections:
               - { name: titulo, label: Título, widget: string }
               - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
               - { name: texto, label: Texto, widget: text, hint: *texto_hint }
-              - { name: imagem, label: Fotografia, widget: image }
-              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
               - label: Pilares
                 name: pilares
                 widget: list
@@ -105,7 +103,9 @@ collections:
                   - { name: titulo, label: Título, widget: string }
                   - { name: texto, label: Texto, widget: text }
                   - { name: botao, label: Texto do botão, widget: string }
-                  - { name: tratamento, label: O botão abre a agenda neste tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Vazio = leva à lista de tratamentos.' }
+                  - { name: tratamento, label: Ao carregar no quadrado vai para este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Leva à zona deste tratamento em «Rituais e tratamentos». Vazio = início da lista.' }
+                  - { name: imagem, label: Fotografia pequena, widget: image, required: false, hint: 'Aparece em cima do quadrado, recortada em quadrado.' }
+                  - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false }
               - { name: citacao, label: Citação, widget: text, required: false }
           - label: Rituais e tratamentos
             name: rituais

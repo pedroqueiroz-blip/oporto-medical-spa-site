@@ -74,13 +74,13 @@ export function home(m) {
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
   const rituals = m.groups.map((g, gi) => `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
-        ${m.inGroup(g).map((x) => `<article class="ritual">
+        ${m.inGroup(g).map((x) => `<article class="ritual" id="t-${esc(x.id)}">
           <h3>${x.grupo === 'Relaxar' ? '<a href="/massagens-porto/">' + esc(x.nome) + '</a>' : esc(x.nome)}</h3>
           <p>${t.inline(x.texto)}</p>
           <p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button>
         </article>`).join('\n        ')}`).join('\n        ');
-  const pillars = (I.casa.pilares || []).map((p, i) => `<li tabindex="0" aria-selected="false"><span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p>${p.tratamento ? `<button type="button" data-book="${esc(p.tratamento)}">${esc(p.botao)} <span aria-hidden="true">→</span></button>` : `<a href="#rituais">${esc(p.botao)} <span aria-hidden="true">→</span></a>`}</li>`).join('\n          ');
+  const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, 16vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 
   const body = `${header(m, { home: true, current: '/' })}
@@ -118,19 +118,16 @@ export function home(m) {
   </section>
 
   <section class="section">
-    <div class="wrap house2">
-      <figure class="house2__fig">
-        <div class="house2__arch">${picture(I.casa.imagem, { widths: [560, 1040], sizes: '(max-width: 860px) 86vw, 36vw', alt: I.casa.imagem_alt })}</div>
-      </figure>
-      <div class="house2__text">
+    <div class="wrap house3">
+      <div class="house3__text">
         <p class="kicker">${esc(I.casa.etiqueta)}</p>
         <h2 class="d" style="font-size:clamp(40px,5vw,76px)">${title(I.casa.titulo, I.casa.titulo_destaque)}</h2>
         <p class="house2__lead">${t.inline(I.casa.texto)}</p>
-        <ol class="pillars" data-select>
-          ${pillars}
-        </ol>
         ${I.casa.citacao ? '<blockquote class="d house2__quote">' + t.inline(I.casa.citacao) + '</blockquote>' : ''}
       </div>
+      <ol class="pillars pillars--cards">
+          ${pillars}
+      </ol>
     </div>
   </section>
 
