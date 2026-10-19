@@ -55,6 +55,27 @@ collections:
           - { name: selo_texto, label: Texto do selo, widget: string, required: false }
           - { name: selo_numero, label: Número do selo, widget: string, required: false }
           - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
+          - { name: destaque_tratamento, label: Tratamento com o selo «Em campanha», widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Aparece um pequeno botão dourado «Em campanha» ao lado do nome, em «Rituais e tratamentos». Ao carregar, desce até às campanhas e abre todas as ativas. Vazio = sem selo.' }
+          - label: Mais campanhas do mês
+            name: extras
+            widget: list
+            required: false
+            summary: '{{fields.titulo}} {{fields.titulo_destaque}}'
+            hint: 'Ficam escondidas por baixo da campanha principal. Se alguma estiver ativa, aparece o botão «Ver + campanhas do mês».'
+            fields:
+              - { name: ativa, label: Mostrar esta campanha, widget: boolean, default: false }
+              - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
+              - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
+              - { name: etiqueta, label: Etiqueta por cima do título, widget: string, required: false }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, required: false, hint: *texto_hint }
+              - { name: imagem, label: Fotografia, widget: image, required: false }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false }
+              - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
+              - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false }
+              - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
+              - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
 
   - name: paginas
     label: Páginas
@@ -331,7 +352,21 @@ collections:
           - { name: comodidades, label: Comodidades, widget: list, field: { name: item, label: Comodidade, widget: string } }
           - { name: conhecimentos, label: Especialidades (Google), widget: list, field: { name: item, label: Especialidade, widget: string } }
           - { name: afiliacoes, label: Associações de que é membro, widget: list, field: { name: item, label: Associação, widget: string } }
+          - { name: instagram, label: Instagram (ligação no topo do site), widget: string, required: false, hint: 'Endereço completo, ex.: https://www.instagram.com/oportomedicalspa/. Vazio = sem ícone.' }
           - { name: redes, label: Perfis (Google Business, Instagram, Facebook), widget: list, required: false, field: { name: url, label: Endereço, widget: string }, hint: 'Ligam o site aos perfis oficiais no Google.' }
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: registo_ers, label: N.º de registo ERS, widget: string, required: false }
+          - label: Newsletter
+            name: newsletter
+            widget: object
+            collapsed: true
+            hint: 'Zona de subscrição por cima do rodapé, em todas as páginas. Os emails ficam no Netlify, em Forms › newsletter.'
+            fields:
+              - { name: mostrar, label: Mostrar a newsletter, widget: boolean, default: true }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, required: false }
+              - { name: botao, label: Texto do botão, widget: string }
+              - { name: consentimento, label: Frase da caixa de consentimento, widget: string }
+              - { name: obrigado, label: Mensagem depois de subscrever, widget: string }
           - { name: frase_rodape, label: Frase do rodapé, widget: string, required: false }

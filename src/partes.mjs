@@ -4,6 +4,8 @@ import { esc, telHref, waHref } from './lib.mjs';
 export const WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.2c.2-.6.2-1.1.1-1.2l-.5-.3Z"/></svg>';
 const PIN_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
 
+const IG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>';
+
 export const tel = (t) => String(t).replace(/^\+351\s*/, '');
 
 export function maps(m) {
@@ -34,7 +36,8 @@ export function header(m, { home, current }) {
     </nav>
     <a class="mark mark--word" href="${home ? '#inicio' : '/'}" aria-label="${esc(m.s.nome)}, início"><img src="/wordmark.svg" alt="${esc(m.s.nome)}" width="90" height="100"${home ? ' fetchpriority="high"' : ''}></a>
     <div class="top__end">
-      <span class="lang"><a href="${esc(current)}" hreflang="pt-PT" aria-current="page">PT</a> · <span class="soon" title="Versão inglesa por traduzir" hreflang="en">EN</span> · <span class="soon" title="Versão espanhola por traduzir" hreflang="es">ES</span></span>
+      <span class="lang"><a href="${esc(current)}" hreflang="pt-PT" aria-current="page">PT</a> · <span class="soon" title="Versão inglesa por traduzir" hreflang="en">EN</span></span>
+      ${m.s.instagram ? `<a class="top__ig" href="${esc(m.s.instagram)}" target="_blank" rel="noopener" aria-label="${esc(m.s.nome)} no Instagram">${IG_ICON}</a>` : ''}
       <a class="btn btn--ghost btn--wa" href="${waHref(m.s.whatsapp)}" target="_blank" rel="noopener" aria-label="Falar connosco por WhatsApp">${WA_ICON}WhatsApp</a>
       <a class="btn btn--primary" href="${b}#reservar">Reservar</a>
     </div>
@@ -46,7 +49,21 @@ export function footer(m, { home }) {
   const s = m.s, h = s.horario || {};
   const hh = (x) => x.replace(/^0/, '').replace(':00', 'h').replace(':', 'h');
   const year = new Date().getFullYear();
-  return `<footer class="foot">
+  const n = s.newsletter;
+  const news = n && n.mostrar ? `<section class="news" id="newsletter" aria-labelledby="news-t">
+    <div class="wrap news__grid">
+      <div><p class="kicker">Newsletter</p><h2 class="d" id="news-t">${title(n.titulo, n.titulo_destaque)}</h2>${n.texto ? '<p class="news__text">' + esc(n.texto) + '</p>' : ''}</div>
+      <form class="news__form" name="newsletter" method="POST" action="/?newsletter=ok#newsletter" data-netlify="true" netlify-honeypot="empresa">
+        <input type="hidden" name="form-name" value="newsletter">
+        <p hidden><label>Não preencher <input name="empresa"></label></p>
+        <div class="news__row"><label class="sr-only" for="news-email">Email</label><input id="news-email" type="email" name="email" placeholder="O seu email" autocomplete="email" required><button type="submit" class="btn btn--primary">${esc(n.botao || 'Subscrever')}</button></div>
+        <label class="news__ok"><input type="checkbox" name="consentimento" value="sim" required> <span>${esc(n.consentimento)}</span></label>
+        <p class="news__thanks" role="status" hidden>${esc(n.obrigado)}</p>
+      </form>
+    </div>
+  </section>
+` : '';
+  return `${news}<footer class="foot">
   <div class="wrap">
     <div class="foot__grid">
       <div><a class="mark" href="${home ? '#inicio' : '/'}"><img src="/logo-beige.svg" alt="${esc(s.nome)}" width="54" height="100" style="height:100px" loading="lazy"></a>${s.frase_rodape ? '<p style="margin-top:20px;max-width:30ch">' + esc(s.frase_rodape) + '</p>' : ''}</div>

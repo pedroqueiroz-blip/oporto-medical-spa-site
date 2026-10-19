@@ -636,3 +636,40 @@ blockquote.d, .trust p { font-style: italic; }
 .ritual:target { background: rgba(217, 168, 108, .08); box-shadow: inset 2px 0 0 var(--flame); }
 @media (max-width: 1100px) { .house3 { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .pillars--cards { grid-template-columns: 1fr; } .pillar__img { aspect-ratio: 16 / 9; } }
+
+/* Cuidar de si: título a toda a largura; citação separada por uma linha do texto e dos quadrados */
+.house3 { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; row-gap: 40px; }
+.house3__head { grid-column: 1 / -1; }
+.house3__head h2 { margin: 0; max-width: none; text-wrap: wrap; }
+.house3__lead { margin: 0; align-self: center; }
+.house3 .house3__quote { grid-column: 1 / -1; margin: 0; max-width: none; padding: 40px 0 0; border-left: 0; border-top: 1px solid var(--line); text-align: center; }
+@media (max-width: 1100px) { .house3 { grid-template-columns: 1fr; } }
+
+/* Instagram no topo */
+.top__ig { display: inline-flex; color: var(--oat); }
+.top__ig svg { width: 20px; height: 20px; }
+.top__ig:hover { color: var(--flame); }
+
+/* Selo "Em campanha" na lista de rituais */
+.camp-badge { display: table; margin-top: 10px; padding: 4px 9px 3px; border-radius: 2px; background: var(--flame); color: var(--night); font: 600 10px var(--body); letter-spacing: .2em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
+.ritual h3 a.camp-badge:hover { color: var(--night); background: var(--linen); }
+
+/* Campanhas extra do mês */
+.camp-more-btn { margin-top: 48px; text-align: center; }
+.camp-extra { margin-top: 64px; padding-top: 64px; border-top: 1px solid var(--line); }
+.camp-extra .sig-title { font-size: clamp(34px, 4vw, 56px); }
+
+/* Newsletter */
+.news { padding-block: clamp(56px, 8vw, 96px); border-top: 1px solid var(--line); background: var(--cacao); }
+.news__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 64px; align-items: center; }
+.news h2 { margin: 0; font-size: clamp(32px, 3.6vw, 50px); }
+.news__text { margin: 16px 0 0; color: var(--oat); max-width: 46ch; }
+.news__form { display: grid; gap: 14px; }
+.news__row { display: flex; gap: 10px; }
+.news__row input { flex: 1; min-width: 0; min-height: 48px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px; background: var(--night); color: var(--linen); font: inherit; }
+.news__row input:focus { outline: none; border-color: var(--flame); }
+.news__ok { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--oat); }
+.news__ok input { margin-top: 3px; accent-color: var(--flame); }
+.news__thanks { margin: 0; font-family: var(--display); font-size: 24px; color: var(--flame); }
+@media (max-width: 860px) { .news__grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .news__row { flex-direction: column; } }

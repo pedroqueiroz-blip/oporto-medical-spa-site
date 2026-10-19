@@ -44,6 +44,21 @@
     });
   });
 
+  // Selo "Em campanha": desce até às campanhas e abre as campanhas extra
+  document.querySelectorAll('[data-open-campaigns]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var btn = document.querySelector('[data-toggle="campanhas-mais"]');
+      if (btn && btn.getAttribute('aria-expanded') !== 'true') btn.click();
+    });
+  });
+  if (location.hash === '#campanha') { var cb = document.querySelector('[data-toggle="campanhas-mais"]'); if (cb) cb.click(); }
+
+  // Newsletter: mensagem de agradecimento depois de subscrever
+  if (/[?&]newsletter=ok/.test(location.search)) {
+    var thanks = document.querySelector('.news__thanks'), row = document.querySelector('.news__row');
+    if (thanks) { thanks.hidden = false; if (row) row.hidden = true; var ok = document.querySelector('.news__ok'); if (ok) ok.hidden = true; }
+  }
+
   // Brilho de vela que segue o cursor
   var hero = $('#hero'), glow = $('#glow');
   if (hero && glow && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

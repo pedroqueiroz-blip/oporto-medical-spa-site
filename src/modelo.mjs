@@ -116,12 +116,22 @@ export function loadModel(today = new Date()) {
     duracao: camp.duracao || (campTreatment && campTreatment.duracao) || null
   } : null;
 
+  /* Campanhas extra: aparecem por baixo da principal, escondidas atrás do botão "Ver + campanhas do mês" */
+  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
+  const withTreatment = (c) => {
+    const tr = c.tratamento ? byId(c.tratamento) : null;
+    return { ...c, preco: c.preco || (tr && tr.preco) || null, duracao: c.duracao || (tr && tr.duracao) || null };
+  };
+  const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
+  /* Tratamento da lista com o selo "Em campanha" (só com alguma campanha no site) */
+  const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
+
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, inicio, massagens, campaign, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
 }
