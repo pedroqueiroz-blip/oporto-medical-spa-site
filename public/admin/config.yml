@@ -63,7 +63,7 @@ collections:
             summary: '{{fields.titulo}} {{fields.titulo_destaque}}'
             hint: 'Ficam escondidas por baixo da campanha principal. Se alguma estiver ativa, aparece o botão «Ver + campanhas do mês».'
             fields:
-              - { name: ativa, label: Mostrar esta campanha, widget: boolean, default: false }
+              - { name: ativa, label: Mostrar esta campanha, widget: boolean, default: false, required: false }
               - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
               - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
               - { name: etiqueta, label: Etiqueta por cima do título, widget: string, required: false }
@@ -362,7 +362,7 @@ collections:
             collapsed: true
             hint: 'Zona de subscrição por cima do rodapé, em todas as páginas. Os emails ficam no Netlify, em Forms › newsletter.'
             fields:
-              - { name: mostrar, label: Mostrar a newsletter, widget: boolean, default: true }
+              - { name: mostrar, label: Mostrar a newsletter, widget: boolean, default: true, required: false }
               - { name: titulo, label: Título, widget: string }
               - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
               - { name: texto, label: Texto, widget: text, required: false }
