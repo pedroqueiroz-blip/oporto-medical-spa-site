@@ -25,7 +25,7 @@
     "pilares": [
       { "titulo": "Cuidar", "texto": "Dores de costas, contraturas, corrigir postura, reforço muscular.", "botao": "Fisioterapia", "tratamento": "fisio", "imagem": "/img/massagem-pindas-760.webp", "imagem_alt": "Terapeuta a massajar as costas de uma cliente" },
       { "titulo": "Tratar", "texto": "Retenção líquidos, edema, celulite.", "botao": "Ver tratamentos", "tratamento": "dren", "imagem": "/img/corpo-728.webp", "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo" },
-      { "titulo": "Relaxar", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil", "imagem": "/img/meditacao-1040.webp", "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada" }
+      { "titulo": "Relaxar", "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.", "botao": "Marcar ritual", "tratamento": "oil", "imagem": "/img/ritual-cha-960.webp", "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule" }
     ],
     "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
   },
@@ -41,12 +41,12 @@
     "escolher_texto": "Se procura sobretudo descanso, escolha uma massagem. Se tem dor ou uma limitação, comece pela fisioterapia. O Pilates clínico mantém o resultado."
   },
   "visita": {
-    "etiqueta": "A sua visita",
-    "titulo": "Tudo começa",
-    "titulo_destaque": "com um chá.",
-    "texto": "Cada pessoa é recebida individualmente e em total exclusividade. Este é o percurso de uma visita, do primeiro gole ao último suspiro.",
-    "imagem": "/img/ritual-cha-520.webp",
-    "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule",
+    "etiqueta": "A Melhor Massagem do Mundo",
+    "titulo": "Exclusivo,",
+    "titulo_destaque": "Oporto Medical Spa.",
+    "texto": "Cada detalhe foi pensado para lhe proporcionar a melhor das experiências sensoriais. Se houvesse uma só massagem seria esta a mais exclusiva, do início até ao último suspiro.",
+    "imagem": "/img/meditacao-560.webp",
+    "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
     "passos": [
       { "titulo": "Chá ou infusão", "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera." },
       { "titulo": "Escuta", "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje." },
