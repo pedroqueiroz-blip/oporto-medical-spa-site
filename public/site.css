@@ -703,3 +703,5 @@ blockquote.d, .trust p { font-style: italic; }
 /* Preço em campanha, com o preço normal riscado por baixo */
 .price-camp { vertical-align: top; display: inline-flex; flex-direction: column; align-items: flex-end; font-weight: inherit; color: var(--flame); line-height: 1.2; }
 .price-camp s { font-size: 13px; color: var(--oat); text-decoration-thickness: 1px; }
+.price-d { display: inline-flex; flex-direction: column; line-height: 1.1; }
+.price-d s { margin-top: 4px; font-family: var(--body); font-size: 15px; color: var(--oat); text-decoration-thickness: 1px; }

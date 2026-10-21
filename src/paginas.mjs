@@ -49,7 +49,7 @@ function campaignBlock(m, c, extra) {
         ${c.selo ? `<p class="sig-seal"><span class="sig-seal__r" aria-hidden="true">®</span><span>${esc(c.selo_texto)}<br><b>${esc(c.selo_numero)}</b></span></p>` : ''}
         ${items.length ? '<ul>\n          ' + items.join('\n          ') + '\n        </ul>' : ''}
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px">
-          <span class="price-d">${c.preco ? esc(eur(c.preco)) : '<mark class="tbc">preço a confirmar</mark>'}</span>
+          <span class="price-d">${c.preco ? esc(eur(c.preco)) + (c.preco_antigo ? '<s><span class="sr-only">Preço normal </span>' + esc(eur(c.preco_antigo)) + '</s>' : '') : '<mark class="tbc">preço a confirmar</mark>'}</span>
           ${book}
           <a href="#oferecer" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">Oferecer</a>
         </div>

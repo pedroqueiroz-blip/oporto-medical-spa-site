@@ -112,18 +112,18 @@ export function loadModel(today = new Date()) {
   const day = today.toISOString().slice(0, 10);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
   const campTreatment = camp.tratamento ? byId(camp.tratamento) : null;
-  const campaign = campaignOn ? {
-    ...camp,
-    preco: camp.preco || (campTreatment && campTreatment.preco) || null,
-    duracao: camp.duracao || (campTreatment && campTreatment.duracao) || null
-  } : null;
+
 
   /* Campanhas extra: aparecem por baixo da principal, escondidas atrás do botão "Ver + campanhas do mês" */
   const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
   const withTreatment = (c) => {
     const tr = c.tratamento ? byId(c.tratamento) : null;
-    return { ...c, preco: c.preco || (tr && tr.preco) || null, duracao: c.duracao || (tr && tr.duracao) || null };
+    const preco = c.preco || (tr && tr.preco) || null;
+    /* Preço antigo riscado: o do campo próprio ou, se a campanha tiver preço, o do tratamento */
+    const antigo = Number(c.preco_antigo) || (c.preco && tr ? tr.preco : null);
+    return { ...c, preco, preco_antigo: antigo && antigo !== preco ? antigo : null, duracao: c.duracao || (tr && tr.duracao) || null };
   };
+  const campaign = campaignOn ? withTreatment(camp) : null;
   const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
   /* Tratamento da lista com o selo "Em campanha" (só com alguma campanha no site) */
   const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;

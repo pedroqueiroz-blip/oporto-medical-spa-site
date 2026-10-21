@@ -50,7 +50,8 @@ collections:
           - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
           - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Se ficar vazio, o botão leva à agenda. Se escolher um tratamento, o preço e a duração vêm dele quando os campos abaixo estão vazios.' }
           - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
-          - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
+          - { name: preco, label: Preço de campanha (€), widget: number, value_type: float, min: 0, required: false }
+          - { name: preco_antigo, label: Preço antigo riscado (€), widget: number, value_type: float, min: 0, required: false, hint: 'Aparece riscado por baixo do preço de campanha. Vazio = usa o preço normal do tratamento escolhido, quando o preço de campanha é diferente.' }
           - { name: selo, label: Mostrar selo de marca registada, widget: boolean, default: false }
           - { name: selo_texto, label: Texto do selo, widget: string, required: false }
           - { name: selo_numero, label: Número do selo, widget: string, required: false }
@@ -76,7 +77,8 @@ collections:
               - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
               - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false }
               - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
-              - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
+              - { name: preco, label: Preço de campanha (€), widget: number, value_type: float, min: 0, required: false }
+              - { name: preco_antigo, label: Preço antigo riscado (€), widget: number, value_type: float, min: 0, required: false, hint: 'Aparece riscado por baixo do preço de campanha. Vazio = usa o preço normal do tratamento escolhido, quando o preço de campanha é diferente.' }
 
   - name: paginas
     label: Páginas
