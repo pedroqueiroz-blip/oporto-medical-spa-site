@@ -705,3 +705,31 @@ blockquote.d, .trust p { font-style: italic; }
 .price-camp s { font-size: 13px; color: var(--oat); text-decoration-thickness: 1px; }
 .price-d { display: inline-flex; flex-direction: column; line-height: 1.1; }
 .price-d s { margin-top: 4px; font-family: var(--body); font-size: 15px; color: var(--oat); text-decoration-thickness: 1px; }
+
+/* Reservar: escolha do tratamento compacta, só nome, duração e preço */
+.bk-options--list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 8px; }
+.bk-option--row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; }
+.bk-option--row .bk-option__title { font-size: 19px; }
+.bk-option--row .bk-option__meta { flex: none; gap: 14px; padding: 0; border: 0; white-space: nowrap; }
+.bk-group + .bk-group { margin-top: 22px; }
+
+/* Reservar no telemóvel: cada área é uma lista suspensa */
+button.bk-group__t { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; border: 0; background: none; text-align: left; font: inherit; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--flame); cursor: default; pointer-events: none; }
+.bk-group__n { display: none; }
+@media (max-width: 640px) {
+  button.bk-group__t { pointer-events: auto; cursor: pointer; margin: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 4px; background: var(--cacao); font-size: 12px; color: var(--linen); }
+  button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1px solid var(--flame); border-bottom: 1px solid var(--flame); transform: rotate(45deg) translateY(-3px); transition: transform .2s; }
+  .bk-group.is-open button.bk-group__t { border-color: var(--flame); }
+  .bk-group.is-open button.bk-group__t::after { transform: rotate(-135deg) translateY(-3px); }
+  .bk-group__n { display: inline; font-size: 11px; letter-spacing: .1em; color: var(--oat); }
+  .bk-group:not(.is-open) .bk-options { display: none; }
+  .bk-group.is-open .bk-options { margin-top: 8px; }
+  .bk-group + .bk-group { margin-top: 10px; }
+}
+
+/* Reservar: tratamento em campanha */
+.bk-camp { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 3px 7px 2px; border-radius: 2px; background: var(--flame); color: var(--night); font: 600 9px var(--body); letter-spacing: .18em; text-transform: uppercase; }
+.bk-option__price.is-camp { display: inline-flex; flex-direction: column; align-items: flex-end; line-height: 1.2; color: var(--flame); }
+.bk-option__price s { font-size: 12px; color: var(--oat); }
+.bk-option--row .bk-option__meta { align-items: center; }
+@media (max-width: 640px) { .bk-camp { display: table; margin: 6px 0 0; } }

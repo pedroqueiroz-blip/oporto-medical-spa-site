@@ -44,7 +44,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function eur(n) { return n.toLocaleString('pt-PT') + ' €'; }
+  function eur(n) { return n.toLocaleString('pt-PT', n % 1 ? { minimumFractionDigits: 2 } : {}) + ' €'; }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
   function initials(name) { return name.split(' ').map(function (p) { return p[0]; }).join(''); }
   function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1000003; return h; }
@@ -94,13 +94,16 @@
     function panelTreatment() {
       var areas = [];
       TREATMENTS.forEach(function (t) { if (areas.indexOf(t.area) < 0) areas.push(t.area); });
-      return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a) {
-        return '<div class="bk-group"><p class="bk-group__t">' + esc(a) + '</p><div class="bk-options">' +
+      var cur = s.treatment && byId(TREATMENTS, s.treatment);
+      return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a, i) {
+        // No telemóvel cada área abre como lista suspensa; no computador estão todas abertas
+        var open = !!(s.openAreas && s.openAreas[a]) || !!(cur && cur.area === a);
+        return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span></button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
-            return '<button type="button" class="bk-option" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
-              '<span class="bk-option__title">' + esc(t.name) + '</span>' +
-              '<span class="bk-option__text">' + esc(t.text) + '</span>' +
-              '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price">' + eur(t.price) + '</span></span></button>';
+            return '<button type="button" class="bk-option bk-option--row" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
+              '<span class="bk-option__title">' + esc(t.name) + (t.camp ? ' <span class="bk-camp">Em campanha</span>' : '') + '</span>' +
+              '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price' + (t.camp ? ' is-camp' : '') + '">' + eur(t.price) +
+              (t.oldPrice ? '<s><span class="sr-only">Preço normal </span>' + eur(t.oldPrice) + '</s>' : '') + '</span></span></button>';
           }).join('') + '</div></div>';
       }).join('') + '</div>';
     }
@@ -190,6 +193,11 @@
 
     root.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.hasAttribute('data-area')) {
+        var g = b.parentNode, on = !g.classList.contains('is-open');
+        g.classList.toggle('is-open', on); b.setAttribute('aria-expanded', on);
+        s.openAreas = s.openAreas || {}; s.openAreas[b.getAttribute('data-area')] = on; return;
+      }
       if (b.hasAttribute('data-go')) { s.step = +b.getAttribute('data-go'); render(); return; }
       if (b.hasAttribute('data-treat')) {
         s.treatment = b.getAttribute('data-treat');
