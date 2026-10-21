@@ -102,7 +102,7 @@ export function home(m) {
         </div>
         <button type="button" class="more-btn rituals__btn" aria-expanded="false" aria-controls="${id}" data-toggle="${id}" data-open-label="Ver menos">${esc(I.rituais.botao_todos || 'Descubra todos')}</button>` : ''}`;
   }).join('\n        ');
-  const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, 16vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
+  const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, (max-width: 1100px) 44vw, 22vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 
   const body = `${header(m, { home: true, current: '/' })}
@@ -144,8 +144,8 @@ export function home(m) {
       <div class="house3__head">
         <p class="kicker">${esc(I.casa.etiqueta)}</p>
         <h2 class="d" style="font-size:clamp(40px,5vw,76px)">${title(I.casa.titulo, I.casa.titulo_destaque)}</h2>
+        <p class="house2__lead house3__lead">${t.inline(I.casa.texto)}</p>
       </div>
-      <p class="house2__lead house3__lead">${t.inline(I.casa.texto)}</p>
       <ol class="pillars pillars--cards">
           ${pillars}
       </ol>

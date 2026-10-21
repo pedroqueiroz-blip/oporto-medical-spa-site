@@ -676,3 +676,11 @@ blockquote.d, .trust p { font-style: italic; }
 
 /* Rituais e tratamentos: botão «Descubra todos» em cada área */
 .rituals__btn { margin: 22px 0 0; }
+
+/* Cuidar de si: título e texto a toda a largura, quatro áreas por baixo e a citação no fim */
+.house3 { grid-template-columns: minmax(0, 1fr); }
+.house3 .house3__lead { margin: 28px 0 0; max-width: none; }
+.house3 .pillars--cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.house3 .pillar__img { aspect-ratio: 4 / 3; }
+@media (max-width: 1100px) { .house3 .pillars--cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .house3 .pillars--cards { grid-template-columns: 1fr; } .house3 .pillar__img { aspect-ratio: 16 / 9; } }
