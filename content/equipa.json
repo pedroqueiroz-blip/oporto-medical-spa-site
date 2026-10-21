@@ -9,8 +9,8 @@
     { "id": "ines", "nome": "Inês Carvalho", "funcao": "Massoterapeuta", "foco": "Rituais de tranquilidade",
       "bio": "Desenha cada ritual à medida de quem chega. Ninguém sai igual a como entrou.",
       "credencial": "Formação [[confirmar]]", "cedula": "", "foto": "", "faz": ["aroma", "oil", "world"], "conhece": ["Massagem de relaxamento"], "confirmado": false },
-    { "id": "sofia", "nome": "Sofia Lemos", "funcao": "Massoterapeuta", "foco": "World Therapy e aromaterapia",
+    { "id": "sofia", "nome": "Sofia Lemos", "funcao": "Massoterapeuta", "foco": "A Melhor Massagem do Mundo e aromaterapia",
       "bio": "Formada em técnicas orientais e ocidentais. Trabalha com calma e com intenção.",
-      "credencial": "Formação [[confirmar]]", "cedula": "", "foto": "", "faz": ["aroma", "world", "oil"], "conhece": ["World Therapy", "Aromaterapia"], "confirmado": false }
+      "credencial": "Formação [[confirmar]]", "cedula": "", "foto": "", "faz": ["aroma", "world", "oil"], "conhece": ["A Melhor Massagem do Mundo", "Aromaterapia"], "confirmado": false }
   ]
 }
