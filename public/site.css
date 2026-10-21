@@ -699,3 +699,7 @@ blockquote.d, .trust p { font-style: italic; }
 .camp-dot.is-on::before { background: var(--flame); border-color: var(--flame); box-shadow: 0 0 10px 2px rgba(217, 168, 108, .55); }
 .camp-dot:focus-visible { outline: 1px solid var(--flame); outline-offset: 2px; border-radius: 50%; }
 @media (prefers-reduced-motion: reduce) { .camp-carousel.is-js .camp-slide { transition: none; } }
+
+/* Preço em campanha, com o preço normal riscado por baixo */
+.price-camp { vertical-align: top; display: inline-flex; flex-direction: column; align-items: flex-end; font-weight: inherit; color: var(--flame); line-height: 1.2; }
+.price-camp s { font-size: 13px; color: var(--oat); text-decoration-thickness: 1px; }

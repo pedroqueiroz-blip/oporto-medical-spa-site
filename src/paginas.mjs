@@ -92,7 +92,7 @@ export function home(m) {
   const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
           <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha">Em campanha</a>' : ''}</h3>
           <p>${t.inline(x.texto)}</p>
-          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p>
+          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${x.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== x.preco ? '<b class="price-camp">' + eur(m.campaignPrice) + '<s><span class="sr-only">Preço normal </span>' + eur(x.preco) + '</s></b>' : eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button>
         </article>`;
   /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */

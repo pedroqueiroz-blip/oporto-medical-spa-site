@@ -127,13 +127,14 @@ export function loadModel(today = new Date()) {
   const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
   /* Tratamento da lista com o selo "Em campanha" (só com alguma campanha no site) */
   const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
+  const campaignPrice = campaignTreatment && Number(camp.destaque_preco) > 0 ? Number(camp.destaque_preco) : null;
 
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
 }
