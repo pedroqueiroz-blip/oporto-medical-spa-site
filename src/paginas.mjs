@@ -85,13 +85,23 @@ export function home(m) {
   const faqItems = m.faq(I.perguntas.lista);
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
-  const rituals = m.groups.map((g, gi) => `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
-        ${m.inGroup(g).map((x) => `<article class="ritual" id="t-${esc(x.id)}">
+  const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
           <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha" data-open-campaigns>Em campanha</a>' : ''}</h3>
           <p>${t.inline(x.texto)}</p>
           <p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button>
-        </article>`).join('\n        ')}`).join('\n        ');
+        </article>`;
+  /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */
+  const rituals = m.groups.map((g, gi) => {
+    const all = m.inGroup(g), n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
+    const shown = all.slice(0, n), rest = all.slice(n), id = 'mais-' + gi;
+    return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
+        ${shown.map(ritual).join('\n        ')}${rest.length ? `
+        <div class="rituals__more" id="${id}" hidden>
+        ${rest.map(ritual).join('\n        ')}
+        </div>
+        <button type="button" class="more-btn rituals__btn" aria-expanded="false" aria-controls="${id}" data-toggle="${id}" data-open-label="Ver menos">${esc(I.rituais.botao_todos || 'Descubra todos')}</button>` : ''}`;
+  }).join('\n        ');
   const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, 16vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 

@@ -44,6 +44,15 @@
     });
   });
 
+  // Ligação para um tratamento escondido em «Descubra todos»: abre a área primeiro
+  function openFor(hash) {
+    var el = hash && hash.length > 1 && document.getElementById(hash.slice(1));
+    var box = el && el.closest('.rituals__more');
+    if (box && box.hidden) { var b = document.querySelector('[data-toggle="' + box.id + '"]'); if (b) b.click(); }
+  }
+  openFor(location.hash);
+  window.addEventListener('hashchange', function () { openFor(location.hash); });
+
   // Selo "Em campanha": desce até às campanhas e abre as campanhas extra
   document.querySelectorAll('[data-open-campaigns]').forEach(function (a) {
     a.addEventListener('click', function () {
