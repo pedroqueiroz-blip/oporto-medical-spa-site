@@ -57,18 +57,22 @@ function campaignBlock(m, c, extra) {
     </div>`;
 }
 
-/* Ritual do mês: a campanha principal e, escondidas atrás do botão, as campanhas extra ativas */
+/* Ritual do mês: com mais de uma campanha ativa, rodam a cada 3 segundos, com pontos por baixo */
 function campaignSection(m) {
   const list = [m.campaign, ...(m.extraCampaigns || [])].filter(Boolean);
   if (!list.length) return '';
-  const [first, ...rest] = list;
-  const more = rest.length ? `
-    <div class="wrap camp-more-btn"><button type="button" class="more-btn" aria-expanded="false" aria-controls="campanhas-mais" data-toggle="campanhas-mais" data-open-label="Ver menos campanhas">Ver + campanhas do mês</button></div>
-    <div class="camp-more" id="campanhas-mais" hidden>
-    ${rest.map((c) => campaignBlock(m, c, true)).join('\n    ')}
-    </div>` : '';
-  return `<section class="section month2" id="campanha">
-    ${campaignBlock(m, first, false)}${more}
+  if (list.length === 1) return `<section class="section month2" id="campanha">
+    ${campaignBlock(m, list[0], false)}
+  </section>`;
+  const slides = list.map((c, i) => `<div class="camp-slide${i ? '' : ' is-on'}" id="camp-${i + 1}" role="group" aria-roledescription="campanha" aria-label="${i + 1} de ${list.length}">
+    ${campaignBlock(m, c, i > 0)}
+    </div>`).join('\n    ');
+  const dots = list.map((c, i) => `<button type="button" class="camp-dot${i ? '' : ' is-on'}" data-slide="${i}" aria-controls="camp-${i + 1}" aria-label="Campanha ${i + 1} de ${list.length}: ${esc([c.titulo, c.titulo_destaque].filter(Boolean).join(' '))}"${i ? '' : ' aria-current="true"'}></button>`).join('');
+  return `<section class="section month2 camp-carousel" id="campanha" aria-roledescription="carrossel" aria-label="Campanhas do mês" data-carousel>
+    <div class="camp-track">
+    ${slides}
+    </div>
+    <div class="wrap camp-dots"><span class="camp-count" aria-live="polite">1 de ${list.length}</span><span class="camp-dots__row">${dots}</span></div>
   </section>`;
 }
 
@@ -86,7 +90,7 @@ export function home(m) {
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
   const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
-          <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha" data-open-campaigns>Em campanha</a>' : ''}</h3>
+          <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha">Em campanha</a>' : ''}</h3>
           <p>${t.inline(x.texto)}</p>
           <p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button>

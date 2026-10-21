@@ -684,3 +684,18 @@ blockquote.d, .trust p { font-style: italic; }
 .house3 .pillar__img { aspect-ratio: 4 / 3; }
 @media (max-width: 1100px) { .house3 .pillars--cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .house3 .pillars--cards { grid-template-columns: 1fr; } .house3 .pillar__img { aspect-ratio: 16 / 9; } }
+
+/* Campanhas do mês em carrossel: as campanhas sobrepõem-se e a visível aparece por cima */
+.camp-carousel.is-js .camp-track { display: grid; }
+.camp-carousel.is-js .camp-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .6s, visibility 0s .6s; }
+.camp-carousel.is-js .camp-slide.is-on { opacity: 1; visibility: visible; transition: opacity .6s; }
+.camp-carousel.is-js .camp-extra { margin-top: 0; padding-top: 0; border-top: 0; }
+.camp-carousel:not(.is-js) .camp-dots { display: none; }
+.camp-dots { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 40px; }
+.camp-count { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--oat); }
+.camp-dots__row { display: flex; gap: 4px; }
+.camp-dot { width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.camp-dot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--oat); transition: background .3s, border-color .3s, box-shadow .3s; }
+.camp-dot.is-on::before { background: var(--flame); border-color: var(--flame); box-shadow: 0 0 10px 2px rgba(217, 168, 108, .55); }
+.camp-dot:focus-visible { outline: 1px solid var(--flame); outline-offset: 2px; border-radius: 50%; }
+@media (prefers-reduced-motion: reduce) { .camp-carousel.is-js .camp-slide { transition: none; } }

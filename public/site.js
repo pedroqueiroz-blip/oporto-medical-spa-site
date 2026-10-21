@@ -53,14 +53,26 @@
   openFor(location.hash);
   window.addEventListener('hashchange', function () { openFor(location.hash); });
 
-  // Selo "Em campanha": desce até às campanhas e abre as campanhas extra
-  document.querySelectorAll('[data-open-campaigns]').forEach(function (a) {
-    a.addEventListener('click', function () {
-      var btn = document.querySelector('[data-toggle="campanhas-mais"]');
-      if (btn && btn.getAttribute('aria-expanded') !== 'true') btn.click();
-    });
+  // Campanhas do mês: rodam a cada 3 segundos; param com o rato por cima, com o foco ou com «reduzir movimento»
+  document.querySelectorAll('[data-carousel]').forEach(function (box) {
+    var slides = box.querySelectorAll('.camp-slide'), dots = box.querySelectorAll('.camp-dot'), count = box.querySelector('.camp-count');
+    var cur = 0, timer = null, paused = false, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.classList.add('is-js');
+    function show(i) {
+      cur = (i + slides.length) % slides.length;
+      slides.forEach(function (s, k) { s.classList.toggle('is-on', k === cur); s.setAttribute('aria-hidden', k === cur ? 'false' : 'true'); s.inert = k !== cur; });
+      dots.forEach(function (d, k) { d.classList.toggle('is-on', k === cur); if (k === cur) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+      if (count) count.textContent = (cur + 1) + ' de ' + slides.length;
+    }
+    function start() { stop(); if (!still && !paused) timer = setInterval(function () { show(cur + 1); }, 3000); }
+    function stop() { if (timer) clearInterval(timer); timer = null; }
+    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.getAttribute('data-slide')); start(); }); });
+    box.addEventListener('mouseenter', function () { paused = true; stop(); });
+    box.addEventListener('mouseleave', function () { paused = false; start(); });
+    box.addEventListener('focusin', function () { paused = true; stop(); });
+    box.addEventListener('focusout', function () { paused = false; start(); });
+    show(0); start();
   });
-  if (location.hash === '#campanha') { var cb = document.querySelector('[data-toggle="campanhas-mais"]'); if (cb) cb.click(); }
 
   // Newsletter: mensagem de agradecimento depois de subscrever
   if (/[?&]newsletter=ok/.test(location.search)) {
