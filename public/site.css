@@ -286,7 +286,7 @@ body { margin: 0; }
 @media (max-width: 900px) { .hero2__grid { grid-template-columns: 1fr; } .frame { display: none; } }
 
 .marquee { overflow: hidden; border-block: 1px solid var(--line); padding: 20px 0; background: #120D09; }
-.marquee__track { display: flex; width: max-content; gap: 48px; font-family: var(--display); font-size: 28px; color: rgba(232, 220, 200, .55); white-space: nowrap; animation: slide 60s linear infinite; }
+.marquee__track { display: flex; width: max-content; gap: 48px; font-family: var(--display); font-size: 28px; color: rgba(232, 220, 200, .55); white-space: nowrap; animation: slide 130s linear infinite; }
 .marquee__track i { color: var(--flame); font-style: normal; }
 @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
