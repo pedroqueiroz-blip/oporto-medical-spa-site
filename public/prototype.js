@@ -101,8 +101,9 @@
         return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span></button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
             return '<button type="button" class="bk-option bk-option--row" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
-              '<span class="bk-option__title">' + esc(t.name) + '</span>' +
-              '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price">' + eur(t.price) + '</span></span></button>';
+              '<span class="bk-option__title">' + esc(t.name) + (t.camp ? ' <span class="bk-camp">Em campanha</span>' : '') + '</span>' +
+              '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price' + (t.camp ? ' is-camp' : '') + '">' + eur(t.price) +
+              (t.oldPrice ? '<s><span class="sr-only">Preço normal </span>' + eur(t.oldPrice) + '</s>' : '') + '</span></span></button>';
           }).join('') + '</div></div>';
       }).join('') + '</div>';
     }
