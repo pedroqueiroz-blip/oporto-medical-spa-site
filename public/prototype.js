@@ -96,7 +96,7 @@
       TREATMENTS.forEach(function (t) { if (areas.indexOf(t.area) < 0) areas.push(t.area); });
       var cur = s.treatment && byId(TREATMENTS, s.treatment);
       return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a, i) {
-        // No telemóvel cada área abre como lista suspensa; no computador estão todas abertas
+        // Cada área abre como lista suspensa (fica aberta a do tratamento escolhido)
         var open = !!(s.openAreas && s.openAreas[a]) || !!(cur && cur.area === a);
         return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span></button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
