@@ -44,7 +44,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function eur(n) { return n.toLocaleString('pt-PT') + ' €'; }
+  function eur(n) { return n.toLocaleString('pt-PT', n % 1 ? { minimumFractionDigits: 2 } : {}) + ' €'; }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
   function initials(name) { return name.split(' ').map(function (p) { return p[0]; }).join(''); }
   function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1000003; return h; }
@@ -95,11 +95,10 @@
       var areas = [];
       TREATMENTS.forEach(function (t) { if (areas.indexOf(t.area) < 0) areas.push(t.area); });
       return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a) {
-        return '<div class="bk-group"><p class="bk-group__t">' + esc(a) + '</p><div class="bk-options">' +
+        return '<div class="bk-group"><p class="bk-group__t">' + esc(a) + '</p><div class="bk-options bk-options--list">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
-            return '<button type="button" class="bk-option" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
+            return '<button type="button" class="bk-option bk-option--row" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
               '<span class="bk-option__title">' + esc(t.name) + '</span>' +
-              '<span class="bk-option__text">' + esc(t.text) + '</span>' +
               '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price">' + eur(t.price) + '</span></span></button>';
           }).join('') + '</div></div>';
       }).join('') + '</div>';
