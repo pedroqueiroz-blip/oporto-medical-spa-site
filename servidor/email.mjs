@@ -59,7 +59,8 @@ export const emailVoucher = (p) => enviar({
 <p>Obrigado, ${esc(p.cliente.nome.split(" ")[0])}. Este é o voucher para oferecer${p.voucher.para ? ` a ${esc(p.voucher.para)}` : ""}:</p>
 <div style="border:1px solid #D9A86C;padding:22px;text-align:center;margin:16px 0;background:#0D0A08;color:#E8DCC8">
 <p style="margin:0 0 6px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#B5A288">Voucher oferta</p>
-<p style="font-family:'EB Garamond',Georgia,serif;font-size:24px;margin:0 0 12px">${esc(p.tratamento.nome)}</p>
+<p style="font-family:'EB Garamond',Georgia,serif;font-size:24px;margin:0 0 4px">${esc(p.tratamento.nome)}</p>
+<p style="font-size:13px;color:#B5A288;margin:0 0 12px">${esc(p.tratamento.duracao)} minutos${p.campanha ? ` · ${esc(p.campanha.nome)}` : ""}</p>
 ${p.voucher.mensagem ? `<p style="font-style:italic;margin:0 0 12px">“${esc(p.voucher.mensagem)}”</p>` : ""}
 ${p.voucher.para || p.voucher.de ? `<p style="font-size:13px;color:#B5A288;margin:0 0 14px">${p.voucher.para ? `Para ${esc(p.voucher.para)}` : ""}${p.voucher.para && p.voucher.de ? " · " : ""}${p.voucher.de ? `De ${esc(p.voucher.de)}` : ""}</p>` : ""}
 <p style="font-size:26px;letter-spacing:.12em;margin:0;color:#D9A86C"><b>${esc(p.voucher.codigo)}</b></p>
@@ -84,7 +85,7 @@ export const emailInterno = (p, problema) => enviar({
   para: process.env.EMAIL_RESERVAS || spa.email,
   assunto: `${problema ? "Atenção · " : ""}${p.tipo === "voucher" ? "Voucher" : "Marcação"} ${p.numero} · ${p.tratamento.nome}${p.marcacao ? ` · ${p.marcacao.data} ${p.marcacao.hora}` : ""}`,
   html: moldura(`${problema ? `<p style="color:#a33"><b>${esc(problema)}</b></p>` : ""}${linhas([
-    ["Pedido", esc(p.numero)], ["Tratamento", `${esc(p.tratamento.nome)} (${esc(p.tratamento.artigo)})`],
+    ["Pedido", esc(p.numero)], ["Tratamento", `${esc(p.tratamento.nome)} (${esc(p.tratamento.artigo)})`], ...(p.campanha ? [["Campanha", `${esc(p.campanha.nome)} · ${esc(p.tratamento.duracao)} min`]] : []),
     p.marcacao && ["Dia e hora", `${esc(dataPT(p.marcacao.data, { semana: true }))}, ${esc(p.marcacao.hora)}`],
     p.marcacao?.terapeuta && ["Terapeuta", esc(p.marcacao.terapeuta)],
     p.voucher?.codigo && ["Voucher", `${esc(p.voucher.codigo)} · válido até ${esc(dataPT(p.voucher.validade))}`],

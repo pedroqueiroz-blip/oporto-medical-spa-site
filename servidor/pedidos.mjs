@@ -2,7 +2,7 @@
 // (OMS-AAMMDD-XXXX), que é também o identificador do pagamento na euPago.
 import crypto from "node:crypto";
 import { store, STORES } from "./store.mjs";
-import { tratamento as lerTratamento } from "./catalogo.mjs";
+import { tratamento as lerTratamento, campanha as lerCampanha } from "./catalogo.mjs";
 import { lerCodigo } from "./codigos.mjs";
 import { hojeISO } from "./datas.mjs";
 
@@ -20,14 +20,37 @@ export async function gravar(p) {
   await (await store(STORES.pedidos)).setJSON(p.numero, p);
 }
 
-// Valor a pagar, calculado no servidor: preço do site, menos o código (VIP, newsletter ou voucher).
-export async function calcular({ tipo, tratamento: id, codigo }) {
+// Vouchers de campanha vendidos (para o limite, ex.: 25 na Black Week)
+const chaveVendidos = (id) => `campanha-${id}`;
+export async function vendidos(id) {
+  return Number((await (await store(STORES.pedidos)).get(chaveVendidos(id), { type: "json" }))?.vendidos || 0);
+}
+export async function contarVenda(id) {
+  const s = await store(STORES.pedidos);
+  await s.setJSON(chaveVendidos(id), { vendidos: (await vendidos(id)) + 1, atualizado: new Date().toISOString() });
+}
+
+// Campanha de vouchers em vigor hoje e com vouchers disponíveis
+async function campanhaValida(id, tipo, tratamentoId) {
+  const c = lerCampanha(id);
+  const hoje = hojeISO();
+  if (!c || (c.inicio && hoje < c.inicio) || (c.fim && hoje > c.fim)) throw new ErroCliente("Esta campanha já não está em vigor.");
+  if (tipo !== "voucher") throw new ErroCliente("O preço desta campanha é só para vouchers.");
+  if (c.tratamento !== tratamentoId) throw new ErroCliente("Pedido inválido.");
+  if (c.limite && (await vendidos(c.id)) >= c.limite) throw new ErroCliente("Os vouchers desta campanha esgotaram.");
+  return c;
+}
+
+// Valor a pagar, calculado no servidor: preço do site (ou da campanha), menos o código (VIP, newsletter ou voucher).
+export async function calcular({ tipo, tratamento: id, codigo, campanha: campanhaId }) {
   if (!["marcacao", "voucher"].includes(tipo)) throw new ErroCliente("Pedido inválido.");
   const t = lerTratamento(id);
   if (!t) throw new ErroCliente("Escolha um tratamento.");
-  const base = r2(t.preco);
-  const out = { tratamento: t, precoBase: base, desconto: 0, total: base, codigo: null };
+  const camp = campanhaId ? await campanhaValida(campanhaId, tipo, t.id) : null;
+  const base = r2(camp ? camp.preco : t.preco);
+  const out = { tratamento: t, campanha: camp, precoBase: base, desconto: 0, total: base, codigo: null };
   if (!String(codigo || "").trim()) return out;
+  if (camp) throw new ErroCliente("Os vouchers de campanha não acumulam com outras campanhas ou descontos.");
   const c = await lerCodigo(codigo);
   if (c?.erro) throw new ErroCliente(c.erro);
   if (c.tipo === "vip") {
@@ -55,7 +78,7 @@ const nifValido = (n) => /^\d{9}$/.test(n) && (() => {
 // Cria o pedido a partir do que vem do site (ainda sem pagamento).
 export async function criar(corpo) {
   const tipo = corpo.tipo;
-  const conta = await calcular({ tipo, tratamento: corpo.tratamento, codigo: corpo.codigo });
+  const conta = await calcular({ tipo, tratamento: corpo.tratamento, codigo: corpo.codigo, campanha: corpo.campanha });
   const cliente = { nome: limpar(corpo.nome, 80), email: limpar(corpo.email, 120).toLowerCase(), telefone: limpar(corpo.telefone, 30), nif: limpar(corpo.nif, 12).replace(/\D/g, "") };
   if (!cliente.nome) throw new ErroCliente("Indique o seu nome.");
   if (!emailValido(cliente.email)) throw new ErroCliente("Indique um email válido.");
@@ -66,7 +89,8 @@ export async function criar(corpo) {
     numero: `OMS-${hojeISO().slice(2).replace(/-/g, "")}-${crypto.randomBytes(3).toString("hex").slice(0, 4).toUpperCase()}`,
     token: crypto.randomBytes(12).toString("hex"),
     tipo, criado: new Date().toISOString(), estado: "novo",
-    tratamento: { id: t.id, nome: t.nome, grupo: t.grupo, artigo: t.artigo, duracao: t.duracao },
+    tratamento: { id: t.id, nome: t.nome, grupo: t.grupo, artigo: t.artigo, duracao: conta.campanha?.duracao || t.duracao },
+    campanha: conta.campanha ? { id: conta.campanha.id, nome: conta.campanha.nome, precoNormal: conta.campanha.preco_antigo || null } : null,
     precoBase: conta.precoBase, desconto: conta.desconto, total: conta.total, codigo: conta.codigo,
     cliente,
   };

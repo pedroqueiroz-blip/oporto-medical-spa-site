@@ -1,6 +1,6 @@
 // Do pedido ao pagamento, e do pagamento à fatura e aos emails.
 import * as E from "./eupago.mjs";
-import { gravar, obter, ErroCliente, NUMERO } from "./pedidos.mjs";
+import { gravar, obter, contarVenda, ErroCliente, NUMERO } from "./pedidos.mjs";
 import { gastarCodigo, criarVoucher } from "./codigos.mjs";
 import { validadeVoucher } from "./datas.mjs";
 import { emitirFatura } from "./moloni.mjs";
@@ -74,7 +74,7 @@ export async function concluir(p, por) {
   if (p.codigo) await gastarCodigo(p.codigo.codigo, p.numero);
   if (p.tipo === "voucher" && !p.voucher.codigo) {
     p.voucher.validade = validadeVoucher();
-    p.voucher.codigo = await criarVoucher({ tratamento: p.tratamento.id, nomeTratamento: p.tratamento.nome, validade: p.voucher.validade, pedido: p.numero, para: p.voucher.para, de: p.voucher.de });
+    p.voucher.codigo = await criarVoucher({ tratamento: p.tratamento.id, nomeTratamento: p.tratamento.nome, validade: p.voucher.validade, pedido: p.numero, para: p.voucher.para, de: p.voucher.de });    if (p.campanha) await contarVenda(p.campanha.id);
   }
   await gravar(p);
   if (p.total > 0) await emitirFatura(p, { guardar: gravar });

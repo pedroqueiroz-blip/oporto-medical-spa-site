@@ -43,6 +43,14 @@ Os pedidos e os códigos ficam no Netlify Blobs. Teste completo com serviços si
 
 O código `VIP` funciona para quem o souber: se for preciso mudá-lo, define-se outro em `CODIGO_VIP` no Netlify.
 
+## Campanhas de vouchers (Black Week, Natal…)
+
+- No backoffice, a campanha com «Campanha de vouchers» ligada vende vouchers do tratamento escolhido ao preço de campanha,
+  com a duração da campanha, só entre as datas de início e fim (dia de Lisboa, confirmado no servidor no momento da compra).
+- Não acumula com códigos (newsletter, VIP, vouchers). O preço normal da marcação não muda.
+- «Limite de vouchers»: contados quando o pagamento é confirmado; depois do limite, o site responde que esgotaram.
+- A fatura sai pelo valor de campanha, no artigo do tratamento (TPREV/TREAB).
+
 ## Vouchers
 
 - Sempre de um tratamento (sem valor livre), só digitais.

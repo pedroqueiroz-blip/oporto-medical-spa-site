@@ -1,0 +1,30 @@
+{
+  "ativa": true,
+  "assinatura": "",
+  "imagem": "",
+  "imagem_alt": "",
+  "inclui": [],
+  "selo": false,
+  "selo_texto": "",
+  "selo_numero": "",
+  "selo_em_campanha": false,
+  "so_vouchers": true,
+  "inicio": "2026-11-01",
+  "fim": "2026-12-31",
+  "etiqueta": "Campanha de Natal",
+  "titulo": "Neste Natal, ofereça",
+  "titulo_destaque": "momentos que cuidam",
+  "botao": "Descubra os vouchers de Natal",
+  "condicoes": [
+    "Vouchers à venda em novembro e dezembro de 2026.",
+    "Não acumulável com outras campanhas ou descontos."
+  ],
+  "tipo_servico": "Massagem de relaxamento",
+  "limite_vouchers": 0,
+  "ordem": 2,
+  "texto": "**Massagem Manual com Aromaterapia.** Óleos essenciais e movimentos suaves para libertar tensões e recuperar a serenidade.",
+  "tratamento": "aroma",
+  "duracao": 45,
+  "preco": 45,
+  "preco_antigo": 65
+}
