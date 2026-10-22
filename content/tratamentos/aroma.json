@@ -1,0 +1,18 @@
+{
+  "ordem": 20,
+  "id": "aroma",
+  "nome": "Aromaterapia",
+  "nome_completo": "Massagem com Aromaterapia",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Óleos escolhidos de acordo com as suas preferências e um toque lento que devolve o corpo ao seu ritmo.",
+  "texto_massagens": "Óleos essenciais escolhidos consigo e um toque lento que devolve o corpo ao seu ritmo. A melhor escolha para uma primeira visita.",
+  "descricao_seo": "Massagem manual com óleos essenciais escolhidos com o cliente.",
+  "indicado_para": "Stress, cansaço, relaxamento",
+  "como_e": "Massagem suave com óleos essenciais",
+  "pressao": "Suave",
+  "duracao": 60,
+  "preco": 65,
+  "visivel": true,
+  "artigo": "a"
+}

@@ -1,0 +1,20 @@
+{
+  "ordem": 30,
+  "id": "ines",
+  "nome": "Inês Carvalho",
+  "funcao": "Massoterapeuta",
+  "foco": "Rituais de tranquilidade",
+  "bio": "Desenha cada ritual à medida de quem chega. Ninguém sai igual a como entrou.",
+  "credencial": "Formação [[confirmar]]",
+  "cedula": "",
+  "foto": "",
+  "faz": [
+    "aroma",
+    "oil",
+    "world"
+  ],
+  "conhece": [
+    "Massagem de relaxamento"
+  ],
+  "confirmado": false
+}

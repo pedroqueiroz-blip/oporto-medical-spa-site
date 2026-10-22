@@ -1,0 +1,18 @@
+{
+  "ordem": 220,
+  "id": "pilates-aparelhos",
+  "nome": "Pilates Aparelhos",
+  "nome_completo": "Pilates com Aparelhos",
+  "grupo": "Recuperar",
+  "tipo_servico": "Pilates clínico",
+  "texto": "Sessão individual em aparelhos de Pilates Reformer.",
+  "texto_massagens": "",
+  "descricao_seo": "Sessão individual em aparelhos de Pilates Reformer.",
+  "indicado_para": "Força muscular, postura e mobilidade",
+  "como_e": "Sessão individual em aparelhos de Pilates Reformer",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 52.5,
+  "visivel": true,
+  "artigo": "o"
+}

@@ -1,0 +1,18 @@
+{
+  "ordem": 150,
+  "id": "rosto-anti-idade",
+  "nome": "Tratamento Rosto - Anti-Idade",
+  "nome_completo": "Tratamento de Rosto Anti-Idade",
+  "grupo": "Relaxar",
+  "tipo_servico": "Tratamento de rosto",
+  "texto": "Limpeza, tratamento reestruturante e máscara facial.",
+  "texto_massagens": "",
+  "descricao_seo": "Limpeza, tratamento reestruturante e máscara facial.",
+  "indicado_para": "Rugas, linhas de expressão, perda de firmeza",
+  "como_e": "Limpeza, tratamento reestruturante e máscara facial",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 65,
+  "visivel": true,
+  "artigo": "o"
+}

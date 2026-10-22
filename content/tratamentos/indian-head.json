@@ -1,0 +1,18 @@
+{
+  "ordem": 90,
+  "id": "indian-head",
+  "nome": "Indian Head Therapy",
+  "nome_completo": "Indian Head Therapy",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Toques suaves e pressões.",
+  "texto_massagens": "",
+  "descricao_seo": "Toques suaves e pressões.",
+  "indicado_para": "Dores de cabeça, cansaço mental",
+  "como_e": "Toques suaves e pressões",
+  "pressao": "",
+  "duracao": 30,
+  "preco": 35,
+  "visivel": true,
+  "artigo": "a"
+}

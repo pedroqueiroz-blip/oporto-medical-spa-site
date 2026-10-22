@@ -1,0 +1,26 @@
+{
+  "etiqueta": "A Melhor Massagem do Mundo",
+  "titulo": "Exclusivo,",
+  "titulo_destaque": "Oporto Medical Spa.",
+  "texto": "Cada detalhe foi pensado para lhe proporcionar a melhor das experiências sensoriais. Se houvesse uma só massagem seria esta a mais exclusiva, do início até ao último suspiro.",
+  "imagem": "/img/meditacao-560.webp",
+  "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
+  "passos": [
+    {
+      "titulo": "Chá ou infusão",
+      "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera."
+    },
+    {
+      "titulo": "Escuta",
+      "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje."
+    },
+    {
+      "titulo": "O tratamento",
+      "texto": "Luz baixa, mãos especializadas e todo o tempo do mundo."
+    },
+    {
+      "titulo": "Repouso",
+      "texto": "Uns minutos só seus antes de voltar à cidade."
+    }
+  ]
+}

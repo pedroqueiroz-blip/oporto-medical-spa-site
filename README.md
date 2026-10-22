@@ -3,18 +3,22 @@
 Site do Oporto Medical Spa, publicado no Netlify a partir do ramo `main`.
 Os textos, imagens, preços, equipa e a campanha do mês editam-se no backoffice em **`/admin`**.
 
-Enquanto «Site visível no Google» estiver desligado (em *Contactos, horário e Google*),
+Enquanto «Site visível no Google» estiver desligado (em *Contactos e horário → Google*),
 o site não é indexado: `noindex` nas páginas e em `_headers`.
 
 ## O backoffice (`/admin`)
 
-| Secção | O que muda |
+| Separador | O que muda |
 | --- | --- |
-| Campanha do mês | Destaque na página inicial: título, texto, fotografia, preço, datas, botão de reserva |
-| Páginas | Títulos, textos e fotografias da página inicial e da página de massagens; perguntas frequentes |
-| Tratamentos e preços | Lista de tratamentos (a ordem é a do site), durações e preços |
+| Campanhas | Uma ficha por campanha: título, texto, fotografia, preço, datas, botão, ligada ou desligada. A primeira pela ordem é a principal; o selo «Em campanha» marca o tratamento na lista |
+| Página inicial | Uma ficha por secção (topo, cuidar, rituais, visita, equipa, reservar, oferecer, afiliações, avaliações, perguntas, como chegar, Google) |
+| Página Massagens | Topo, tabela, perguntas, onde estamos e Google |
+| Tratamentos e preços | Um tratamento por ficha, agrupados por área: nome, textos, duração, preço, fotografia e ordem |
 | Equipa | Pessoas, retratos, especialidades e os tratamentos que cada uma faz |
-| Contactos, horário e Google | Nome, morada, telefones, horário, coordenadas, perfis e o interruptor de indexação |
+| Contactos e horário | Contactos, horário, newsletter, a casa e o interruptor «Site visível no Google» |
+
+Cada ficha tem uma pré-visualização ao lado, com as cores e os tipos de letra do site.
+O conteúdo está em `content/<separador>/`: um ficheiro por ficha; os que começam por `_` juntam-se à ficha principal.
 
 Cada alteração fica primeiro como **rascunho**, com uma pré-visualização do Netlify
 (botão «Verificar se há pré-visualização»). Só vai para o site quando se carrega em **Publicar**.
@@ -56,7 +60,7 @@ O backoffice entra com a conta GitHub de quem tem acesso a este repositório.
 ## Estrutura
 
 ```
-content/      conteúdo editado no backoffice (JSON)
+content/      conteúdo editado no backoffice (JSON, uma pasta por separador)
 public/       ficheiros estáticos (CSS, JS, imagens, logótipos) e o backoffice em public/admin
 src/          build: modelo de dados, páginas, SEO/GEO
 servidor/     pagamentos (euPago), faturação (Moloni ON), emails e códigos

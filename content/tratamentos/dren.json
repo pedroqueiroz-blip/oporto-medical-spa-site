@@ -1,0 +1,18 @@
+{
+  "ordem": 240,
+  "id": "dren",
+  "nome": "Drenagem Linfática Manual",
+  "nome_completo": "Drenagem Linfática Manual",
+  "grupo": "Cuidar",
+  "tipo_servico": "Drenagem linfática manual",
+  "texto": "Massagem suave, lenta e rítmica.",
+  "texto_massagens": "",
+  "descricao_seo": "Massagem suave, lenta e rítmica.",
+  "indicado_para": "Pernas pesadas, retenção, pós-operatório",
+  "como_e": "Massagem suave, lenta e rítmica",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 70,
+  "visivel": true,
+  "artigo": "a"
+}

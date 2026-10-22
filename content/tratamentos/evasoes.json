@@ -1,0 +1,18 @@
+{
+  "ordem": 110,
+  "id": "evasoes",
+  "nome": "Ritual Evasões",
+  "nome_completo": "Ritual Evasões",
+  "grupo": "Relaxar",
+  "tipo_servico": "Ritual de spa",
+  "texto": "Pedras quentes e massagem à cabeça.",
+  "texto_massagens": "",
+  "descricao_seo": "Pedras quentes e massagem à cabeça.",
+  "indicado_para": "Bem-estar e serenidade. Um presente para mim.",
+  "como_e": "Pedras quentes e massagem à cabeça",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 85,
+  "visivel": true,
+  "artigo": "o"
+}

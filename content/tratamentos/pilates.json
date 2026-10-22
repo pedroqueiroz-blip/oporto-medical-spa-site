@@ -1,0 +1,18 @@
+{
+  "ordem": 210,
+  "id": "pilates",
+  "nome": "Pilates Clínico",
+  "nome_completo": "Pilates Clínico",
+  "grupo": "Recuperar",
+  "tipo_servico": "Pilates clínico",
+  "texto": "Sessão individual orientada por fisioterapeuta.",
+  "texto_massagens": "",
+  "descricao_seo": "Sessão individual orientada por fisioterapeuta.",
+  "indicado_para": "Postura, flexibilidade, força e prevenção de lesões",
+  "como_e": "Sessão individual orientada por fisioterapeuta",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 45,
+  "visivel": true,
+  "artigo": "o"
+}

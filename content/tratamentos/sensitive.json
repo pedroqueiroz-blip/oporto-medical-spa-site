@@ -1,0 +1,18 @@
+{
+  "ordem": 100,
+  "id": "sensitive",
+  "nome": "Ritual Sensitive",
+  "nome_completo": "Ritual Sensitive",
+  "grupo": "Relaxar",
+  "tipo_servico": "Ritual de spa",
+  "texto": "Aromaterapia e hidratação facial.",
+  "texto_massagens": "",
+  "descricao_seo": "Aromaterapia e hidratação facial.",
+  "indicado_para": "Relaxamento, hidratação facial, luminosidade",
+  "como_e": "Aromaterapia e hidratação facial",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 95,
+  "visivel": true,
+  "artigo": "o"
+}

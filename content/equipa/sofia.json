@@ -1,0 +1,21 @@
+{
+  "ordem": 40,
+  "id": "sofia",
+  "nome": "Sofia Lemos",
+  "funcao": "Massoterapeuta",
+  "foco": "A Melhor Massagem do Mundo e aromaterapia",
+  "bio": "Formada em técnicas orientais e ocidentais. Trabalha com calma e com intenção.",
+  "credencial": "Formação [[confirmar]]",
+  "cedula": "",
+  "foto": "",
+  "faz": [
+    "aroma",
+    "world",
+    "oil"
+  ],
+  "conhece": [
+    "A Melhor Massagem do Mundo",
+    "Aromaterapia"
+  ],
+  "confirmado": false
+}

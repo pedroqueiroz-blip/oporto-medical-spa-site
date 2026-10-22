@@ -85,6 +85,7 @@ function personCard(m, p, i) {
 }
 
 export function home(m) {
+  const A = m.inicio.avaliacoes || { etiqueta: 'Quem já esteve cá', titulo: 'Nas palavras', titulo_destaque: 'de quem saiu mais leve.' };
   const I = m.inicio, t = m.text, s = m.s, mp = maps(m);
   const faqItems = m.faq(I.perguntas.lista);
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
@@ -124,7 +125,7 @@ export function home(m) {
             <a class="btn btn--ghost" href="#oferecer">Oferecer</a>
           </div>
           <address class="hero2__facts">
-            <span><i class="d" style="font-size:15px;color:var(--linen)">Spa</i> · do latim <i>sanus per aquam</i>, a saúde pela água</span>
+            ${h.frase_spa ? '<span><i class="d" style="font-size:15px;color:var(--linen)">Spa</i> · ' + t.inline(h.frase_spa).replace(/<em>/g, '<i>').replace(/<\/em>/g, '</i>') + '</span>' : ''}
             <a href="#como-chegar">${esc(s.rua.replace(/\s*-\s*S\/\d+/, '') + ' · ' + s.localidade)}</a>
             <span>${esc(m.hoursShort)}</span>
           </address>
@@ -177,7 +178,7 @@ export function home(m) {
         <div>
           <h2 class="d" style="font-size:clamp(30px,3.4vw,46px)">${title(I.rituais.escolher_titulo, I.rituais.escolher_destaque)}</h2>
           <p class="prose" style="margin:16px 0 0">${t.inline(I.rituais.escolher_texto)}</p>
-          <button type="button" class="more-btn" aria-expanded="false" aria-controls="cmp" data-toggle="cmp" data-open-label="Fechar rituais e tratamentos">Conheça todos os rituais e tratamentos</button>
+          <button type="button" class="more-btn" aria-expanded="false" aria-controls="cmp" data-toggle="cmp" data-open-label="Fechar rituais e tratamentos">${esc(I.rituais.botao_comparar || 'Conheça todos os rituais e tratamentos')}</button>
         </div>
       </div>
       <div class="cmp-wrap" id="cmp" tabindex="0" role="region" aria-label="Comparação de tratamentos" hidden>
@@ -245,21 +246,21 @@ export function home(m) {
   <section class="section" id="avaliacoes" style="padding-top:0">
     <div class="wrap">
       <div class="sh" style="margin-bottom:26px">
-        <div><p class="kicker">Quem já esteve cá</p><h2 class="d">Nas palavras <em>de quem saiu mais leve.</em></h2></div>
+        <div><p class="kicker">${esc(A.etiqueta)}</p><h2 class="d">${title(A.titulo, A.titulo_destaque)}</h2></div>
       </div>
       <div class="reviews__head">
         <span class="reviews__score"><mark class="tbc">nota</mark></span>
         <span><span class="stars" role="img" aria-label="Classificação em estrelas">
           ${STARS}
         </span><br><span style="color:var(--oat);font-size:14px"><mark class="tbc">n.º</mark> avaliações no Google</span></span>
-        <a class="btn btn--ghost" style="margin-left:auto" href="${esc(mp.reviews)}" rel="noopener" target="_blank">Ver todas no Google</a>
+        <a class="btn btn--ghost" style="margin-left:auto" href="${esc(mp.reviews)}" rel="noopener" target="_blank">${esc(A.botao || 'Ver todas no Google')}</a>
       </div>
       <div class="reviews__grid">
         <article class="review"><b>Avaliação mais recente</b><span>O texto real da avaliação, o nome como aparece no Google e a data. Puxada pela API do Google, sem edição.</span></article>
         <article class="review"><b>Segunda mais recente</b><span>Mostramos as mais recentes, não só as de cinco estrelas.</span></article>
         <article class="review"><b>Terceira mais recente</b><span>Cada cartão leva a atribuição “Google”, como as regras da API exigem.</span></article>
       </div>
-      <p class="reviews__note">As avaliações são publicadas por clientes no Google e mostradas por ordem de data, sem seleção. O ${esc(s.nome)} não as edita.</p>
+      <p class="reviews__note">${t.inline(A.nota || '')}</p>
     </div>
   </section>
 
@@ -355,7 +356,7 @@ export function massages(m) {
       <p class="hero2__lead">${summary ? '<strong>' + esc(summary) + '</strong> ' : ''}${t.inline(M.hero.texto)}</p>
       <div class="hero2__cta">
         <a class="btn btn--primary" href="/#reservar">${esc(M.hero.botao)} <span aria-hidden="true">→</span></a>
-        <a class="btn btn--ghost" href="/#oferecer">Oferecer uma massagem</a>
+        <a class="btn btn--ghost" href="/#oferecer">${esc(M.hero.botao_oferecer || 'Oferecer uma massagem')}</a>
       </div>
     </div>
   </section>

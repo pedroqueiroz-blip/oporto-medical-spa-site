@@ -1,0 +1,18 @@
+{
+  "ordem": 60,
+  "id": "sensations",
+  "nome": "Oporto Sensations",
+  "nome_completo": "Massagem Oporto Sensations",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Movimentos suaves com creme nutritivo.",
+  "texto_massagens": "",
+  "descricao_seo": "Movimentos suaves com creme nutritivo.",
+  "indicado_para": "Stress, relaxamento, bem-estar sensorial",
+  "como_e": "Movimentos suaves com creme nutritivo",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 70,
+  "visivel": true,
+  "artigo": "a"
+}

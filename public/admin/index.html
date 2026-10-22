@@ -6,50 +6,218 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Backoffice · Oporto Medical Spa</title>
 <link rel="icon" href="/logo-brown.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap">
+<style>
+  /* Backoffice com as cores e as letras da marca. O Decap CMS gera os nomes das classes
+     (css-xxxx-NomeDoComponente), por isso as regras apontam para o nome do componente. */
+  :root {
+    --night: #0D0A08; --cacao: #24180F; --walnut: #3B2919; --linen: #E8DCC8; --oat: #B5A288; --flame: #D9A86C;
+    --bg: #F4EEE4; --card: #FFFCF7; --line: #E6DACA; --ink: #24180F; --muted: #7A6650; --soft: #F1E6D6;
+    --display: "EB Garamond", Garamond, Georgia, serif; --body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  }
+  html, body { background: var(--bg) !important; }
+  body, button, input, textarea, select, [class*="-AppMainContainer"] { font-family: var(--body) !important; color: var(--ink); }
+  ::selection { background: rgba(217, 168, 108, .35); }
+
+  /* Topo */
+  [class*="-AppHeader-css"] { background: var(--night) !important; box-shadow: none !important; border-bottom: 1px solid var(--walnut); }
+  [class*="-AppHeaderContent"] { min-height: 68px; align-items: center; }
+  [class*="-AppHeaderContent"]::before { content: ""; flex: none; width: 44px; height: 48px; margin: 0 28px 0 18px; background: url(/wordmark.svg) center / contain no-repeat; }
+  [class*="-AppHeaderNavLink"], [class*="-AppHeaderButton"] { color: var(--oat) !important; font-weight: 400 !important; letter-spacing: .02em; }
+  [class*="-AppHeaderNavLink"] svg, [class*="-AppHeaderButton"] svg { color: var(--oat) !important; }
+  .header-link-active, .header-link-active svg, [class*="-AppHeaderNavLink"]:hover, [class*="-AppHeaderNavLink"]:hover svg { color: var(--linen) !important; }
+  .header-link-active { box-shadow: inset 0 -2px 0 var(--flame); }
+  [class*="-AppHeaderQuickNewButton"] { background: var(--flame) !important; color: var(--night) !important; border-radius: 999px !important; padding: 0 18px !important; font-weight: 500 !important; }
+  [class*="-AppHeaderSiteLink"] { color: var(--oat) !important; }
+  [class*="-AppHeaderSiteLink"]:hover { color: var(--linen) !important; }
+
+  /* Cartões, barra lateral e listas */
+  [class*="-card-card"], [class*="-ListCard-card"] { background: var(--card) !important; border-radius: 6px !important; box-shadow: 0 1px 0 var(--line), 0 10px 30px -22px rgba(36, 24, 15, .35) !important; }
+  [class*="-SidebarHeading"], [class*="-CollectionTopHeading"] { font-family: var(--display) !important; font-weight: 400 !important; color: var(--night) !important; letter-spacing: -.01em; }
+  [class*="-SidebarHeading"] { font-size: 28px !important; }
+  [class*="-CollectionTopHeading"] { font-size: 36px !important; }
+  [class*="-CollectionTopDescription"] { color: var(--muted) !important; font-size: 15px !important; line-height: 1.6 !important; }
+  [class*="-SidebarNavLink"] { color: var(--muted) !important; border-left: 2px solid transparent !important; font-size: 15px !important; }
+  [class*="-SidebarNavLink"] svg { color: var(--oat) !important; }
+  [class*="-SidebarNavLink"] { background: transparent !important; }
+  [class*="-SidebarNavLink"]:hover, [class*="-SidebarNavLink"].sidebar-active { color: var(--night) !important; background: var(--soft) !important; border-left-color: var(--flame) !important; }
+  [class*="-SidebarNavLink"].sidebar-active svg { color: var(--flame) !important; }
+  [class*="-SearchInput"] { background: var(--soft) !important; color: var(--ink) !important; border-radius: 999px !important; }
+  [class*="-CollectionTopNewButton"], [class*="-CollectionTopNewButton"]:hover { background: var(--night) !important; color: var(--linen) !important; border-radius: 999px !important; padding: 0 22px !important; font-weight: 500 !important; letter-spacing: .04em; }
+  [class*="-ViewControls"] [class*="-StyledDropdownButton"], [class*="-ViewControls"] [class*="-StyledDropdownButton"]::after { color: var(--walnut) !important; border-top-color: var(--walnut) !important; }
+  [class*="-ViewControlsButton"] { color: var(--oat) !important; }
+  [class*="-ControlButton-css"], [class*="-ControlButton-css"] * { color: var(--walnut) !important; }
+  [class*="-ControlButton-css"]::after { border-top-color: var(--walnut) !important; }
+  [class*="-ListCard-card"] { border-left: 3px solid transparent !important; transition: border-color .2s, transform .2s; }
+  [class*="-ListCard-card"]:hover { border-left-color: var(--flame) !important; transform: translateX(2px); }
+  [class*="-ListCardTitle"] { font-family: var(--display) !important; font-weight: 400 !important; font-size: 21px !important; color: var(--night) !important; }
+  [class*="-GroupHeading"], h2[class*="-Group"] { font-family: var(--display) !important; font-weight: 400 !important; color: var(--walnut) !important; font-size: 26px !important; }
+
+  /* Editor */
+  [class*="-ToolbarContainer"] { background: var(--card) !important; border-bottom: 1px solid var(--line) !important; box-shadow: none !important; }
+  [class*="-BackCollection"] { color: var(--muted) !important; }
+  [class*="-ToolbarButton"], [class*="-PublishedButton"] { border-radius: 999px !important; }
+  [class*="-PublishedToolbarButton"], [class*="-PublishedButton"], [class*="-StatusButton"] { background: var(--soft) !important; color: var(--walnut) !important; }
+  [class*="-PublishedToolbarButton"]::after, [class*="-StatusButton"]::after { color: var(--walnut) !important; border-top-color: var(--walnut) !important; }
+  [class*="-PublishButton"], [class*="-SaveButton"] { background: var(--walnut) !important; color: var(--linen) !important; }
+  [class*="-DeleteButton"] { background: transparent !important; color: #a3442f !important; border: 1px solid #e3c2b8 !important; }
+  [class*="-PreviewLink"] { color: var(--walnut) !important; }
+  [class*="-ControlPaneContainer"]:not([class*="-PreviewPaneContainer-"]), [class*="-EditorContainer"], .Pane1 { background: var(--bg) !important; }
+  [class*="-PreviewPaneContainer-ControlPaneContainer"] { background: var(--bg) !important; }
+  .Resizer.vertical { background: var(--line) !important; border-color: var(--line) !important; width: 3px !important; }
+  .Resizer.vertical::before { background: var(--flame) !important; }
+  [class*="-FieldLabel"] { background: var(--soft) !important; color: var(--walnut) !important; border: 0 !important; border-radius: 4px 4px 0 0 !important; letter-spacing: .14em !important; font-weight: 600 !important; font-size: 11px !important; }
+  [class*="-ControlContainer"]:focus-within [class*="-FieldLabel"] { background: var(--walnut) !important; color: var(--linen) !important; }
+  [class*="-ControlContainer"] > div > input, [class*="-ControlContainer"] > input, [class*="-ControlContainer"] textarea,
+  [class*="-ControlContainer"] [class*="-TextControl"], [class*="-ControlContainer"] > [class*="-InputContainer"] {
+    background: var(--card) !important; border-color: var(--line) !important; border-radius: 0 6px 6px 6px !important; color: var(--ink) !important; font-size: 16px !important; }
+  [class*="-ControlContainer"] input:focus, [class*="-ControlContainer"] textarea:focus { border-color: var(--walnut) !important; }
+  [class*="-ControlHint"] { color: var(--muted) !important; font-size: 13px !important; line-height: 1.5 !important; }
+  [class*="-ControlTopbar"] { background: var(--soft) !important; }
+  [class*="-ObjectWidgetTopBar"], [class*="-ListItemTopBar"] { background: var(--soft) !important; }
+  [class*="-FileWidgetButton"] { background: var(--night) !important; color: var(--linen) !important; border-radius: 999px !important; }
+  [class*="-FileWidgetButtonRemove"] { background: transparent !important; color: #a3442f !important; border: 1px solid #e3c2b8 !important; }
+  [class*="-ToggleBackground"] { background: var(--line) !important; }
+  [class*="-ToggleContainer"][aria-checked="true"] [class*="-ToggleBackground"], [class*="-ToggleBackground"][class*="Active"] { background: var(--flame) !important; }
+  [class*="-PreviewPaneContainer"]:not([class*="ControlPaneContainer"]) { background: var(--night) !important; }
+  [class*="-EditorToggle"] { color: var(--walnut) !important; }
+  a { color: var(--walnut); }
+
+  /* Entrada */
+  [class*="-StyledAuthenticationPage"] { background: var(--night) !important; }
+  [class*="-StyledAuthenticationPage"] [class*="-CustomLogoIcon"] { border: 0 !important; }
+  [class*="-LoginButton"] { background: var(--linen) !important; color: var(--night) !important; border-radius: 999px !important; padding: 0 30px !important; letter-spacing: .14em; text-transform: uppercase; font-size: 12px !important; }
+  [class*="-StyledAuthenticationPage"] a { color: var(--oat) !important; }
+</style>
 </head>
 <body>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>
-  /* Pré-visualização da campanha do mês com o aspeto do site */
+  /* Pré-visualizações com o aspeto do site (letras, cores e classes de /site.css) */
   CMS.registerPreviewStyle('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap');
   CMS.registerPreviewStyle('/site.css');
-  CMS.registerPreviewStyle('body{background:#0D0A08;color:#E8DCC8}.section{padding:40px 0}', { raw: true });
+  CMS.registerPreviewStyle('body{background:#0D0A08;color:#E8DCC8;margin:0}.section{padding:44px 0}.wrap{padding-inline:28px}.pv-note{font:12px/1.5 Manrope,sans-serif;color:#B5A288;border-top:1px solid rgba(232,220,200,.14);margin-top:36px;padding-top:14px}.pv-img{width:100%;max-height:420px;object-fit:cover;border-radius:4px;margin-top:22px}.pv-list{list-style:none;margin:26px 0 0;padding:0;border-top:1px solid rgba(232,220,200,.14)}.pv-list li{padding:16px 0;border-bottom:1px solid rgba(232,220,200,.14)}.pv-list b{display:block;font:400 22px/1.2 "EB Garamond",serif;margin-bottom:4px}.pv-list span{color:#B5A288;font-size:15px}.pv-off{padding:40px;font:15px Manrope,sans-serif;color:#B5A288}', { raw: true });
 
   var h = window.h;
   function inline(s) {
     return String(s || '').replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; })
       .replace(/\[\[(.+?)\]\]/g, '<mark class="tbc">$1</mark>')
+      .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
   }
+  function js(v) { return v && v.toJS ? v.toJS() : v; }
+  function eur(n) { return n == null || n === '' ? '' : String(n).replace('.', ',') + ' €'; }
+  function html(tag, props, s) { props = props || {}; props.dangerouslySetInnerHTML = { __html: inline(s) }; return h(tag, props); }
+  function title(t, em, size) {
+    return h('h2', { className: 'd', style: { fontSize: size || 'clamp(34px,5vw,58px)' } }, t || '', em ? ' ' : null, em ? h('em', {}, em) : null);
+  }
+
+  /* Campanhas: o bloco da campanha como aparece na página inicial */
   var CampanhaPreview = createClass({
     render: function () {
       var e = this.props.entry, get = function (k) { return e.getIn(['data', k]); };
-      if (!get('ativa')) return h('p', { style: { padding: '40px', fontFamily: 'sans-serif' } }, 'A campanha está desligada e não aparece no site.');
+      var off = !get('ativa') ? h('p', { className: 'pv-off' }, 'Esta campanha está desligada: não aparece no site.') : null;
       var img = get('imagem') ? this.props.getAsset(get('imagem')) : null;
-      var inclui = (get('inclui') || []).toJS ? get('inclui').toJS() : (get('inclui') || []);
+      var inclui = js(get('inclui')) || [];
       var preco = get('preco');
-      return h('section', { className: 'section month2' },
+      return h('div', {}, off, h('section', { className: 'section month2' },
         h('div', { className: 'wrap split' },
           img ? h('figure', { className: 'arch arch--photo' }, h('img', { src: img.toString(), alt: '' }))
               : h('figure', { className: 'arch' }, h('figcaption', {}, 'Fotografia · a enviar')),
           h('div', { style: { display: 'grid', gap: '24px' } },
             h('p', { className: 'kicker', style: { margin: 0 } }, get('etiqueta')),
-            h('h2', { className: 'd sig-title' }, get('titulo') + ' ', get('titulo_destaque') ? h('em', {}, get('titulo_destaque')) : null,
+            h('h2', { className: 'd sig-title' }, (get('titulo') || '') + ' ', get('titulo_destaque') ? h('em', {}, get('titulo_destaque')) : null,
               get('assinatura') ? h('span', { className: 'sig-by' }, get('assinatura')) : null),
-            h('p', { style: { margin: 0, fontSize: '18px', maxWidth: '46ch' }, dangerouslySetInnerHTML: { __html: inline(get('texto')) } }),
+            html('p', { style: { margin: 0, fontSize: '18px', maxWidth: '46ch' } }, get('texto')),
             get('selo') ? h('p', { className: 'sig-seal' }, h('span', { className: 'sig-seal__r' }, '®'), h('span', {}, get('selo_texto'), h('br'), h('b', {}, get('selo_numero')))) : null,
             inclui.length || get('duracao') ? h('ul', {},
-              inclui.map(function (x, i) { return h('li', { key: i, dangerouslySetInnerHTML: { __html: inline(x) } }); }),
+              inclui.map(function (x, i) { return html('li', { key: i }, x); }),
               get('duracao') ? h('li', {}, 'Duração: ' + get('duracao') + ' min') : null) : null,
-            h('div', { style: { display: 'flex', gap: '18px 28px', alignItems: 'center' } },
-              h('span', { className: 'price-d' }, preco ? String(preco).replace('.', ',') + ' €' : 'preço do tratamento escolhido'),
-              h('span', { className: 'btn btn--primary' }, 'Reservar'))
+            h('div', { style: { display: 'flex', gap: '18px 28px', alignItems: 'center', flexWrap: 'wrap' } },
+              h('span', { className: 'price-d' }, preco ? eur(preco) : 'Preço do tratamento escolhido'),
+              get('preco_antigo') ? h('s', { style: { color: '#B5A288' } }, eur(get('preco_antigo'))) : null,
+              h('span', { className: 'btn btn--primary' }, 'Reservar')),
+            get('selo_em_campanha') ? h('p', { className: 'pv-note' }, 'O tratamento escolhido ganha o selo dourado «Em campanha» na lista de tratamentos.') : null
           )
         )
-      );
+      ));
     }
   });
-  CMS.registerPreviewTemplate('campanha', CampanhaPreview);
+  CMS.registerPreviewTemplate('campanhas', CampanhaPreview);
+
+  /* Zonas das páginas: etiqueta, título, texto, fotografia e as listas que tiverem */
+  var SecaoPreview = createClass({
+    render: function () {
+      var d = js(this.props.entry.get('data')) || {}, self = this;
+      var img = d.imagem ? this.props.getAsset(d.imagem) : null;
+      var lista = d.pilares || d.passos || d.lista || [];
+      var extra = [];
+      ['resumo', 'citacao', 'escolher_texto', 'nota', 'confianca', 'confianca_nota', 'onde_texto', 'nota_fisio'].forEach(function (k) {
+        if (d[k]) extra.push(html('p', { key: k, className: 'prose', style: k === 'resumo' ? { color: '#E8DCC8' } : {} }, d[k]));
+      });
+      var t = d.titulo || d.escolher_titulo || d.onde_titulo, em = d.titulo_destaque || d.escolher_destaque || d.onde_destaque;
+      var seo = d.descricao !== undefined && !d.etiqueta;
+      return h('section', { className: 'section' }, h('div', { className: 'wrap' },
+        seo ? h('div', { style: { background: '#fff', color: '#202124', padding: '22px 26px', borderRadius: '8px', fontFamily: 'Arial,sans-serif', maxWidth: '640px' } },
+          h('div', { style: { fontSize: '13px', color: '#4d5156' } }, 'oportomedicalspa.com'),
+          h('div', { style: { fontSize: '20px', color: '#1a0dab', margin: '4px 0' } }, d.titulo),
+          h('div', { style: { fontSize: '14px', color: '#4d5156' } }, d.descricao || 'Descrição escrita sozinha com os preços e a campanha do mês.')) : null,
+        d.etiqueta ? h('p', { className: 'kicker' }, d.etiqueta) : null,
+        !seo && t ? title(t, em) : null,
+        d.texto ? html('p', { className: 'prose' }, d.texto) : null,
+        extra,
+        d.botao ? h('p', { style: { marginTop: '26px' } }, h('span', { className: 'btn btn--primary' }, d.botao)) : null,
+        img ? h('img', { className: 'pv-img', src: img.toString(), alt: '' }) : null,
+        lista.length ? h('ul', { className: 'pv-list' }, lista.map(function (x, i) {
+          var pic = x.imagem ? self.props.getAsset(x.imagem) : null;
+          return h('li', { key: i },
+            pic ? h('img', { src: pic.toString(), alt: '', style: { width: '96px', height: '96px', objectFit: 'cover', float: 'right', marginLeft: '16px', borderRadius: '4px' } }) : null,
+            h('b', {}, x.titulo || x.pergunta || ''), html('span', {}, x.texto || x.resposta || (x.automatica ? 'Resposta automática, com os preços e contactos atuais.' : '')));
+        })) : null,
+        h('p', { className: 'pv-note' }, 'Pré-visualização aproximada. O aspeto final vê-se no rascunho do site, em «Ver pré-visualização».')
+      ));
+    }
+  });
+  ['topo', 'cuidar', 'rituais', 'visita', 'equipa_intro', 'reservar', 'oferecer', 'afiliacoes', 'avaliacoes', 'perguntas', 'como_chegar', 'google', 'tabela', 'onde']
+    .forEach(function (n) { CMS.registerPreviewTemplate(n, SecaoPreview); });
+
+  /* Tratamentos: a linha como aparece em «Rituais e tratamentos» */
+  var TratamentoPreview = createClass({
+    render: function () {
+      var d = js(this.props.entry.get('data')) || {};
+      return h('section', { className: 'section' }, h('div', { className: 'wrap' },
+        h('p', { className: 'kicker' }, d.grupo || ''),
+        h('div', { className: 'rituals', style: { marginTop: '10px' } },
+          h('div', { className: 'ritual' },
+            h('h3', {}, h('small', {}, (d.tipo_servico || '')), d.nome || ''),
+            html('p', {}, d.texto),
+            h('span', { className: 'ritual__price' }, h('span', {}, (d.duracao || '') + ' min'), eur(d.preco)),
+            h('button', { type: 'button' }, '→'))),
+        d.indicado_para ? h('p', { className: 'prose' }, h('b', { style: { color: '#E8DCC8', fontWeight: 500 } }, 'Indicado para: '), d.indicado_para) : null,
+        h('p', { className: 'pv-note' }, d.visivel === false ? 'Escondido: não aparece no site, na agenda nem nos vouchers.' :
+          'Fatura como ' + (d.grupo === 'Relaxar' ? 'TPREV · Terapêuticas de Prevenção' : 'TREAB · Terapêuticas de Reabilitação') + ', isento de IVA.')
+      ));
+    }
+  });
+  CMS.registerPreviewTemplate('tratamentos', TratamentoPreview);
+
+  /* Equipa: o cartão de «Quem cuida de si» */
+  var PessoaPreview = createClass({
+    render: function () {
+      var d = js(this.props.entry.get('data')) || {};
+      var foto = d.foto ? this.props.getAsset(d.foto) : null;
+      var ini = String(d.nome || '').split(' ').map(function (p) { return p[0] || ''; }).join('');
+      return h('section', { className: 'section' }, h('div', { className: 'wrap' }, h('article', { className: 'tm-card', style: { maxWidth: '300px' } },
+        foto ? h('img', { src: foto.toString(), alt: '', style: { aspectRatio: '4/5', objectFit: 'cover', borderRadius: '160px 160px 0 0', marginBottom: '16px', width: '100%' } })
+             : h('div', { className: 'tm-card__photo pms-tone-1' }, h('span', {}, ini), h('small', {}, 'fotografia')),
+        h('p', { className: 'tm-card__role' }, d.funcao || ''), h('h3', { className: 'tm-card__name' }, d.nome || ''),
+        h('p', { className: 'tm-card__focus' }, d.foco || ''), h('p', { className: 'tm-card__bio' }, d.bio || ''),
+        h('span', { className: 'tm-card__cta' }, 'Marcar com ' + String(d.nome || '').split(' ')[0]))));
+    }
+  });
+  CMS.registerPreviewTemplate('equipa', PessoaPreview);
 </script>
 </body>
 </html>

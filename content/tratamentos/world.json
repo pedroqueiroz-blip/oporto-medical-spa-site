@@ -1,0 +1,18 @@
+{
+  "ordem": 40,
+  "id": "world",
+  "nome": "A Melhor Massagem do Mundo",
+  "nome_completo": "A Melhor Massagem do Mundo",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de assinatura",
+  "texto": "Ritual exclusivo com técnicas combinadas.",
+  "texto_massagens": "",
+  "descricao_seo": "Ritual exclusivo com técnicas combinadas.",
+  "indicado_para": "Experiência sensorial inesquecível",
+  "como_e": "Ritual exclusivo com técnicas combinadas",
+  "pressao": "",
+  "duracao": 75,
+  "preco": 88,
+  "visivel": true,
+  "artigo": "a"
+}

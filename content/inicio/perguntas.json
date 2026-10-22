@@ -1,0 +1,80 @@
+{
+  "etiqueta": "Perguntas frequentes",
+  "titulo": "Antes de vir.",
+  "texto": "Reserve aqui, pelo {telefone} ou por {email}. Recomendamos dois dias de antecedência.",
+  "lista": [
+    {
+      "pergunta": "Onde fica o Oporto Medical Spa?",
+      "resposta": "",
+      "automatica": "morada",
+      "acrescento": "[[acrescentar distância medida a um ponto de referência]]"
+    },
+    {
+      "pergunta": "Quanto custa uma massagem no Oporto Medical Spa?",
+      "resposta": "",
+      "automatica": "precos_relaxar",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quanto custa uma sessão de fisioterapia?",
+      "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?",
+      "resposta": "",
+      "automatica": "precos_fisio",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quem faz os tratamentos?",
+      "resposta": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Há estacionamento?",
+      "resposta": "[[confirmar: estacionamento próprio, parque próximo ou rua]]",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Falam inglês e espanhol?",
+      "resposta": "[[confirmar idiomas da equipa]]",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quando devo chegar?",
+      "resposta": "Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "E se não puder vir?",
+      "resposta": "Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Preciso de exame médico?",
+      "resposta": "Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "O que devo trazer?",
+      "resposta": "Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "O que significa medical spa?",
+      "resposta": "Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Posso oferecer uma massagem?",
+      "resposta": "Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.",
+      "automatica": "",
+      "acrescento": ""
+    }
+  ]
+}

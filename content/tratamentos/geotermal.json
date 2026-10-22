@@ -1,0 +1,18 @@
+{
+  "ordem": 30,
+  "id": "geotermal",
+  "nome": "Geotermal",
+  "nome_completo": "Massagem Geotermal",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Pedras vulcânicas aquecidas e óleos essenciais.",
+  "texto_massagens": "",
+  "descricao_seo": "Pedras vulcânicas aquecidas e óleos essenciais.",
+  "indicado_para": "Tensão muscular, alívio e relaxamento profundo",
+  "como_e": "Pedras vulcânicas aquecidas e óleos essenciais",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 70,
+  "visivel": true,
+  "artigo": "a"
+}

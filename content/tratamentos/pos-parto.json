@@ -1,0 +1,18 @@
+{
+  "ordem": 190,
+  "id": "pos-parto",
+  "nome": "Programa Reabilitação Pós-Parto",
+  "nome_completo": "Programa de Reabilitação Pós-Parto",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Plano individual de tratamentos para recuperar o corpo após a gravidez.",
+  "texto_massagens": "",
+  "descricao_seo": "Plano individual de tratamentos para recuperar o corpo após a gravidez.",
+  "indicado_para": "Recuperação pós-parto, reforço do pavimento pélvico e estabilidade corporal",
+  "como_e": "Plano individual de tratamentos para recuperar o corpo após a gravidez",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 60,
+  "visivel": true,
+  "artigo": "o"
+}

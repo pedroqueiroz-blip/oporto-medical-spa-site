@@ -1,6 +1,6 @@
 /* Lê o conteúdo do backoffice (content/*.json) e calcula o que se repete pelo site:
    preços, intervalos, horário, respostas automáticas e a campanha em vigor. */
-import { readJSON, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
+import { readJSON, readList, readCampaigns, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
 
 const GROUP_AREA = { Fortalecer: 'Fisioterapia', Recuperar: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
 
@@ -8,9 +8,8 @@ export function loadModel(today = new Date()) {
   const s = readJSON('definicoes');
   const inicio = readJSON('inicio');
   const massagens = readJSON('massagens');
-  const camp = readJSON('campanha');
-  const treatments = readJSON('tratamentos').lista.filter((t) => t.visivel !== false);
-  const team = readJSON('equipa').lista;
+  const treatments = readList('tratamentos').filter((t) => t.visivel !== false);
+  const team = readList('equipa');
 
   s.url = String(s.url || '').replace(/\/+$/, '');
   const byId = (id) => treatments.find((t) => t.id === id);
@@ -110,12 +109,13 @@ export function loadModel(today = new Date()) {
 
   /* Campanha em vigor: ativa e dentro das datas (as datas contam no momento do build) */
   const day = today.toISOString().slice(0, 10);
+  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
+  const camp = readCampaigns(live);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
   const campTreatment = camp.tratamento ? byId(camp.tratamento) : null;
 
 
   /* Campanhas extra: aparecem por baixo da principal, escondidas atrás do botão "Ver + campanhas do mês" */
-  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
   const withTreatment = (c) => {
     const tr = c.tratamento ? byId(c.tratamento) : null;
     const preco = c.preco || (tr && tr.preco) || null;

@@ -1,0 +1,25 @@
+{
+  "etiqueta": "Perguntas sobre massagens",
+  "titulo": "Antes de reservar.",
+  "lista": [
+    {
+      "pergunta": "Qual a melhor massagem para relaxar?",
+      "resposta": "Para uma primeira visita ou para stress do dia a dia, a Aromaterapia ({duracao:aroma}, {preco:aroma}). Para uma experiência sensorial inesquecível, A Melhor Massagem do Mundo ({duracao:world}, {preco:world}). Para um momento de puro conforto, a Oil & Candle ({duracao:oil}, {preco:oil}).",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quanto custa uma massagem de relaxamento no Porto?",
+      "pergunta_seo": "Quanto custa uma massagem de relaxamento no Porto, no Oporto Medical Spa?",
+      "resposta": "",
+      "automatica": "intervalo_relaxar",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Posso fazer uma massagem a dois?",
+      "resposta": "Sim, com o ritual Escape a Dois: chá, massagem aos pés e Massagem Oil & Candle em simultâneo, numa sala só vossa.",
+      "automatica": "",
+      "acrescento": ""
+    }
+  ]
+}

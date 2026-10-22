@@ -1,0 +1,18 @@
+{
+  "ordem": 180,
+  "id": "osteo",
+  "nome": "Osteopatia",
+  "nome_completo": "Osteopatia",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Osteopatia",
+  "texto": "Técnicas manuais individualizadas para melhorar a mobilidade e o equilíbrio corporal.",
+  "texto_massagens": "",
+  "descricao_seo": "Técnicas manuais individualizadas para melhorar a mobilidade e o equilíbrio corporal.",
+  "indicado_para": "Tensões musculares, desconforto e mobilidade reduzida",
+  "como_e": "Técnicas manuais individualizadas para melhorar a mobilidade e o equilíbrio corporal",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 45,
+  "visivel": true,
+  "artigo": "a"
+}

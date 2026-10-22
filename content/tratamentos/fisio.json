@@ -1,0 +1,18 @@
+{
+  "ordem": 170,
+  "id": "fisio",
+  "nome": "Fisioterapia",
+  "nome_completo": "Fisioterapia",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Avaliação. Terapia manual e exercícios.",
+  "texto_massagens": "",
+  "descricao_seo": "Avaliação. Terapia manual e exercícios.",
+  "indicado_para": "Dor, limitações de movimento, recuperação funcional",
+  "como_e": "Avaliação. Terapia manual e exercícios",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 45,
+  "visivel": true,
+  "artigo": "a"
+}

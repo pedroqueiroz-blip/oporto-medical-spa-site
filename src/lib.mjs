@@ -5,8 +5,35 @@ import path from 'node:path';
 export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 export const PUBLIC = path.join(ROOT, 'public');
 
+const CONTENT = path.join(ROOT, 'content');
+const jsonFiles = (dir) => fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()
+  .map((f) => ({ key: f.slice(0, -5), data: JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')) }));
+const byOrder = (a, b) => (Number(a.ordem) || 0) - (Number(b.ordem) || 0);
+
+/* Conteúdo do backoffice. Uma pasta (content/inicio/) junta-se num só objeto: cada ficheiro é uma
+   secção com o nome do ficheiro (hero.json → hero); os que começam por _ juntam-se ao nível de cima. */
 export function readJSON(name) {
-  return JSON.parse(fs.readFileSync(path.join(ROOT, 'content', name + '.json'), 'utf8'));
+  const dir = path.join(CONTENT, name);
+  if (!fs.existsSync(dir)) return JSON.parse(fs.readFileSync(dir + '.json', 'utf8'));
+  const out = {};
+  for (const { key, data } of jsonFiles(dir)) {
+    if (key.startsWith('_')) Object.assign(out, data);
+    else out[key] = data;
+  }
+  return out;
+}
+
+/* Lista com um ficheiro por item (content/tratamentos/oil.json), pela ordem do campo «ordem». */
+export function readList(name) {
+  return jsonFiles(path.join(CONTENT, name)).map((f) => f.data).sort(byOrder);
+}
+
+/* Campanhas (content/campanhas/): a primeira pela ordem é a principal, as outras rodam por baixo.
+   O selo dourado «Em campanha» vai para o tratamento da primeira campanha ligada que o tenha pedido. */
+export function readCampaigns(isLive) {
+  const [main = {}, ...extras] = readList('campanhas');
+  const badge = [main, ...extras].find((c) => c.selo_em_campanha && c.tratamento && isLive(c));
+  return { ...main, extras, destaque_tratamento: badge ? badge.tratamento : null, destaque_preco: badge ? badge.preco : null };
 }
 
 export function esc(s) {

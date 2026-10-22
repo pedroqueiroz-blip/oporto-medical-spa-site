@@ -1,0 +1,17 @@
+{
+  "ordem": 20,
+  "ativa": true,
+  "inicio": "",
+  "fim": "",
+  "etiqueta": "Campanha do mês",
+  "titulo": "Segunda campanha",
+  "titulo_destaque": "a confirmar",
+  "texto": "[[Texto da segunda campanha a enviar.]]",
+  "imagem": "",
+  "imagem_alt": "",
+  "inclui": [],
+  "tratamento": "oil",
+  "duracao": null,
+  "preco": 64,
+  "selo_em_campanha": true
+}

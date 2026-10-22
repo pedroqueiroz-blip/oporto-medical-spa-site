@@ -1,0 +1,18 @@
+{
+  "ordem": 230,
+  "id": "postura",
+  "nome": "Reeducação Postural",
+  "nome_completo": "Reeducação Postural",
+  "grupo": "Recuperar",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Pilates Clínico e terapia manual numa sessão integrada.",
+  "texto_massagens": "",
+  "descricao_seo": "Pilates Clínico e terapia manual numa sessão integrada.",
+  "indicado_para": "Desequilíbrios posturais, tensão muscular e rigidez",
+  "como_e": "Pilates Clínico e terapia manual numa sessão integrada",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 60,
+  "visivel": true,
+  "artigo": "a"
+}

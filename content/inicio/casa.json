@@ -1,0 +1,43 @@
+{
+  "etiqueta": "Cuidar de si",
+  "titulo": "Dores de costas, drenagens linfáticas",
+  "titulo_destaque": "e também relaxamento.",
+  "texto": "Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Dores de costas, reforço muscular, reabilitação são abordadas em cada massagem de relaxamento. Mas é com o Pilates clínico e a Osteopatia que reforçamos a sua saúde, para que cada visita seja ao mesmo tempo prazer e tratamento.",
+  "imagem": "/img/meditacao-560.webp",
+  "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
+  "pilares": [
+    {
+      "titulo": "Relaxar",
+      "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.",
+      "botao": "Marcar ritual",
+      "tratamento": "oil",
+      "imagem": "/img/ritual-cha-960.webp",
+      "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule"
+    },
+    {
+      "titulo": "Fortalecer",
+      "texto": "Dores de costas, contraturas, corrigir postura, reforço muscular.",
+      "botao": "Fisioterapia",
+      "tratamento": "fisio",
+      "imagem": "/img/massagem-pindas-760.webp",
+      "imagem_alt": "Terapeuta a massajar as costas de uma cliente"
+    },
+    {
+      "titulo": "Recuperar",
+      "texto": "Postura, flexibilidade, força e prevenção de lesões.",
+      "botao": "Pilates",
+      "tratamento": "pilates",
+      "imagem": "/img/meditacao-560.webp",
+      "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada"
+    },
+    {
+      "titulo": "Cuidar",
+      "texto": "Retenção líquidos, edema, celulite.",
+      "botao": "Ver tratamentos",
+      "tratamento": "dren",
+      "imagem": "/img/corpo-728.webp",
+      "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo"
+    }
+  ],
+  "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
+}
