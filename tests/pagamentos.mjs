@@ -151,6 +151,8 @@ try {
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "voucher só serve uma vez");
 
   // 5) Validações
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, formato: "caixa", nome: "João", email: "joao@exemplo.pt", metodo: "card" });
+  ok(r.status === 400 && /caixa/.test(r.j.erro), "caixa oferta ainda não se compra online");
   r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "tratamento desconhecido é recusado");
   r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "123", metodo: "mb_way" });

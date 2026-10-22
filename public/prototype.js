@@ -312,9 +312,9 @@
       else if (b.dataset.format) { v.format = b.dataset.format; render(); }
       else if (b.hasAttribute('data-buy')) {
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
-        if (window.OMS_PAGAR && v.mode === 'exp') {
+        if (window.OMS_PAGAR && v.mode !== 'valor') {
           var tr = byId(TREATMENTS, v.exp);
-          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.id, nomeTratamento: tr.name, para: v.to, de: v.from, mensagem: v.msg }, { voltar: render });
+          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.id, nomeTratamento: tr.name, para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;
