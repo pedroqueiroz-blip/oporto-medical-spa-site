@@ -257,10 +257,10 @@
         '<img class="vc-card__logo" src="logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
         '<div class="vc-card__top"><span class="vc-card__kind">Voucher oferta</span></div>' +
         '<p class="vc-card__name">' + esc(t.name) + '</p>' +
-        '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? ' <span>' + t.min + ' min</span>' : '') + '</p>' +
+        '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? ' (Reserve ' + t.min + ' min.)' : '') + '</p>' +
         '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : 'A sua mensagem aparece aqui.') + '</p>' +
         '<div class="vc-card__foot"><span>Para ' + esc(v.to || '…') + '</span><span>De ' + esc(v.from || '…') + '</span></div>' +
-        '<p class="vc-card__info">Válido até ' + validUntil() + '.' + (S.horario ? ' Marcações: ' + esc(S.horario) + '.' : '') + (S.telefone ? ' ' + esc(S.telefone) + '.' : '') + '</p></div>';
+        '<p class="vc-card__info">Válido até ' + validUntil() + '.' + (S.telefone ? '<br>' + esc(S.telefone) : '') + '</p></div>';
     }
 
     function form() {
