@@ -1,0 +1,181 @@
+// Teste de ponta a ponta dos pagamentos, contra euPago, Moloni ON e Resend simulados.
+// Corre sozinho depois do build: npm test (node src/build.mjs && node tests/pagamentos.mjs).
+import http from "node:http";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
+const ok = (c, m) => { if (!c) throw new Error("FALHOU: " + m); console.log("✓ " + m); };
+const PORTA = 9997, B = `http://localhost:${PORTA}`;
+Object.assign(process.env, {
+  LOCAL_BLOBS_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "oms-pag-")),
+  EUPAGO_API_KEY: "demo-chave-teste", EUPAGO_MODO: "real", EUPAGO_API_BASE: `${B}/eupago`,
+  MOLONI_API_KEY: "apik:teste", MOLONI_API_BASE: `${B}/moloni`, MOLONI_FECHAR: "sim",
+  RESEND_API_KEY: "re_teste", EMAIL_FROM: "Oporto Medical Spa <reservas@exemplo.pt>", RESEND_API_BASE: `${B}/resend`,
+});
+
+// --- Serviços simulados ---
+const S = { mb: [], mbway: [], cartao: [], docs: {}, faturaEmails: [], emails: [], artigos: { TREAB: "M10", TPREV: "M10" } };
+const r2 = (v) => Math.round(v * 100) / 100;
+const esc = (s) => String(s).replace(/&/g, "&amp;");
+const servidor = http.createServer(async (req, res) => {
+  let body = ""; for await (const c of req) body += c;
+  const j = body ? JSON.parse(body) : {};
+  res.setHeader("Content-Type", "application/json");
+  const out = (x) => res.end(JSON.stringify(x));
+  if (req.url.startsWith("/resend")) { S.emails.push(j); return out({ id: "e" + S.emails.length }); }
+  if (req.url === "/eupago/clientes/rest_api/multibanco/create") { S.mb.push(j); return out({ sucesso: true, entidade: "12345", referencia: "123456789", valor: j.valor, data_fim: j.data_fim }); }
+  if (req.url === "/eupago/api/v1.02/mbway/create") { S.mbway.push(j); return out({ transactionStatus: "Success", transactionID: "mw" + S.mbway.length, reference: "r1" }); }
+  if (req.url === "/eupago/api/v1.02/creditcard/create") { S.cartao.push(j); return out({ transactionStatus: "Success", transactionID: "cc1", reference: "r2", redirectUrl: "https://pagar.exemplo/cc1" }); }
+  if (req.url.startsWith("/moloni")) {
+    const { query, variables: v } = j;
+    const nome = query.match(/\{\s*(\w+)\s*\(/)?.[1] || query.match(/\{\s*(\w+)\s*\{/)?.[1];
+    const dados = (data) => out({ data: { [nome]: { errors: [], data } } });
+    const f = v?.options?.filter?.[0];
+    switch (nome) {
+      case "me": return dados({ userCompanies: [{ companyId: 5 }] });
+      case "documentSets": return dados([{ documentSetId: 1, name: "2026", isDefault: true }, { documentSetId: 7, name: "SPA" }]);
+      case "paymentMethods": return dados([{ paymentMethodId: 1, name: "Numerário", isDefault: true }, { paymentMethodId: 2, name: "Cartão de crédito" }, { paymentMethodId: 3, name: "MB WAY" }, { paymentMethodId: 4, name: "Multibanco" }]);
+      case "customers": return dados(f.field === "number" && f.value === "1" ? [{ customerId: 1, name: "Consumidor final", vat: "999999990" }] : f.field === "isDefault" ? [{ customerId: 1, name: "Consumidor final", country: { countryId: 1 }, language: { languageId: 1 } }] : []);
+      case "customerNextNumber": return dados("2");
+      case "customerCreate": return dados({ customerId: 50 });
+      case "products": return dados(S.artigos[f.value] !== undefined ? [{ productId: f.value === "TREAB" ? 101 : 102, name: f.value, reference: f.value, exemptionReason: S.artigos[f.value] }] : []);
+      case "invoiceReceiptCreate": {
+        const id = 900 + Object.keys(S.docs).length;
+        const total = r2(v.data.products.reduce((a, p) => a + p.qty * p.price * (1 + (p.taxes[0]?.value || 0) / 100), 0));
+        S.docs[id] = { documentId: id, number: 0, status: 0, totalValue: total, documentSetName: "SPA", dados: v.data };
+        return dados(S.docs[id]);
+      }
+      case "invoiceReceiptUpdate": Object.assign(S.docs[v.data.documentId], { status: 1, number: Object.values(S.docs).filter((d) => d.status === 1).length + 1 }); return dados(S.docs[v.data.documentId]);
+      case "invoiceReceiptGetPDF": return out({ data: { invoiceReceiptGetPDF: true } });
+      case "invoiceReceiptSendMail": S.faturaEmails.push(v.mailData); return out({ data: { invoiceReceiptSendMail: true } });
+    }
+  }
+  res.statusCode = 404; out({ erro: "desconhecido " + req.url });
+});
+await new Promise((r) => servidor.listen(PORTA, r));
+
+const api = (await import("../netlify/functions/api.mjs")).default;
+const news = (await import("../netlify/functions/submission-created.mjs")).handler;
+const cat = JSON.parse(fs.readFileSync(new URL("../servidor/gerado/catalogo.json", import.meta.url)));
+const pedir = async (rota, dados, metodo = "POST") => {
+  const r = await api(new Request("https://oms.exemplo" + rota, metodo === "POST" ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dados) } : {}));
+  return { status: r.status, j: await r.json() };
+};
+const notificar = (p, extra = {}) => pedir(`/api/eupago-notificacao?${new URLSearchParams({ chave_api: "demo-chave-teste", identificador: p.numero, valor: String(p.total), transacao: "t-" + p.numero, mp: "MW:PT", ...extra })}`, null, "GET");
+const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tratamentos.find((t) => t.grupo !== "Relaxar");
+const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
+const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
+const { validadeVoucher } = await import("../servidor/datas.mjs");
+
+try {
+  ok(relax.artigo === "TPREV" && outro.artigo === "TREAB" && cat.tratamentos.every((t) => t.artigo === (t.grupo === "Relaxar" ? "TPREV" : "TREAB")), "catálogo: Relaxar → TPREV, o resto → TREAB");
+  ok(validadeVoucher(new Date("2026-10-22T12:00:00Z")) === "2027-10-31" && validadeVoucher(new Date("2026-02-10T12:00:00Z")) === "2027-02-28" && validadeVoucher(new Date("2026-06-30T23:30:00Z")) === "2027-07-31", "validade do voucher: fim do mês, 12 meses depois (fuso de Lisboa)");
+
+  // 1) Marcação de fisioterapia (TREAB) por MB WAY
+  let r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", terapeuta: "Ana", ...cliente, metodo: "mb_way" });
+  ok(r.status === 200 && r.j.estado === "aguarda_pagamento" && r.j.total === outro.preco, `marcação ${outro.nome}: MB WAY pedido por ${r.j.total} € (preço do site)`);
+  ok(S.mbway[0].payment.customerPhone === "912345678" && S.mbway[0].payment.amount.value === outro.preco, "MB WAY com o telemóvel e o valor certos");
+  const p1 = r.j;
+  r = await pedir(`/api/pedido?n=${p1.numero}&t=errado`, null, "GET");
+  ok(r.status === 404, "estado do pedido só com o token certo");
+  r = await notificar({ ...p1, total: 1 });
+  r = await pedir(`/api/pedido?n=${p1.numero}&t=${p1.token}`, null, "GET");
+  ok(r.j.estado === "aguarda_pagamento" && !Object.keys(S.docs).length, "pagamento com valor diferente não confirma nem fatura");
+  r = await pedir(`/api/eupago-notificacao?${new URLSearchParams({ chave_api: "outra", identificador: p1.numero, valor: String(p1.total) })}`, null, "GET");
+  ok(r.status === 403, "notificação com chave errada é recusada");
+  await notificar(p1);
+  r = await pedir(`/api/pedido?n=${p1.numero}&t=${p1.token}`, null, "GET");
+  ok(r.j.estado === "pago", "notificação da euPago: pedido pago");
+  const d1 = Object.values(S.docs)[0];
+  ok(d1.status === 1 && d1.dados.documentSetId === 7, "fatura-recibo fechada na série SPA");
+  ok(d1.dados.products.length === 1 && d1.dados.products[0].productId === 101 && d1.dados.products[0].taxes.length === 0 && d1.dados.products[0].exemptionReason === "M10", "linha TREAB, sem IVA, com motivo de isenção");
+  ok(d1.dados.products[0].price === outro.preco && d1.totalValue === outro.preco && d1.dados.payments[0].paymentMethodId === 3, "valor da fatura = valor pago, meio MB WAY");
+  ok(d1.dados.customerId === 1, "sem NIF: Consumidor final");
+  ok(S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome), "fatura enviada com o texto da terapêutica de reabilitação");
+  const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt");
+  ok(e1 && e1.html.includes("Iniciará de seguida a sua terapêutica de reabilitação: " + esc(outro.nome)) && e1.subject.includes("Marcação confirmada"), "email de confirmação com o texto do Pedro (reabilitação)");
+  ok(S.emails.some((e) => e.to[0] === cat.spa.email && e.subject.includes(p1.numero)), "aviso à equipa por email");
+  await notificar(p1);
+  ok(Object.keys(S.docs).length === 1, "notificação repetida não emite segunda fatura");
+
+  // 2) Newsletter: código de 10%, usado numa massagem (TPREV) por Multibanco, com NIF
+  const n1 = await news({ body: JSON.stringify({ payload: { form_name: "newsletter", data: { email: "Rui@Exemplo.pt" } } }) });
+  const boas = S.emails.find((e) => e.to[0] === "rui@exemplo.pt");
+  const codigo = boas?.html.match(/BEMVINDO-[A-Z0-9]{6}/)?.[0];
+  ok(n1.statusCode === 200 && codigo, `newsletter: código ${codigo} enviado por email`);
+  await news({ body: JSON.stringify({ payload: { form_name: "newsletter", data: { email: "rui@exemplo.pt" } } }) });
+  ok(S.emails.filter((e) => e.to[0] === "rui@exemplo.pt").length === 1, "reinscrever-se não gera outro código");
+  r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: codigo.toLowerCase() });
+  const com10 = r2(relax.preco * 0.9);
+  ok(r.j.total === com10 && r.j.codigo.tipo === "newsletter", `preço com o código: ${relax.preco} € → ${r.j.total} €`);
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
+  const p2 = r.j;
+  ok(p2.total === com10 && p2.multibanco?.referencia === "123456789" && S.mb[0].valor === com10, "referência Multibanco com o valor já com desconto");
+  ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.subject.startsWith("Dados para pagamento") && e.html.includes("123 456 789")), "email com a referência Multibanco");
+  await notificar(p2, { mp: "PC:PT" });
+  const d2 = Object.values(S.docs)[1];
+  ok(d2.dados.products[0].productId === 102 && d2.dados.products[0].price === com10 && d2.totalValue === com10, "fatura TPREV com o valor já com o desconto");
+  ok(d2.dados.customerId === 50 && d2.dados.payments[0].paymentMethodId === 4, "com NIF: cliente criado no Moloni ON; meio Multibanco");
+  ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.html.includes("cuidar da sua saúde e bem-estar. Iniciará de seguida a sua terapêutica de prevenção: " + esc(relax.nome))), "email com o texto da terapêutica de prevenção");
+  r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo });
+  ok(r.status === 400 && /já foi usado/.test(r.j.erro), "código de boas-vindas só serve uma vez");
+
+  // 3) Código VIP: massagem a 0 €, sem pagamento nem fatura
+  const docsAntes = Object.keys(S.docs).length, eupagoAntes = S.mb.length + S.mbway.length + S.cartao.length;
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "11:00", nome: "Cliente VIP", email: "vip@exemplo.pt", codigo: " vip " });
+  ok(r.j.estado === "confirmado" && r.j.total === 0, "código VIP: marcação confirmada a 0 €");
+  ok(Object.keys(S.docs).length === docsAntes && S.mb.length + S.mbway.length + S.cartao.length === eupagoAntes, "VIP: sem pagamento na euPago e sem fatura");
+  ok(S.emails.some((e) => e.to[0] === "vip@exemplo.pt" && e.html.includes("terapêutica de prevenção") && e.html.includes("Sem custos")), "VIP: email de confirmação na mesma");
+  r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, codigo: "VIP" });
+  ok(r.status === 400, "VIP não serve para comprar vouchers");
+
+  // 4) Voucher oferta: pago por cartão, código só no email, depois usado numa marcação
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, para: "Maria", de: "João", mensagem: "Para parares.", nome: "João", email: "joao@exemplo.pt", metodo: "card" });
+  const p4 = r.j;
+  ok(p4.url === "https://pagar.exemplo/cc1" && S.cartao[0].payment.amount.value === relax.preco && S.cartao[0].payment.successUrl.includes(`/pagamento/?n=${p4.numero}`), "voucher: segue para o pagamento com cartão e volta à página do pedido");
+  await notificar(p4, { mp: "CC:PT" });
+  const ev = S.emails.find((e) => e.to[0] === "joao@exemplo.pt" && e.subject.startsWith("O seu voucher"));
+  const vcod = ev?.html.match(/OMS-[A-Z0-9]{4}-[A-Z0-9]{4}/)?.[0];
+  ok(vcod && ev.html.includes("Válido até") && ev.html.includes(validadeVoucher().slice(0, 4)), `voucher: código ${vcod} e validade só no email`);
+  r = await pedir(`/api/pedido?n=${p4.numero}&t=${p4.token}`, null, "GET");
+  ok(r.j.estado === "pago" && !JSON.stringify(r.j).includes(vcod), "a página do pedido não mostra o código do voucher");
+  const d4 = Object.values(S.docs).at(-1);
+  ok(d4.dados.products[0].name.startsWith("Voucher oferta") && d4.dados.products[0].productId === 102 && d4.dados.payments[0].paymentMethodId === 2, "fatura do voucher: TPREV, meio Cartão");
+  r = await pedir("/api/preco", { tipo: "marcacao", tratamento: outro.id, codigo: vcod });
+  ok(r.status === 400 && r.j.erro.includes(relax.nome), "voucher só para o tratamento dele");
+  const docs5 = Object.keys(S.docs).length;
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "17:00", nome: "Maria", email: "maria@exemplo.pt", codigo: vcod });
+  ok(r.j.estado === "confirmado" && r.j.total === 0 && Object.keys(S.docs).length === docs5, "marcação com o voucher: 0 €, sem segunda fatura");
+  r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: vcod });
+  ok(r.status === 400 && /já foi usado/.test(r.j.erro), "voucher só serve uma vez");
+
+  // 5) Validações
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
+  ok(r.status === 400, "tratamento desconhecido é recusado");
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "123", metodo: "mb_way" });
+  ok(r.status === 400 && /telemóvel/.test(r.j.erro), "MB WAY sem telemóvel válido é recusado");
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, nif: "123456788", metodo: "card" });
+  ok(r.status === 400 && /NIF/.test(r.j.erro), "NIF inválido é recusado");
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: "2020-01-01", hora: "10:00", ...cliente, metodo: "card" });
+  ok(r.status === 400, "dia no passado é recusado");
+
+  // 6) Artigo sem isenção no Moloni ON: a fatura fica por emitir com o erro guardado
+  S.artigos.TREAB = null;
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "12:00", ...cliente, metodo: "mb_way" });
+  await notificar(r.j);
+  const { obter } = await import("../servidor/pedidos.mjs");
+  const p6 = await obter(r.j.numero);
+  ok(p6.estado === "pago" && !p6.fatura && /isenção/.test(p6.moloni.erro) && S.emails.some((e) => e.subject.includes(p6.numero) && e.html.includes("isenção")), "artigo sem motivo de isenção: pago, sem fatura, e a equipa é avisada do erro");
+
+  // 7) euPago em modo de teste: a fatura fica só em rascunho
+  S.artigos.TREAB = "M10";
+  process.env.EUPAGO_MODO = "teste";
+  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "13:00", ...cliente, metodo: "mb_way" });
+  await notificar(r.j);
+  ok(Object.values(S.docs).at(-1).status === 0, "modo de teste: só rascunho no Moloni ON");
+
+  console.log("\nTudo certo.");
+} finally {
+  servidor.close();
+}

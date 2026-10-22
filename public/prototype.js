@@ -218,6 +218,15 @@
       e.preventDefault();
       var ok = s.name.trim() && /.+@.+\..+/.test(s.email);
       if (!ok) { root.querySelector('.bk-error').hidden = false; return; }
+      // Pagamento (public/pagar.js): código, meio de pagamento e confirmação no servidor
+      if (window.OMS_PAGAR) {
+        var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist(), d = s.day;
+        var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+        var voucher = root.querySelector('#bk-voucher');
+        OMS_PAGAR.abrir(root, { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', data: iso, hora: s.hour,
+          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone }, { voltar: render, codigo: !!(voucher && voucher.checked) });
+        return;
+      }
       s.done = true; render();
     });
 
@@ -302,6 +311,12 @@
       else if (b.dataset.amount) { v.amount = +b.dataset.amount; v.custom = ''; render(); }
       else if (b.dataset.format) { v.format = b.dataset.format; render(); }
       else if (b.hasAttribute('data-buy')) {
+        // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
+        if (window.OMS_PAGAR && v.mode === 'exp') {
+          var tr = byId(TREATMENTS, v.exp);
+          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.id, nomeTratamento: tr.name, para: v.to, de: v.from, mensagem: v.msg }, { voltar: render });
+          return;
+        }
         root.querySelector('[data-bought]').hidden = false;
         if (opts.onBuy) opts.onBuy(total());
       }

@@ -4,7 +4,8 @@ import path from 'node:path';
 import { ROOT, PUBLIC } from './lib.mjs';
 import { loadModel } from './modelo.mjs';
 import { home, massages } from './paginas.mjs';
-import { robots, sitemap, headers, llms } from './seo.mjs';
+import { robots, sitemap, headers, llms, head } from './seo.mjs';
+import { page, header, footer } from './partes.mjs';
 
 const DIST = path.join(ROOT, 'dist');
 fs.rmSync(DIST, { recursive: true, force: true });
@@ -22,6 +23,15 @@ const ms = massages(m);
 write('index.html', h.html);
 write('massagens-porto/index.html', ms.html);
 
+/* Página de regresso do pagamento com cartão (fora do Google) */
+write('pagamento/index.html', page(m, {
+  headHtml: head(m, { title: 'Pagamento · ' + m.s.nome, description: 'Estado do pagamento da sua marcação ou voucher.', path: '/pagamento/' })
+    .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
+  ld: '',
+  body: header(m, { home: false, current: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
+  scripts: ['/pagar.js']
+}));
+
 /* Dados para a agenda e os vouchers (prototype.js) */
 const dados = {
   treatments: m.treatments.map((t) => {
@@ -32,6 +42,17 @@ const dados = {
   team: m.team.map((p, i) => ({ id: p.id, name: p.nome, role: p.funcao, focus: p.foco, bio: p.bio, does: p.faz || [], tone: (i % 4) + 1, photo: p.foto || '' }))
 };
 write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nwindow.OMS_DATA = ' + JSON.stringify(dados) + ';\n');
+
+/* Catálogo para o servidor de pagamentos (netlify/functions): os mesmos preços que o site mostra.
+   Relaxar fatura como TPREV (Terapêuticas de Prevenção), o resto como TREAB (Reabilitação). */
+const catalogo = {
+  gerado: new Date().toISOString(),
+  spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
+  tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' }))
+};
+const CAT = path.join(ROOT, 'servidor', 'gerado', 'catalogo.json');
+fs.mkdirSync(path.dirname(CAT), { recursive: true });
+fs.writeFileSync(CAT, JSON.stringify(catalogo, null, 1));
 
 write('robots.txt', robots(m));
 write('sitemap.xml', sitemap(m, ['/', '/massagens-porto/']));

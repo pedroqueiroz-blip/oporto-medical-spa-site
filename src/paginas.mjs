@@ -325,7 +325,7 @@ ${mbar(m, { home: true })}
       headHtml: head(m, { title: I.seo.titulo, description: homeDescription(m), path, ogTitle: I.seo.titulo_partilha, ogDescription: I.seo.descricao_partilha, ogImage: s.imagem_partilha || h.imagem }),
       ld: homeLD(m, faqItems),
       body,
-      scripts: ['/dados.js', '/prototype.js', '/site.js']
+      scripts: ['/dados.js', '/prototype.js', '/pagar.js', '/site.js']
     })
   };
 }

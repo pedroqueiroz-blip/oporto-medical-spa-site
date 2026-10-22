@@ -37,6 +37,12 @@ O build (`src/build.mjs`) gera tudo a partir do conteúdo, por isso nada disto s
 
 Textos com `[[a confirmar]]` nunca entram nos dados estruturados.
 
+## Pagamentos e faturação
+
+Marcações e vouchers pagam-se no site (euPago: MB WAY, Multibanco, cartão) e a fatura-recibo é emitida
+no Moloni ON (série SPA, artigos TPREV e TREAB isentos de IVA). Códigos `VIP`, 10% da newsletter e vouchers.
+Regras, emails e configuração: [docs/integracoes.md](docs/integracoes.md).
+
 ## Configuração inicial (uma vez)
 
 O backoffice entra com a conta GitHub de quem tem acesso a este repositório.
@@ -53,6 +59,9 @@ O backoffice entra com a conta GitHub de quem tem acesso a este repositório.
 content/      conteúdo editado no backoffice (JSON)
 public/       ficheiros estáticos (CSS, JS, imagens, logótipos) e o backoffice em public/admin
 src/          build: modelo de dados, páginas, SEO/GEO
+servidor/     pagamentos (euPago), faturação (Moloni ON), emails e códigos
+netlify/      funções do Netlify: /api/* e o código de 10% da newsletter
+tests/        teste dos pagamentos com serviços simulados (npm test)
 dist/         site gerado (não vai para o git)
 docs/         notas de arquitetura (pagamentos, faturação, agenda)
 ```
@@ -62,4 +71,5 @@ docs/         notas de arquitetura (pagamentos, faturação, agenda)
 ```
 npm run dev      # gera o site e serve-o em http://localhost:8080
 npm run cms      # noutro terminal: backoffice local em http://localhost:8080/admin/ (grava em content/)
+npm test         # pagamentos, faturas e emails contra euPago, Moloni ON e Resend simulados
 ```
