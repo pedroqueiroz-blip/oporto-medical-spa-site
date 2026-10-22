@@ -223,11 +223,10 @@
   var PessoaPreview = createClass({
     render: function () {
       var d = js(this.props.entry.get('data')) || {};
-      var foto = d.foto ? this.props.getAsset(d.foto) : null;
-      var ini = String(d.nome || '').split(' ').map(function (p) { return p[0] || ''; }).join('');
+      var foto = d.foto && d.mostrar_foto !== false ? this.props.getAsset(d.foto) : null;
       return h('section', { className: 'section' }, h('div', { className: 'wrap' }, h('article', { className: 'tm-card', style: { maxWidth: '300px' } },
         foto ? h('img', { src: foto.toString(), alt: '', style: { aspectRatio: '4/5', objectFit: 'cover', borderRadius: '160px 160px 0 0', marginBottom: '16px', width: '100%' } })
-             : h('div', { className: 'tm-card__photo pms-tone-1' }, h('span', {}, ini), h('small', {}, 'fotografia')),
+             : null,
         h('p', { className: 'tm-card__role' }, d.funcao || ''), h('h3', { className: 'tm-card__name' }, d.nome || ''),
         h('p', { className: 'tm-card__focus' }, d.foco || ''), h('p', { className: 'tm-card__bio' }, d.bio || ''),
         h('span', { className: 'tm-card__cta' }, 'Marcar com ' + String(d.nome || '').split(' ')[0]))));

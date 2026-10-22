@@ -81,11 +81,11 @@ function campaignSection(m) {
   </section>`;
 }
 
-function personCard(m, p, i) {
+function personCard(m, p) {
   const first = p.nome.split(' ')[0];
   const ph = p.foto
     ? `<div class="person__ph person__ph--photo">${picture(p.foto, { widths: [320, 640], sizes: '(max-width: 860px) 46vw, 22vw', alt: 'Retrato de ' + p.nome })}</div>`
-    : `<div class="person__ph pms-tone-${(i % 4) + 1}">Retrato</div>`;
+    : '';
   return `<article class="person">${ph}<p class="person__role">${esc(p.funcao)}</p><h3>${esc(p.nome)}</h3><p>${esc(p.foco)}</p>${p.credencial ? '<p class="cred">' + m.text.inline(p.credencial) + '</p>' : ''}<button type="button" data-book-with="${esc(p.id)}">Marcar com ${esc(first)}</button></article>`;
 }
 
@@ -223,7 +223,7 @@ export function home(m) {
         <p class="prose">${t.inline(I.equipa.texto)}${m.teamConfirmed ? '' : ' <mark class="tbc">nomes e cédulas ilustrativos</mark>'}</p>
       </div>
       <div class="team">
-        ${m.team.map((p, i) => personCard(m, p, i)).join('\n        ')}
+        ${m.team.map((p) => personCard(m, p)).join('\n        ')}
       </div>
     </div>
   </section>

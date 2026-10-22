@@ -398,7 +398,8 @@ collections:
       - { name: bio, label: Apresentação curta (agenda), widget: text }
       - { name: credencial, label: Linha da credencial, widget: string, required: false, hint: 'Ex.: Cédula OF n.º 12345' }
       - { name: cedula, label: N.º da cédula profissional (Google), widget: string, required: false }
-      - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5).' }
+      - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5). Sem retrato, o cartão mostra só o nome, a função e a especialidade.' }
+      - { name: mostrar_foto, label: Mostrar o retrato no site, widget: boolean, required: false, default: true, hint: 'Desligue para esconder o retrato sem o apagar.' }
       - { name: faz, label: Tratamentos que faz, widget: relation, collection: tratamentos, value_field: id, search_fields: [nome, nome_completo], display_fields: [nome], multiple: true }
       - { name: conhece, label: Áreas de conhecimento (Google), widget: list, required: false, field: { name: area, label: Área, widget: string } }
       - { name: confirmado, label: Dados confirmados, widget: boolean, required: false, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }
