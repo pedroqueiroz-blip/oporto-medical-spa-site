@@ -74,7 +74,7 @@
     "etiqueta": "Vouchers oferta",
     "titulo": "Ofereça",
     "titulo_destaque": "uma pausa.",
-    "texto": "Ofereça saúde, relaxamento e bem-estar. Um valor ou um ritual, em digital no mesmo instante ou numa caixa de linho entregue em casa.",
+    "texto": "Ofereça saúde, relaxamento e bem-estar. Escolha a massagem ou o ritual a oferecer, em digital no mesmo instante ou numa caixa de linho entregue em casa.",
     "nota": "Recebeu um voucher? Use o código no último passo da reserva."
   },
   "confianca": "Membro da International Medical SPA Association e da Spa Industry Association. Pioneiro em Portugal no conceito de medical spa.",
@@ -95,7 +95,7 @@
       { "pergunta": "Preciso de exame médico?", "resposta": "Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.", "automatica": "", "acrescento": "" },
       { "pergunta": "O que devo trazer?", "resposta": "Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.", "automatica": "", "acrescento": "" },
       { "pergunta": "O que significa medical spa?", "resposta": "Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Posso oferecer uma massagem?", "resposta": "Sim. Os vouchers oferta compram-se online, por valor ou por ritual, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.", "automatica": "", "acrescento": "" }
+      { "pergunta": "Posso oferecer uma massagem?", "resposta": "Sim. Os vouchers oferta compram-se online, escolhendo a massagem ou o ritual a oferecer, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.", "automatica": "", "acrescento": "" }
     ]
   },
   "como_chegar": {

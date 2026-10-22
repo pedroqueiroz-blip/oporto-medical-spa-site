@@ -16,7 +16,7 @@
   "whatsapp": "+351 93 616 30 30",
   "email": "reservas@oportomedicalspa.com",
   "horario": {
-    "semana_abre": "09:00",
+    "semana_abre": "08:00",
     "semana_fecha": "20:00",
     "sabado_aberto": true,
     "sabado_abre": "09:00",
@@ -35,6 +35,7 @@
     "titulo": "Cartas da casa",
     "titulo_destaque": "uma vez por mês.",
     "texto": "Os rituais do mês, as campanhas e pequenos conselhos para cuidar de si, no seu email. Sem excessos.",
+    "oferta": "Novo cliente? Inscreva-se e receba 10% de desconto na primeira marcação.",
     "botao": "Subscrever",
     "consentimento": "Aceito receber a newsletter do Oporto Medical Spa. Posso cancelar a qualquer momento.",
     "obrigado": "Obrigado. A próxima carta segue para o seu email."
