@@ -10,7 +10,8 @@ export function loadModel(today = new Date()) {
   const inicio = readJSON('inicio');
   const massagens = readJSON('massagens');
   const treatments = readList('tratamentos').filter((t) => t.visivel !== false);
-  const team = readList('equipa');
+  /* Retrato desligado no backoffice (mostrar_foto) = como se não houvesse foto: o cartão mostra só o texto */
+  const team = readList('equipa').map((p) => (p.mostrar_foto === false ? { ...p, foto: '' } : p));
 
   s.url = String(s.url || '').replace(/\/+$/, '');
   const byId = (id) => treatments.find((t) => t.id === id);

@@ -1,0 +1,18 @@
+{
+  "ordem": 85,
+  "id": "localizada",
+  "nome": "Localizada",
+  "nome_completo": "Massagem Manual Localizada",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem localizada",
+  "texto": "Alívio da tensão muscular nas costas, pescoço e ombros através de técnicas específicas.",
+  "texto_massagens": "",
+  "descricao_seo": "Alívio da tensão muscular nas costas, pescoço e ombros através de técnicas específicas.",
+  "indicado_para": "Tensão nas costas, pescoço e ombros",
+  "como_e": "Técnicas específicas na zona de tensão",
+  "pressao": "",
+  "duracao": 45,
+  "preco": 40,
+  "visivel": true,
+  "artigo": "a"
+}

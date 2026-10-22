@@ -25,13 +25,14 @@ export function readJSON(name) {
 
 /* Lista com um ficheiro por item (content/tratamentos/oil.json), pela ordem do campo «ordem». */
 export function readList(name) {
-  return jsonFiles(path.join(CONTENT, name)).map((f) => f.data).sort(byOrder);
+  return jsonFiles(path.join(CONTENT, name)).map((f) => ({ _id: f.key, ...f.data })).sort(byOrder);
 }
 
-/* Campanhas (content/campanhas/): a primeira pela ordem é a principal, as outras rodam por baixo.
+/* Campanhas (content/campanhas/): a primeira em vigor pela ordem é a principal, as outras rodam por baixo.
    O selo dourado «Em campanha» vai para o tratamento da primeira campanha ligada que o tenha pedido. */
 export function readCampaigns(isLive) {
-  const [main = {}, ...extras] = readList('campanhas');
+  const all = readList('campanhas');
+  const [main = {}, ...extras] = [...all.filter(isLive), ...all.filter((c) => !isLive(c))];
   const badge = [main, ...extras].find((c) => c.selo_em_campanha && c.tratamento && isLive(c));
   return { ...main, extras, destaque_tratamento: badge ? badge.tratamento : null, destaque_preco: badge ? badge.preco : null };
 }

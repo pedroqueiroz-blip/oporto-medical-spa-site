@@ -753,3 +753,11 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .vc-desc { margin: 12px 0 0; font-size: 14px; color: var(--oat); }
 .news__offer { margin: 14px 0 0; display: inline-block; padding: 6px 12px; border: 1px solid var(--flame); border-radius: 2px; color: var(--flame); font-size: 14px; }
 @media (max-width: 880px) { .vc-preview { position: static; } }
+
+/* Campanhas de vouchers: condições e etiqueta no cartão */
+.month2 .camp-cond { border-top: 0; max-width: 52ch; }
+.month2 .camp-cond li { display: block; padding: 0; border: 0; font-size: 12px; line-height: 1.7; }
+.month2 .camp-cond li::before { content: "· "; }
+.vc-card__camp + .vc-card__name { margin-top: 6px; }
+.vc-card__camp { margin: 28px 0 0; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--flame); }
+.vc-total s { font-size: .8em; opacity: .6; margin-left: 6px; }

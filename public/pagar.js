@@ -84,8 +84,8 @@
         '<form class="bk-form" novalidate>' +
         (pedeDados ? '<label class="field"><span>O seu nome</span><input id="pg-nome" autocomplete="name" value="' + esc(st.nome) + '" required></label>' +
           '<label class="field"><span>O seu email</span><input id="pg-email" type="email" autocomplete="email" value="' + esc(st.email) + '" required></label>' : '') +
-        '<div class="pg-codigo"><label class="field"><span>' + (pedido.tipo === 'voucher' ? 'Código de desconto' : 'Código VIP, de desconto ou de voucher') + '</span><input id="pg-codigo" autocomplete="off" autocapitalize="characters" value="' + esc(st.codigo) + '"></label>' +
-        '<button type="button" class="btn btn--ghost" data-aplicar>Aplicar</button></div>' +
+        (opts.semCodigo ? '<p class="bk-note">Preço de campanha, não acumulável com outros códigos ou descontos.</p>' : '<div class="pg-codigo"><label class="field"><span>' + (pedido.tipo === 'voucher' ? 'Código de desconto' : 'Código VIP, de desconto ou de voucher') + '</span><input id="pg-codigo" autocomplete="off" autocapitalize="characters" value="' + esc(st.codigo) + '"></label>' +
+        '<button type="button" class="btn btn--ghost" data-aplicar>Aplicar</button></div>') +
         (gratis ? '' :
           '<div class="vc-row"><p class="vc-label">Como quer pagar</p><div class="vc-seg" role="group">' +
           [['mb_way', 'MB WAY'], ['multibanco', 'Multibanco'], ['card', 'Cartão']].map(function (m) {
@@ -101,13 +101,13 @@
     }
 
     function calcular(codigo, focar) {
-      return api('/preco', { tipo: pedido.tipo, tratamento: pedido.tratamento, codigo: codigo })
+      return api('/preco', { tipo: pedido.tipo, tratamento: pedido.tratamento, campanha: pedido.campanha, codigo: codigo })
         .then(function (c) { st.conta = c; st.codigo = codigo; render(); })
         .catch(function (e) {
           // Código inválido: volta ao preço sem código e mostra porquê
           st.codigo = codigo;
           if (!codigo) return render(e.message);
-          return api('/preco', { tipo: pedido.tipo, tratamento: pedido.tratamento }).then(function (c) { st.conta = c; }, function () {}).then(function () { render(e.message); });
+          return api('/preco', { tipo: pedido.tipo, tratamento: pedido.tratamento, campanha: pedido.campanha }).then(function (c) { st.conta = c; }, function () {}).then(function () { render(e.message); });
         })
         .then(function () { if (focar) { var i = root.querySelector('#pg-codigo'); if (i) i.focus(); } });
     }

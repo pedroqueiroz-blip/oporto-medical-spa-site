@@ -10,15 +10,18 @@
     if (booking) { booking.preset(p); $('#reservar').scrollIntoView(); }
     else location.href = '/#reservar';
   }
-  var voucherEl = $('#voucher');
+  var voucherEl = $('#voucher'), voucher = null;
   if (voucherEl && window.PMS) {
     var count = 0, sum = 0, cart = $('#cart');
-    PMS.mountVoucher(voucherEl, { onBuy: function (v) {
+    voucher = PMS.mountVoucher(voucherEl, { onBuy: function (v) {
       count++; sum += v; cart.hidden = false; cart.textContent = 'Carrinho · ' + count + ' · ' + PMS.eur(sum);
     } });
   }
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-book]'); if (b) return goBook({ treatment: b.getAttribute('data-book') });
+    // Botão de uma campanha de vouchers: abre o voucher dessa campanha
+    var cv = e.target.closest('[data-voucher]');
+    if (cv) { if (voucher) { e.preventDefault(); voucher.preset(cv.getAttribute('data-voucher')); $('#oferecer').scrollIntoView(); } return; }
     var w = e.target.closest('[data-book-with]'); if (w && !w.closest('#booking')) goBook({ therapist: w.getAttribute('data-book-with') });
   });
 

@@ -1,7 +1,7 @@
 /* Build do site: content/*.json + public/ → dist/. Corre no Netlify a cada publicação (node src/build.mjs). */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, PUBLIC } from './lib.mjs';
+import { ROOT, PUBLIC, readList } from './lib.mjs';
 import { loadModel } from './modelo.mjs';
 import { home, massages, areaPage } from './paginas.mjs';
 import { robots, sitemap, headers, llms, head, INDEXNOW_KEY } from './seo.mjs';
@@ -11,7 +11,8 @@ const DIST = path.join(ROOT, 'dist');
 fs.rmSync(DIST, { recursive: true, force: true });
 fs.cpSync(PUBLIC, DIST, { recursive: true });
 
-const m = loadModel();
+/* OMS_HOJE=2026-11-25 node src/build.mjs gera o site como nesse dia (para ver campanhas futuras) */
+const m = loadModel(process.env.OMS_HOJE ? new Date(process.env.OMS_HOJE + 'T12:00:00Z') : undefined);
 const write = (rel, data) => {
   const f = path.join(DIST, rel);
   fs.mkdirSync(path.dirname(f), { recursive: true });
@@ -44,6 +45,11 @@ const dados = {
     const h = m.s.horario || {}, f = (x) => String(x || '').replace(/^0/, '').replace(':', 'h');
     return { telefone: m.s.telefone, horario: '2.ª a 6.ª ' + f(h.semana_abre) + '–' + f(h.semana_fecha) + (h.sabado_aberto ? ', sábado ' + f(h.sabado_abre) + '–' + f(h.sabado_fecha) : '') };
   })(),
+  /* Vouchers de campanha em vigor (Black Week, Natal…): aparecem primeiro na escolha do voucher */
+  campaignVouchers: [m.campaign, ...m.extraCampaigns].filter((c) => c && c.so_vouchers && c.tratamento && c.preco && m.byId(c.tratamento)).map((c) => {
+    const t = m.byId(c.tratamento);
+    return { id: 'c-' + c._id, camp: c._id, treatment: t.id, area: t.grupo, name: t.nome_completo || t.nome, label: (c.etiqueta || 'Campanha').split(' · ')[0], min: c.duracao || t.duracao, price: c.preco, oldPrice: c.preco_antigo || null, text: t.texto, camp_title: [c.titulo, c.titulo_destaque].filter(Boolean).join(' ') };
+  }),
   team: m.team.map((p, i) => ({ id: p.id, name: p.nome, role: p.funcao, focus: p.foco, bio: p.bio, does: p.faz || [], tone: (i % 4) + 1, photo: p.foto || '' }))
 };
 write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nwindow.OMS_DATA = ' + JSON.stringify(dados) + ';\n');
@@ -56,6 +62,12 @@ const catalogo = {
   spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
   tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' })),
   /* Para avisar o Bing/IndexNow depois de cada publicação (netlify/functions/deploy-succeeded.mjs) */
+  /* Campanhas de vouchers (todas as ligadas): o servidor confirma as datas e o limite no momento da compra */
+  campanhas: readList('campanhas').filter((c) => c.ativa && c.so_vouchers && c.tratamento && c.preco && m.byId(c.tratamento)).map((c) => {
+    const t = m.byId(c.tratamento);
+    return { id: c._id, nome: (c.etiqueta ? c.etiqueta.split(' · ')[0] + ' · ' : '') + (t.nome_completo || t.nome), tratamento: t.id, preco: c.preco, preco_antigo: c.preco_antigo || t.preco, duracao: c.duracao || t.duracao,
+      inicio: c.inicio ? c.inicio.slice(0, 10) : '', fim: c.fim ? c.fim.slice(0, 10) : '', limite: Number(c.limite_vouchers) || 0 };
+  }),
   seo: { indexar: !!m.s.indexar, chave: INDEXNOW_KEY, paginas: PAGINAS.map((p) => m.s.url + p).concat(m.s.url + '/llms.txt') }
 };
 const CAT = path.join(ROOT, 'servidor', 'gerado', 'catalogo.json');

@@ -23,7 +23,7 @@ export default async (req) => {
     if (rota === "/preco" && m === "POST") {
       const c = await corpo(req);
       if (c.codigo) await pausa(300);
-      const r = await calcular({ tipo: c.tipo, tratamento: c.tratamento, codigo: c.codigo });
+      const r = await calcular({ tipo: c.tipo, tratamento: c.tratamento, codigo: c.codigo, campanha: c.campanha });
       return json({ precoBase: r.precoBase, desconto: r.desconto, total: r.total, codigo: r.codigo && { tipo: r.codigo.tipo, texto: r.codigo.texto } });
     }
 

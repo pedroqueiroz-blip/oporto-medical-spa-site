@@ -1,0 +1,32 @@
+{
+  "ativa": true,
+  "assinatura": "",
+  "imagem": "/img/uploads/massagem-relax-oleo.jpg",
+  "imagem_alt": "Massagem manual nas costas com óleo, à luz de uma vela",
+  "inclui": [],
+  "selo": false,
+  "selo_texto": "",
+  "selo_numero": "",
+  "selo_em_campanha": false,
+  "so_vouchers": true,
+  "ordem": 1,
+  "inicio": "2026-11-23",
+  "fim": "2026-11-29",
+  "etiqueta": "Black Week · 23 a 29 de novembro",
+  "titulo": "Um Momento",
+  "titulo_destaque": "Só Seu",
+  "texto": "**Massagem Manual Localizada.** Uma oportunidade especial para fazer uma pausa, aliviar a tensão muscular e descobrir a experiência de cuidado do Oporto Medical Spa.",
+  "tratamento": "localizada",
+  "duracao": 45,
+  "preco": 33,
+  "preco_antigo": 40,
+  "botao": "Garanta o seu voucher Black Week",
+  "limite_vouchers": 25,
+  "condicoes": [
+    "Disponível para compra apenas de 23 a 29 de novembro de 2026.",
+    "Limitado aos primeiros 25 vouchers.",
+    "Voucher válido por 12 meses após a data da aquisição.",
+    "Não acumulável com outras campanhas ou descontos."
+  ],
+  "tipo_servico": "Massagem localizada"
+}

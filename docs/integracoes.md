@@ -43,6 +43,14 @@ Os pedidos e os códigos ficam no Netlify Blobs. Teste completo com serviços si
 
 O código `VIP` funciona para quem o souber: se for preciso mudá-lo, define-se outro em `CODIGO_VIP` no Netlify.
 
+## Campanhas de vouchers (Black Week, Natal…)
+
+- No backoffice, a campanha com «Campanha de vouchers» ligada vende vouchers do tratamento escolhido ao preço de campanha,
+  com a duração da campanha, só entre as datas de início e fim (dia de Lisboa, confirmado no servidor no momento da compra).
+- Não acumula com códigos (newsletter, VIP, vouchers). O preço normal da marcação não muda.
+- «Limite de vouchers»: contados quando o pagamento é confirmado; depois do limite, o site responde que esgotaram.
+- A fatura sai pelo valor de campanha, no artigo do tratamento (TPREV/TREAB).
+
 ## Vouchers
 
 - Sempre de um tratamento (sem valor livre), só digitais.
@@ -76,6 +84,7 @@ nunca no repositório. Depois de as criar, é preciso publicar de novo (*Deploys
 | `RESEND_API_KEY`, `EMAIL_FROM` | Envio dos emails (Resend), por exemplo `Oporto Medical Spa <reservas@oportomedicalspa.com>` |
 | `EMAIL_RESERVAS` | Opcional: outro email para os avisos à equipa |
 | `CODIGO_VIP` | Opcional: outro código VIP |
+| `BACKOFFICE_PASSWORD`, `BACKOFFICE_GITHUB_TOKEN` | Entrada no backoffice (/admin) com palavra-passe (ver README) |
 | `BUILD_HOOK_URL` | Reconstrução diária do site, para as campanhas mudarem nas datas (ver README) |
 | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | Agenda (fase seguinte) |
 

@@ -177,6 +177,29 @@ try {
   await notificar(r.j);
   ok(Object.values(S.docs).at(-1).status === 0, "modo de teste: só rascunho no Moloni ON");
 
+  // 8) Campanha de vouchers: preço de campanha só entre as datas, sem códigos, com limite de vendas
+  const CAT = (await import("../servidor/gerado/catalogo.json", { with: { type: "json" } })).default;
+  const hoje = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Lisbon" });
+  CAT.campanhas = [...(CAT.campanhas || []),
+    { id: "teste-ja", nome: "Teste · " + relax.nome, tratamento: relax.id, preco: 11, preco_antigo: relax.preco, duracao: 45, inicio: hoje, fim: hoje, limite: 1 },
+    { id: "teste-futura", nome: "Futura", tratamento: relax.id, preco: 9, duracao: 45, inicio: "2099-01-01", fim: "2099-01-31", limite: 0 }];
+  r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, campanha: "teste-ja" });
+  ok(r.j.total === 11, "voucher de campanha ao preço de campanha");
+  r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, campanha: "teste-futura" });
+  ok(r.status === 400 && /vigor/.test(r.j.erro), "campanha fora das datas é recusada");
+  r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, campanha: "teste-ja" });
+  ok(r.status === 400 && /vouchers/.test(r.j.erro), "preço de campanha de vouchers não vale para marcações");
+  r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, campanha: "teste-ja", codigo });
+  ok(r.status === 400 && /acumulam/.test(r.j.erro), "campanha não acumula com códigos");
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, campanha: "teste-ja", nome: "Eva", email: "eva@exemplo.pt", metodo: "mb_way", telemovel: "912345678" });
+  ok(r.j.total === 11, "voucher de campanha pedido por 11 €");
+  await notificar(r.j);
+  const evc = S.emails.find((e) => e.to[0] === "eva@exemplo.pt" && e.subject.includes("voucher"));
+  ok(evc && evc.html.includes("45 minutos") && evc.html.includes("Teste"), "email do voucher com a duração e a campanha");
+  ok(Object.values(S.docs).at(-1).dados.products[0].price === 11, "fatura com o preço de campanha");
+  r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, campanha: "teste-ja" });
+  ok(r.status === 400 && /esgotaram/.test(r.j.erro), "depois do limite, a campanha esgota");
+
   console.log("\nTudo certo.");
 } finally {
   servidor.close();

@@ -93,6 +93,7 @@
 </style>
 </head>
 <body>
+<script>window.CMS_MANUAL_INIT = true;</script>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>
   /* Pré-visualizações com o aspeto do site (letras, cores e classes de /site.css) */
@@ -222,17 +223,20 @@
   var PessoaPreview = createClass({
     render: function () {
       var d = js(this.props.entry.get('data')) || {};
-      var foto = d.foto ? this.props.getAsset(d.foto) : null;
-      var ini = String(d.nome || '').split(' ').map(function (p) { return p[0] || ''; }).join('');
+      var foto = d.foto && d.mostrar_foto !== false ? this.props.getAsset(d.foto) : null;
       return h('section', { className: 'section' }, h('div', { className: 'wrap' }, h('article', { className: 'tm-card', style: { maxWidth: '300px' } },
         foto ? h('img', { src: foto.toString(), alt: '', style: { aspectRatio: '4/5', objectFit: 'cover', borderRadius: '160px 160px 0 0', marginBottom: '16px', width: '100%' } })
-             : h('div', { className: 'tm-card__photo pms-tone-1' }, h('span', {}, ini), h('small', {}, 'fotografia')),
+             : null,
         h('p', { className: 'tm-card__role' }, d.funcao || ''), h('h3', { className: 'tm-card__name' }, d.nome || ''),
         h('p', { className: 'tm-card__focus' }, d.foco || ''), h('p', { className: 'tm-card__bio' }, d.bio || ''),
         h('span', { className: 'tm-card__cta' }, 'Marcar com ' + String(d.nome || '').split(' ')[0]))));
     }
   });
   CMS.registerPreviewTemplate('equipa', PessoaPreview);
+
+  /* Entrada com a palavra-passe da equipa (netlify/functions/admin-entrar.mjs), no próprio site.
+     Sem a palavra-passe definida no Netlify, essa página encaminha para a entrada com conta GitHub. */
+  CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'admin-entrar' } } });
 </script>
 </body>
 </html>

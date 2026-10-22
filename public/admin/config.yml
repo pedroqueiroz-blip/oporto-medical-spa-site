@@ -49,10 +49,10 @@ collections:
       - { label: Desligadas, field: ativa, pattern: false }
     editor: { preview: true }
     fields:
-      - { name: ordem, label: Ordem, widget: number, value_type: int, default: 50, hint: 'A campanha com o número mais baixo é a principal (a grande, com assinatura e selo de marca). As outras rodam por baixo.' }
+      - { name: ordem, label: Ordem, widget: number, value_type: int, default: 50, hint: 'Das campanhas em vigor, a de número mais baixo é a principal. As outras rodam por baixo.' }
       - { name: ativa, label: Campanha ligada (aparece no site), widget: boolean, required: false, default: true }
       - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = já em vigor.' }
-      - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = sem data de fim. Depois desta data a campanha sai do site na publicação seguinte.' }
+      - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = sem data de fim. A campanha entra e sai do site sozinha nas datas marcadas.' }
       - { name: etiqueta, label: Etiqueta por cima do título, widget: string }
       - { name: titulo, label: Título, widget: string }
       - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
@@ -70,6 +70,10 @@ collections:
       - { name: selo_numero, label: Número do selo, widget: string, required: false }
       - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
       - { name: selo_em_campanha, label: Pôr o selo dourado «Em campanha» no tratamento, widget: boolean, required: false, default: false, hint: 'O tratamento escolhido acima ganha um pequeno botão dourado «Em campanha» em «Rituais e tratamentos» e na agenda, com o preço de campanha e o preço normal riscado. Só conta a primeira campanha ligada com isto ativo.' }
+      - { name: so_vouchers, label: Campanha de vouchers (preço de campanha só na compra de vouchers), widget: boolean, required: false, default: false, hint: 'O botão abre o voucher desta campanha em «Oferecer», ao preço de campanha e com a duração acima, só entre as datas de início e fim. Não acumula com códigos de desconto.' }
+      - { name: botao, label: Texto do botão, widget: string, required: false, hint: 'Ex.: Garanta o seu voucher Black Week. Vazio = «Reservar» (ou «Oferecer voucher» nas campanhas de vouchers).' }
+      - { name: limite_vouchers, label: Limite de vouchers (opcional), widget: number, value_type: int, min: 0, required: false, hint: 'Ex.: 25. Depois de vendidos, o site responde que esgotaram. Vazio ou 0 = sem limite.' }
+      - { name: condicoes, label: Condições (letra pequena), widget: list, required: false, field: { name: linha, label: Linha, widget: string } }
 
   - name: inicio
     label: Página inicial
@@ -394,7 +398,8 @@ collections:
       - { name: bio, label: Apresentação curta (agenda), widget: text }
       - { name: credencial, label: Linha da credencial, widget: string, required: false, hint: 'Ex.: Cédula OF n.º 12345' }
       - { name: cedula, label: N.º da cédula profissional (Google), widget: string, required: false }
-      - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5).' }
+      - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5). Sem retrato, o cartão mostra só o nome, a função e a especialidade.' }
+      - { name: mostrar_foto, label: Mostrar o retrato no site, widget: boolean, required: false, default: true, hint: 'Desligue para esconder o retrato sem o apagar.' }
       - { name: faz, label: Tratamentos que faz, widget: relation, collection: tratamentos, value_field: id, search_fields: [nome, nome_completo], display_fields: [nome], multiple: true }
       - { name: conhece, label: Áreas de conhecimento (Google), widget: list, required: false, field: { name: area, label: Área, widget: string } }
       - { name: confirmado, label: Dados confirmados, widget: boolean, required: false, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }

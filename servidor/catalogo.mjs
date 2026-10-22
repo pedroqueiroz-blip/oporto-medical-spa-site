@@ -4,6 +4,8 @@ import catalogo from "./gerado/catalogo.json" with { type: "json" };
 
 export const spa = catalogo.spa;
 export const tratamento = (id) => catalogo.tratamentos.find((t) => t.id === id) || null;
+// Campanhas com preço só para vouchers (Black Week, Natal…): as datas confirmam-se no servidor, no dia de Lisboa.
+export const campanha = (id) => (catalogo.campanhas || []).find((c) => c.id === id) || null;
 
 // Textos do email de confirmação (pedido do Pedro, 22/10/2026). TPREV = área Relaxar, TREAB = todas as outras.
 export const TEXTO_TERAPEUTICA = {

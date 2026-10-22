@@ -38,7 +38,11 @@ function campaignBlock(m, c, extra) {
   const items = (c.inclui || []).map((x) => '<li>' + t.inline(x) + '</li>');
   if (c.duracao) items.push('<li>Duração: ' + minutes(c.duracao) + '</li>');
   else if (!items.some((x) => /Duração/.test(x))) items.push('<li><mark class="tbc">Duração: a confirmar</mark></li>');
-  const book = c.tratamento ? `<button type="button" class="btn btn--primary" data-book="${esc(c.tratamento)}">Reservar</button>` : '<a class="btn btn--primary" href="#reservar">Reservar</a>';
+  /* Campanha só de vouchers (Black Week, Natal…): o botão abre o voucher da campanha, ao preço de campanha */
+  const book = c.so_vouchers && c.tratamento
+    ? `<a class="btn btn--primary" href="#oferecer" data-voucher="c-${esc(c._id)}">${esc(c.botao || 'Oferecer voucher')}</a>`
+    : c.tratamento ? `<button type="button" class="btn btn--primary" data-book="${esc(c.tratamento)}">${esc(c.botao || 'Reservar')}</button>` : `<a class="btn btn--primary" href="#reservar">${esc(c.botao || 'Reservar')}</a>`;
+  const cond = (c.condicoes || []).filter(Boolean);
   const h = extra ? 'h3' : 'h2';
   return `<div class="wrap split${extra ? ' camp-extra' : ''}">
       ${img}
@@ -51,8 +55,9 @@ function campaignBlock(m, c, extra) {
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px">
           <span class="price-d">${c.preco ? esc(eur(c.preco)) + (c.preco_antigo ? '<s><span class="sr-only">Preço normal </span>' + esc(eur(c.preco_antigo)) + '</s>' : '') : '<mark class="tbc">preço a confirmar</mark>'}</span>
           ${book}
-          <a href="#oferecer" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">Oferecer</a>
+          ${c.so_vouchers ? '' : `<a href="#oferecer" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">Oferecer</a>`}
         </div>
+        ${cond.length ? '<ul class="camp-cond">' + cond.map((x) => '<li>' + t.inline(x) + '</li>').join('') + '</ul>' : ''}
       </div>
     </div>`;
 }
@@ -76,11 +81,11 @@ function campaignSection(m) {
   </section>`;
 }
 
-function personCard(m, p, i) {
+function personCard(m, p) {
   const first = p.nome.split(' ')[0];
   const ph = p.foto
     ? `<div class="person__ph person__ph--photo">${picture(p.foto, { widths: [320, 640], sizes: '(max-width: 860px) 46vw, 22vw', alt: 'Retrato de ' + p.nome })}</div>`
-    : `<div class="person__ph pms-tone-${(i % 4) + 1}">Retrato</div>`;
+    : '';
   return `<article class="person">${ph}<p class="person__role">${esc(p.funcao)}</p><h3>${esc(p.nome)}</h3><p>${esc(p.foco)}</p>${p.credencial ? '<p class="cred">' + m.text.inline(p.credencial) + '</p>' : ''}<button type="button" data-book-with="${esc(p.id)}">Marcar com ${esc(first)}</button></article>`;
 }
 
@@ -218,7 +223,7 @@ export function home(m) {
         <p class="prose">${t.inline(I.equipa.texto)}${m.teamConfirmed ? '' : ' <mark class="tbc">nomes e cédulas ilustrativos</mark>'}</p>
       </div>
       <div class="team">
-        ${m.team.map((p, i) => personCard(m, p, i)).join('\n        ')}
+        ${m.team.map((p) => personCard(m, p)).join('\n        ')}
       </div>
     </div>
   </section>
