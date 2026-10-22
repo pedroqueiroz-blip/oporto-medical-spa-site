@@ -1,0 +1,18 @@
+{
+  "ordem": 80,
+  "id": "energizante",
+  "nome": "Energizante",
+  "nome_completo": "Massagem Energizante",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Manobras vigorosas para estimular a musculatura e recuperar a vitalidade física.",
+  "texto_massagens": "",
+  "descricao_seo": "Manobras vigorosas para estimular a musculatura e recuperar a vitalidade física.",
+  "indicado_para": "Fadiga muscular, vitalidade, recuperação",
+  "como_e": "Manobras vigorosas e intensas",
+  "pressao": "",
+  "duracao": 50,
+  "preco": 50,
+  "visivel": true,
+  "artigo": "a"
+}

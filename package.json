@@ -2,11 +2,17 @@
   "name": "oporto-medical-spa-site",
   "private": true,
   "type": "module",
-  "description": "Site do Oporto Medical Spa, gerado a partir do conteúdo do backoffice (Decap CMS).",
+  "description": "Site do Oporto Medical Spa, gerado a partir do conteúdo do backoffice (Decap CMS), com pagamentos euPago e faturação Moloni ON.",
   "scripts": {
     "build": "node src/build.mjs",
     "dev": "node src/build.mjs && python3 -m http.server 8080 --directory dist",
-    "cms": "npx decap-server"
+    "cms": "npx decap-server",
+    "test": "node src/build.mjs && node tests/pagamentos.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.4"
+  }
 }

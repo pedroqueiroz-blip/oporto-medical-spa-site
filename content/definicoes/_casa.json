@@ -1,0 +1,32 @@
+{
+  "descricao_negocio": "Medical spa no Porto com massagens de relaxamento, fisioterapia, drenagem linfática manual e Pilates clínico, feitos por fisioterapeutas e terapeutas especializadas.",
+  "areas_servidas": [
+    "Porto",
+    "Boavista, Porto",
+    "Foz do Douro, Porto",
+    "Nevogilde, Porto",
+    "Matosinhos",
+    "Vila Nova de Gaia"
+  ],
+  "comodidades": [
+    "Roupão, toalhas e chinelos",
+    "Ritual do chá à chegada",
+    "Atendimento individual em sala privada"
+  ],
+  "conhecimentos": [
+    "Massagem de relaxamento",
+    "Aromaterapia",
+    "Fisioterapia",
+    "Reeducação postural",
+    "Fisioterapia dermato-funcional",
+    "Drenagem linfática manual",
+    "Pilates clínico",
+    "Fitoterapia"
+  ],
+  "afiliacoes": [
+    "International Medical SPA Association",
+    "Spa Industry Association"
+  ],
+  "registo_ers": "E138084",
+  "frase_rodape": "Um compromisso pelos resultados terapêuticos."
+}

@@ -731,6 +731,20 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .bk-option--row .bk-option__meta { align-items: center; }
 @media (max-width: 640px) { .bk-camp { display: table; margin: 6px 0 0; } }
 
+/* Pagamento (public/pagar.js) */
+.pg-codigo { display: flex; align-items: end; gap: 12px; }
+.pg-codigo .field { flex: 1; }
+.pg .vc-seg { grid-template-columns: repeat(3, 1fr); }
+.pg [data-voltar] { justify-self: start; }
+.pg-pagina { padding-block: 160px 100px; min-height: 60vh; }
+
+/* Ligações para as páginas de cada área */
+.group-t__link { float: right; letter-spacing: .2em; color: var(--linen); opacity: .75; border-bottom: 1px solid rgba(181, 162, 136, .4); }
+.group-t__link:hover { opacity: 1; color: var(--flame); }
+.foot__areas { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 13px; }
+.foot__areas a { border-bottom: 1px solid rgba(181, 162, 136, .4); }
+.area-links a { border-bottom: 1px solid rgba(181, 162, 136, .5); }
+@media (max-width: 640px) { .group-t__link { float: none; display: block; margin-top: 8px; } }
 /* Voucher: direito, só a massagem escolhida, com o descritivo de «Rituais e tratamentos» */
 .vc-card { transform: none; aspect-ratio: auto; min-height: 0; overflow: visible; }
 .vc-card__name { margin: 28px 0 0; padding-right: 90px; font-family: var(--display); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.1; }

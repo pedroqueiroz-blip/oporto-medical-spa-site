@@ -1,0 +1,18 @@
+{
+  "ordem": 260,
+  "id": "modela-360",
+  "nome": "Protocolo Modela 360",
+  "nome_completo": "Protocolo Modela 360º",
+  "grupo": "Cuidar",
+  "tipo_servico": "Tratamento corporal",
+  "texto": "Protocolo exclusivo que combina Ondas Acústicas e massagem modeladora para melhorar a aparência da celulite e definir a silhueta.",
+  "texto_massagens": "",
+  "descricao_seo": "Protocolo exclusivo que combina Ondas Acústicas e massagem modeladora para melhorar a aparência da celulite e definir a silhueta.",
+  "indicado_para": "Celulite, qualidade dos tecidos e silhueta",
+  "como_e": "Ondas acústicas e massagem anticelulite",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 90,
+  "visivel": true,
+  "artigo": "o"
+}

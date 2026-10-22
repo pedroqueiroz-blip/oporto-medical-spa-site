@@ -1,0 +1,18 @@
+{
+  "ordem": 70,
+  "id": "pre-mama",
+  "nome": "Pré-Mamã",
+  "nome_completo": "Massagem Pré-Mamã",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Massagem concebida para a mulher grávida para relaxar, aliviar e proporcionar bem-estar durante a gravidez.",
+  "texto_massagens": "",
+  "descricao_seo": "Massagem concebida para a mulher grávida para relaxar, aliviar e proporcionar bem-estar durante a gravidez.",
+  "indicado_para": "Gravidez, pernas cansadas, tensão muscular",
+  "como_e": "Massagem suave adaptada à gravidez",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 70,
+  "visivel": true,
+  "artigo": "a"
+}

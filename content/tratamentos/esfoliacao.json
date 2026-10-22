@@ -1,0 +1,18 @@
+{
+  "ordem": 160,
+  "id": "esfoliacao",
+  "nome": "Esfoliação e Hidratação Corporal",
+  "nome_completo": "Esfoliação e Hidratação Corporal",
+  "grupo": "Relaxar",
+  "tipo_servico": "Tratamento corporal",
+  "texto": "Esfoliação revitalizante e hidratação profunda para uma pele renovada, suave e aveludada.",
+  "texto_massagens": "",
+  "descricao_seo": "Esfoliação revitalizante e hidratação profunda para uma pele renovada, suave e aveludada.",
+  "indicado_para": "Pele áspera, textura irregular, falta de suavidade",
+  "como_e": "Peeling corporal e hidratação nutritiva",
+  "pressao": "",
+  "duracao": 50,
+  "preco": 49,
+  "visivel": true,
+  "artigo": "a"
+}

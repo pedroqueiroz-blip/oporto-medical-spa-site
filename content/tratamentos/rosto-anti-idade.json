@@ -1,0 +1,18 @@
+{
+  "ordem": 150,
+  "id": "rosto-anti-idade",
+  "nome": "Tratamento Rosto - Anti-Idade",
+  "nome_completo": "Tratamento Rosto Anti-Idade",
+  "grupo": "Relaxar",
+  "tipo_servico": "Tratamento de rosto",
+  "texto": "Cuidado reestruturante que suaviza a aparência das rugas e melhora a firmeza e a textura da pele.",
+  "texto_massagens": "",
+  "descricao_seo": "Cuidado reestruturante que suaviza a aparência das rugas e melhora a firmeza e a textura da pele.",
+  "indicado_para": "Rugas, linhas de expressão, perda de firmeza",
+  "como_e": "Limpeza, tratamento reestruturante e máscara facial",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 65,
+  "visivel": true,
+  "artigo": "o"
+}

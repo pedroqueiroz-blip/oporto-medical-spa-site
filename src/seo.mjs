@@ -9,6 +9,8 @@ const clip = (s, n = 158) => {
 };
 const abs = (m, p) => !p ? '' : /^https?:/.test(p) ? p : m.s.url + (p.startsWith('/') ? p : '/' + p);
 const price2 = (n) => Number(n).toFixed(2);
+/* Chave pública do IndexNow (Bing, que alimenta o Copilot e a pesquisa do ChatGPT): publicada em /<chave>.txt */
+export const INDEXNOW_KEY = '5f0c2e8a9b6d4e31a7c3d18e2f94b6a0';
 
 export function homeDescription(m) {
   const own = m.inicio.seo.descricao;
@@ -35,6 +37,15 @@ export function massagesDescription(m) {
   const d = 'Massagens de relaxamento no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
   const list = relax.map((t) => t.nome + ' ' + eur(t.preco)).join(', ');
   return fit([d + ': ' + list + '. Reserve online.', d + ': ' + list + '.', d + '. Reserve online.']);
+}
+
+export function areaDescription(m, P) {
+  const own = P.seo && P.seo.descricao;
+  if (own) return clip(own);
+  const list = m.inGroup(P.grupo);
+  const d = (P.resumo_tipo ? P.resumo_tipo.charAt(0).toUpperCase() + P.resumo_tipo.slice(1) : P.grupo) + ' no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
+  const items = list.map((t) => t.nome + ' ' + eur(t.preco)).join(', ');
+  return fit([d + ': ' + items + '. Reserve online.', d + ': ' + items + '.', d + '. Reserve online.']);
 }
 
 export function head(m, { title, description, path, ogTitle, ogDescription, ogImage, hreflang }) {
@@ -81,8 +92,7 @@ function offer(m, t) {
   return o;
 }
 
-function campaignOffer(m) {
-  const c = m.campaign;
+function campaignOffer(m, c = m.campaign) {
   if (!c) return null;
   const name = [c.titulo, c.titulo_destaque, c.assinatura].filter(Boolean).join(' ');
   const o = { '@type': 'Offer', itemOffered: { '@type': 'Service', name, serviceType: c.tipo_servico || 'Massagem' } };
@@ -98,7 +108,7 @@ function campaignOffer(m) {
 export function business(m) {
   const s = m.s;
   const id = s.url + '/#spa';
-  const images = [s.imagem_partilha, m.inicio.hero.imagem, m.inicio.visita.imagem, m.inicio.casa.imagem, m.campaign && m.campaign.imagem].filter(Boolean).map((p) => abs(m, p));
+  const images = [s.imagem_partilha, m.inicio.hero.imagem, m.inicio.visita.imagem, m.inicio.casa.imagem, ...m.campaigns.map((c) => c.imagem)].filter(Boolean).map((p) => abs(m, p));
   const b = {
     '@type': ['DaySpa', 'Physiotherapy'],
     '@id': id,
@@ -123,7 +133,7 @@ export function business(m) {
   const same = (s.redes || []).map((r) => (typeof r === 'string' ? r : r.url)).filter((u) => /^https?:\/\//.test(u || ''));
   if (same.length) b.sameAs = same;
   if (s.telemovel) b.contactPoint = [{ '@type': 'ContactPoint', telephone: telE164(s.telemovel), contactType: 'reservations', availableLanguage: ['pt'] }];
-  const offers = [campaignOffer(m), ...m.treatments.map((t) => offer(m, t))].filter(Boolean);
+  const offers = [...m.campaigns.map((c) => campaignOffer(m, c)), ...m.treatments.map((t) => offer(m, t))].filter(Boolean);
   b.hasOfferCatalog = { '@type': 'OfferCatalog', name: 'Rituais e tratamentos', itemListElement: offers };
   /* A equipa só entra nos dados estruturados quando os nomes estão confirmados */
   if (m.teamConfirmed) {
@@ -176,6 +186,29 @@ export function massagesLD(m, faqItems, path) {
   return ld(graph);
 }
 
+export function areaLD(m, P, faqItems) {
+  const list = m.inGroup(P.grupo);
+  const url = m.s.url + P.path;
+  const graph = [
+    {
+      '@type': 'Service',
+      '@id': url + '#servico',
+      name: (P.nome_menu || P.titulo),
+      serviceType: P.resumo_tipo || P.grupo,
+      description: m.text.plain(P.texto),
+      provider: { '@id': m.s.url + '/#spa' },
+      areaServed: (m.s.areas_servidas || []).slice(0, 3).map((a) => ({ '@type': /,/.test(a) ? 'Place' : 'City', name: a })),
+      offers: list.map((t) => offer(m, t))
+    },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: m.s.url + '/' },
+      { '@type': 'ListItem', position: 2, name: P.nome_menu || P.titulo, item: url }
+    ] },
+    faqPage(url + '#perguntas', faqItems)
+  ].filter(Boolean);
+  return ld(graph);
+}
+
 function ld(graph) {
   const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 2).replace(/</g, '\\u003c');
   return '<script type="application/ld+json">\n' + json + '\n</script>';
@@ -186,8 +219,10 @@ export function robots(m) {
   return 'User-agent: *\nAllow: /\nDisallow: /admin/\n\nSitemap: ' + m.s.url + '/sitemap.xml\n';
 }
 
+/* lastmod: o dia da última alteração publicada (backoffice ou código) ou, se for mais recente,
+   o dia em que uma campanha entrou ou saiu. Não muda em reconstruções sem alterações. */
 export function sitemap(m, pages) {
-  const day = new Date().toISOString().slice(0, 10);
+  const day = [m.changed, ...m.campaignDays].filter(Boolean).sort().pop() || m.day;
   return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     pages.map((p) => '  <url><loc>' + esc(m.s.url + p) + '</loc><lastmod>' + day + '</lastmod></url>').join('\n') + '\n</urlset>\n';
 }
@@ -208,17 +243,19 @@ export function llms(m, faqItems) {
     '- Email: ' + s.email,
     '- Horário: ' + m.hoursShort + (s.horario && s.horario.sabado_aberto ? ' · Domingo fechado' : ' · Sábado e domingo fechado'),
     '- Reservas e vouchers: ' + s.url + '/#reservar', ''];
-  if (m.campaign) {
-    const c = m.campaign;
-    lines.push('## Campanha em vigor', '', '- ' + [c.titulo, c.titulo_destaque, c.assinatura].filter(Boolean).join(' ') +
-      (c.preco ? ': ' + eur(c.preco) : '') + (c.duracao ? ', ' + minutes(c.duracao) : '') + (c.fim ? ' (até ' + c.fim.slice(0, 10) + ')' : ''), '');
+  if (m.campaigns.length) {
+    lines.push(m.campaigns.length > 1 ? '## Campanhas em vigor' : '## Campanha em vigor', '');
+    m.campaigns.forEach((c) => lines.push('- ' + [c.titulo, c.titulo_destaque, c.assinatura].filter(Boolean).join(' ') +
+      (c.preco ? ': ' + eur(c.preco) : '') + (c.duracao ? ', ' + minutes(c.duracao) : '') + (c.fim ? ' (até ' + c.fim.slice(0, 10) + ')' : '')));
+    lines.push('');
   }
   lines.push('## Tratamentos e preços', '');
   m.groups.forEach((g) => {
     m.inGroup(g).forEach((t) => lines.push('- ' + t.nome_completo + ' (' + g.toLowerCase() + '): ' + eur(t.preco) + ', ' + minutes(t.duracao) + '. ' + (t.descricao_seo || '')));
   });
-  lines.push('', '## Páginas', '', '- [Início](' + s.url + '/)', '- [Massagens de relaxamento no Porto](' + s.url + '/massagens-porto/)', '');
-  const qs = faqItems.filter((x) => x.plain);
+  lines.push('', '## Páginas', '', '- [Início](' + s.url + '/)', '- [Massagens de relaxamento no Porto](' + s.url + '/massagens-porto/)',
+    ...m.areaPages.map((p) => '- [' + p.nome_menu + '](' + s.url + p.path + ')'), '');
+  const qs = faqItems.filter((x, i) => x.plain && faqItems.findIndex((y) => y.qSeo === x.qSeo) === i);
   if (qs.length) { lines.push('## Perguntas frequentes', ''); qs.forEach((x) => lines.push('**' + x.qSeo + '**', x.plain, '')); }
   return lines.join('\n');
 }

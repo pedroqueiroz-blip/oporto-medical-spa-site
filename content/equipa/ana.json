@@ -1,0 +1,20 @@
+{
+  "ordem": 10,
+  "id": "ana",
+  "nome": "Ana Ribeiro",
+  "funcao": "Fisioterapeuta",
+  "foco": "Reeducação postural e Pilates clínico",
+  "bio": "Acredita que cada corpo conta uma história. O trabalho dela é ouvi-la antes de a corrigir.",
+  "credencial": "Cédula OF n.º [[confirmar]]",
+  "cedula": "",
+  "foto": "",
+  "faz": [
+    "fisio",
+    "pilates"
+  ],
+  "conhece": [
+    "Reeducação postural",
+    "Pilates clínico"
+  ],
+  "confirmado": false
+}

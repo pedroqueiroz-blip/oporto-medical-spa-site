@@ -1,0 +1,18 @@
+{
+  "ordem": 170,
+  "id": "fisio",
+  "nome": "Fisioterapia",
+  "nome_completo": "Fisioterapia",
+  "grupo": "Recuperar",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Movimentos orientados e técnicas especializadas para aliviar a dor, recuperar a mobilidade e devolver confiança ao corpo. Um acompanhamento personalizado, adaptado às suas necessidades e ao seu ritmo de recuperação.",
+  "texto_massagens": "",
+  "descricao_seo": "Movimentos orientados e técnicas especializadas para aliviar a dor, recuperar a mobilidade e devolver confiança ao corpo. Um acompanhamento personalizado, adaptado às suas necessidades e ao seu ritmo de recuperação.",
+  "indicado_para": "Dor, limitações de movimento, recuperação funcional",
+  "como_e": "Avaliação. Terapia manual e exercícios",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 45,
+  "visivel": true,
+  "artigo": "a"
+}

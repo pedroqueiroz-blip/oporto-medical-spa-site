@@ -1,0 +1,17 @@
+{
+  "ordem": 40,
+  "ativa": false,
+  "inicio": "",
+  "fim": "",
+  "etiqueta": "Campanha do mês",
+  "titulo": "Quarta campanha",
+  "titulo_destaque": "",
+  "texto": "",
+  "imagem": "",
+  "imagem_alt": "",
+  "inclui": [],
+  "tratamento": "",
+  "duracao": null,
+  "preco": null,
+  "selo_em_campanha": false
+}

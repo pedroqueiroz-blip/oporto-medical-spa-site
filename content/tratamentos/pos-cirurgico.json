@@ -1,0 +1,18 @@
+{
+  "ordem": 200,
+  "id": "pos-cirurgico",
+  "nome": "Programa Reabilitação Pós-Cirúrgico",
+  "nome_completo": "Programa Reabilitação Pós-Cirúrgico",
+  "grupo": "Recuperar",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Um plano de recuperação personalizado para ajudar o corpo a recuperar a mobilidade, a funcionalidade e a confiança após uma cirurgia. Cada etapa é ajustada à sua evolução, respeitando os tempos de cicatrização e as orientações clínicas.",
+  "texto_massagens": "",
+  "descricao_seo": "Um plano de recuperação personalizado para ajudar o corpo a recuperar a mobilidade, a funcionalidade e a confiança após uma cirurgia. Cada etapa é ajustada à sua evolução, respeitando os tempos de cicatrização e as orientações clínicas.",
+  "indicado_para": "Recuperação da mobilidade e da funcionalidade após cirurgia",
+  "como_e": "Plano de reabilitação, adaptado à cirurgia e à evolução individual",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 60,
+  "visivel": true,
+  "artigo": "o"
+}

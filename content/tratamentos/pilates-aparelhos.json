@@ -1,0 +1,18 @@
+{
+  "ordem": 220,
+  "id": "pilates-aparelhos",
+  "nome": "Pilates com Aparelhos",
+  "nome_completo": "Pilates com Aparelhos",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Pilates clínico",
+  "texto": "Exercícios de Pilates com Aparelhos para fortalecer o corpo, melhorar a postura e aumentar a mobilidade.",
+  "texto_massagens": "",
+  "descricao_seo": "Exercícios de Pilates com Aparelhos para fortalecer o corpo, melhorar a postura e aumentar a mobilidade.",
+  "indicado_para": "Força muscular, postura e mobilidade",
+  "como_e": "Exercícios de Pilates com aparelhos",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 55,
+  "visivel": true,
+  "artigo": "o"
+}

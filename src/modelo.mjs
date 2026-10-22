@@ -1,16 +1,16 @@
 /* Lê o conteúdo do backoffice (content/*.json) e calcula o que se repete pelo site:
    preços, intervalos, horário, respostas automáticas e a campanha em vigor. */
-import { readJSON, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
+import { execFileSync } from 'node:child_process';
+import { readJSON, readList, readCampaigns, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
 
-const GROUP_AREA = { Fortalecer: 'Fisioterapia', Recuperar: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
+const GROUP_AREA = { Recuperar: 'Fisioterapia', Fortalecer: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
 
 export function loadModel(today = new Date()) {
   const s = readJSON('definicoes');
   const inicio = readJSON('inicio');
   const massagens = readJSON('massagens');
-  const camp = readJSON('campanha');
-  const treatments = readJSON('tratamentos').lista.filter((t) => t.visivel !== false);
-  const team = readJSON('equipa').lista;
+  const treatments = readList('tratamentos').filter((t) => t.visivel !== false);
+  const team = readList('equipa');
 
   s.url = String(s.url || '').replace(/\/+$/, '');
   const byId = (id) => treatments.find((t) => t.id === id);
@@ -51,7 +51,7 @@ export function loadModel(today = new Date()) {
   const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
 
   /* Respostas que se escrevem sozinhas a partir dos preços e da morada */
-  function auto(kind) {
+  function auto(kind, grupo) {
     const relax = inGroup('Relaxar');
     const rec = inGroup('Recuperar'), fort = inGroup('Fortalecer');
     switch (kind) {
@@ -73,6 +73,12 @@ export function loadModel(today = new Date()) {
         return 'No ' + s.nome + ', ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
           ', conforme o ritual e a duração (' + (d.min === d.max ? minutes(d.min) : d.min + ' ou ' + d.max + ' minutos') + ').';
       }
+      case 'precos_area': {
+        /* Preço e duração de cada tratamento da área da página */
+        const all = inGroup(grupo);
+        if (!all.length) return '';
+        return 'No ' + s.nome + ': ' + listPT(all.map((t) => t.nome_completo + ', ' + eur(t.preco) + ' (' + minutes(t.duracao) + ')')) + '.';
+      }
       case 'precos_fisio': {
         const all = rec.concat(fort);
         if (!all.length) return '';
@@ -83,9 +89,9 @@ export function loadModel(today = new Date()) {
     }
     return '';
   }
-  function faq(list) {
+  function faq(list, grupo) {
     return (list || []).map((q) => {
-      const base = q.automatica ? auto(q.automatica) : q.resposta;
+      const base = q.automatica ? auto(q.automatica, grupo) : q.resposta;
       const full = [base, q.acrescento].filter(Boolean).join(' ');
       return { q: q.pergunta, qSeo: q.pergunta_seo || q.pergunta, html: text.inline(full), plain: text.plain(base) && !text.hasTbc(base) ? text.plain(base) : '' };
     }).filter((x) => x.html);
@@ -98,7 +104,7 @@ export function loadModel(today = new Date()) {
     if (p) parts.push('As massagens de relaxamento custam ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
       ' e duram ' + (d.min === d.max ? d.min + ' minutos' : d.min + ' a ' + d.max + ' minutos') + '.');
     const bits = [];
-    const AREA_TXT = { Fortalecer: 'de fisioterapia e osteopatia', Recuperar: 'de Pilates e reeducação postural', Cuidar: 'de corpo' };
+    const AREA_TXT = { Recuperar: 'de fisioterapia e osteopatia', Fortalecer: 'de Pilates e reeducação postural', Cuidar: 'de corpo' };
     groups.filter((g) => g !== 'Relaxar').forEach((g) => {
       const pr = range(inGroup(g), 'preco');
       if (pr) bits.push('os tratamentos ' + (AREA_TXT[g] || g.toLowerCase()) + ' custam ' + (pr.min === pr.max ? eur(pr.min) : 'entre ' + eur(pr.min) + ' e ' + eur(pr.max)) + ' por sessão');
@@ -108,14 +114,16 @@ export function loadModel(today = new Date()) {
     return parts.join(' ');
   }
 
-  /* Campanha em vigor: ativa e dentro das datas (as datas contam no momento do build) */
-  const day = today.toISOString().slice(0, 10);
+  /* Campanha em vigor: ativa e dentro das datas, no dia de Lisboa (as datas contam no momento do build;
+     o site reconstrói-se todos os dias de madrugada para as campanhas entrarem e saírem sozinhas) */
+  const day = today.toLocaleDateString('sv-SE', { timeZone: 'Europe/Lisbon' });
+  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
+  const camp = readCampaigns(live);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
   const campTreatment = camp.tratamento ? byId(camp.tratamento) : null;
 
 
   /* Campanhas extra: aparecem por baixo da principal, escondidas atrás do botão "Ver + campanhas do mês" */
-  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
   const withTreatment = (c) => {
     const tr = c.tratamento ? byId(c.tratamento) : null;
     const preco = c.preco || (tr && tr.preco) || null;
@@ -129,12 +137,33 @@ export function loadModel(today = new Date()) {
   const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
   const campaignPrice = campaignTreatment && Number(camp.destaque_preco) > 0 ? Number(camp.destaque_preco) : null;
 
+  /* Campanhas que entram no Google e no llms.txt: as que estão no site e não têm nada [[a confirmar]] */
+  const campaigns = [campaign, ...extraCampaigns].filter((c) => c && ![c.titulo, c.titulo_destaque, c.texto].some(text.hasTbc));
+  /* Dias em que uma campanha entrou ou saiu do site (para o lastmod do sitemap) */
+  const nextDay = (d) => new Date(Date.parse(d.slice(0, 10)) + 864e5).toISOString().slice(0, 10);
+  const campaignDays = [camp, ...(camp.extras || [])].filter((c) => c && c.ativa)
+    .flatMap((c) => [c.inicio && c.inicio.slice(0, 10), c.fim && nextDay(c.fim)]).filter((d) => d && d <= day);
+  const changed = lastChange();
+
+  /* Páginas por área (fisioterapia, Pilates, drenagem…); a área Relaxar tem a página de massagens */
+  const areaPages = readList('paginas').filter((p) => p.endereco && p.grupo && inGroup(p.grupo).length)
+    .map((p) => ({ ...p, path: '/' + p.endereco.replace(/^\/+|\/+$/g, '') + '/' }));
+  const pageFor = (g) => g === 'Relaxar' ? { path: '/massagens-porto/', nome_menu: 'Massagens no ' + s.localidade } : areaPages.find((p) => p.grupo === g) || null;
+
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, day, changed, areaPages, pageFor, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
+}
+
+/* Dia (Lisboa) do último commit que mexeu no conteúdo ou no código do site; null sem histórico git */
+function lastChange() {
+  try {
+    const iso = execFileSync('git', ['log', '-1', '--format=%cI', '--', 'content', 'src', 'public'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return iso ? new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'Europe/Lisbon' }) : null;
+  } catch { return null; }
 }

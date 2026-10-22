@@ -1,0 +1,24 @@
+{
+  "ordem": 10,
+  "ativa": true,
+  "inicio": "",
+  "fim": "",
+  "etiqueta": "Ritual do mês · assinatura da casa",
+  "titulo": "A Melhor Massagem",
+  "titulo_destaque": "do Mundo",
+  "assinatura": "by Oporto Medical SPA",
+  "texto": "A massagem de assinatura do Oporto Medical Spa, criada na casa e registada como marca. Só a encontra aqui.",
+  "imagem": "",
+  "imagem_alt": "",
+  "inclui": [
+    "[[O que inclui: a confirmar]]"
+  ],
+  "tratamento": "world",
+  "duracao": null,
+  "preco": null,
+  "selo": true,
+  "selo_texto": "Marca registada no INPI",
+  "selo_numero": "N.º 480541",
+  "tipo_servico": "Massagem de assinatura",
+  "selo_em_campanha": false
+}

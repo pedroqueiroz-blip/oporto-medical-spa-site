@@ -15,3 +15,9 @@
   from = "/index.html"
   to = "/"
   status = 301
+
+# Pagamentos (euPago), faturação (Moloni ON) e emails: netlify/functions, código em servidor/.
+# As chaves ficam só nas variáveis de ambiente do Netlify (ver docs/integracoes.md).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

@@ -1,0 +1,18 @@
+{
+  "ordem": 230,
+  "id": "postura",
+  "nome": "Reeducação Postural",
+  "nome_completo": "Reeducação Postural",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Fisioterapia",
+  "texto": "Técnicas específicas para melhorar a postura, a flexibilidade, a respiração e o equilíbrio muscular.",
+  "texto_massagens": "",
+  "descricao_seo": "Técnicas específicas para melhorar a postura, a flexibilidade, a respiração e o equilíbrio muscular.",
+  "indicado_para": "Desequilíbrios posturais, tensão muscular e rigidez",
+  "como_e": "Pilates Clínico e terapia manual numa sessão integrada",
+  "pressao": "",
+  "duracao": 90,
+  "preco": 60,
+  "visivel": true,
+  "artigo": "a"
+}

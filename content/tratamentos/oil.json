@@ -1,0 +1,18 @@
+{
+  "ordem": 10,
+  "id": "oil",
+  "nome": "Oil & Candle",
+  "nome_completo": "Massagem Oil & Candle",
+  "grupo": "Relaxar",
+  "tipo_servico": "Massagem de relaxamento",
+  "texto": "Relaxamento profundo através do calor de uma vela aromática derretida que nutre e suaviza a pele.",
+  "texto_massagens": "",
+  "descricao_seo": "Relaxamento profundo através do calor de uma vela aromática derretida que nutre e suaviza a pele.",
+  "indicado_para": "Relaxamento, hidratação, experiência sensorial",
+  "como_e": "Massagem com vela aquecida",
+  "pressao": "Suave a média",
+  "duracao": 60,
+  "preco": 74,
+  "visivel": true,
+  "artigo": "a"
+}

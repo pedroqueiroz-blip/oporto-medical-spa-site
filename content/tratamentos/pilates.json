@@ -1,0 +1,18 @@
+{
+  "ordem": 210,
+  "id": "pilates",
+  "nome": "Pilates Clínico",
+  "nome_completo": "Pilates Clínico",
+  "grupo": "Fortalecer",
+  "tipo_servico": "Pilates clínico",
+  "texto": "Sessão individual com fisioterapeuta, para postura, flexibilidade e equilíbrio.",
+  "texto_massagens": "",
+  "descricao_seo": "Sessão individual com fisioterapeuta, para postura, flexibilidade e equilíbrio.",
+  "indicado_para": "Postura, flexibilidade, força e prevenção de lesões",
+  "como_e": "Sessão individual orientada por fisioterapeuta",
+  "pressao": "",
+  "duracao": 60,
+  "preco": 45,
+  "visivel": true,
+  "artigo": "o"
+}

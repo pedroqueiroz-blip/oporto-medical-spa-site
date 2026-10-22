@@ -1,0 +1,17 @@
+{
+  "ordem": 30,
+  "ativa": true,
+  "inicio": "",
+  "fim": "",
+  "etiqueta": "Campanha do mês",
+  "titulo": "Terceira campanha",
+  "titulo_destaque": "a confirmar",
+  "texto": "[[Texto da terceira campanha a enviar.]]",
+  "imagem": "",
+  "imagem_alt": "",
+  "inclui": [],
+  "tratamento": "dren",
+  "duracao": null,
+  "preco": null,
+  "selo_em_campanha": false
+}
