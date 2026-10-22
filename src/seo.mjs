@@ -39,6 +39,15 @@ export function massagesDescription(m) {
   return fit([d + ': ' + list + '. Reserve online.', d + ': ' + list + '.', d + '. Reserve online.']);
 }
 
+export function areaDescription(m, P) {
+  const own = P.seo && P.seo.descricao;
+  if (own) return clip(own);
+  const list = m.inGroup(P.grupo);
+  const d = (P.resumo_tipo ? P.resumo_tipo.charAt(0).toUpperCase() + P.resumo_tipo.slice(1) : P.grupo) + ' no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
+  const items = list.map((t) => t.nome + ' ' + eur(t.preco)).join(', ');
+  return fit([d + ': ' + items + '. Reserve online.', d + ': ' + items + '.', d + '. Reserve online.']);
+}
+
 export function head(m, { title, description, path, ogTitle, ogDescription, ogImage, hreflang }) {
   const url = m.s.url + path;
   const img = abs(m, ogImage || m.s.imagem_partilha || '/img/massagem-pindas-760.webp');
@@ -177,6 +186,29 @@ export function massagesLD(m, faqItems, path) {
   return ld(graph);
 }
 
+export function areaLD(m, P, faqItems) {
+  const list = m.inGroup(P.grupo);
+  const url = m.s.url + P.path;
+  const graph = [
+    {
+      '@type': 'Service',
+      '@id': url + '#servico',
+      name: (P.nome_menu || P.titulo),
+      serviceType: P.resumo_tipo || P.grupo,
+      description: m.text.plain(P.texto),
+      provider: { '@id': m.s.url + '/#spa' },
+      areaServed: (m.s.areas_servidas || []).slice(0, 3).map((a) => ({ '@type': /,/.test(a) ? 'Place' : 'City', name: a })),
+      offers: list.map((t) => offer(m, t))
+    },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Início', item: m.s.url + '/' },
+      { '@type': 'ListItem', position: 2, name: P.nome_menu || P.titulo, item: url }
+    ] },
+    faqPage(url + '#perguntas', faqItems)
+  ].filter(Boolean);
+  return ld(graph);
+}
+
 function ld(graph) {
   const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }, null, 2).replace(/</g, '\\u003c');
   return '<script type="application/ld+json">\n' + json + '\n</script>';
@@ -221,8 +253,9 @@ export function llms(m, faqItems) {
   m.groups.forEach((g) => {
     m.inGroup(g).forEach((t) => lines.push('- ' + t.nome_completo + ' (' + g.toLowerCase() + '): ' + eur(t.preco) + ', ' + minutes(t.duracao) + '. ' + (t.descricao_seo || '')));
   });
-  lines.push('', '## Páginas', '', '- [Início](' + s.url + '/)', '- [Massagens de relaxamento no Porto](' + s.url + '/massagens-porto/)', '');
-  const qs = faqItems.filter((x) => x.plain);
+  lines.push('', '## Páginas', '', '- [Início](' + s.url + '/)', '- [Massagens de relaxamento no Porto](' + s.url + '/massagens-porto/)',
+    ...m.areaPages.map((p) => '- [' + p.nome_menu + '](' + s.url + p.path + ')'), '');
+  const qs = faqItems.filter((x, i) => x.plain && faqItems.findIndex((y) => y.qSeo === x.qSeo) === i);
   if (qs.length) { lines.push('## Perguntas frequentes', ''); qs.forEach((x) => lines.push('**' + x.qSeo + '**', x.plain, '')); }
   return lines.join('\n');
 }

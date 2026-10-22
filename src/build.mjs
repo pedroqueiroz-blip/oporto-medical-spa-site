@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, PUBLIC } from './lib.mjs';
 import { loadModel } from './modelo.mjs';
-import { home, massages } from './paginas.mjs';
+import { home, massages, areaPage } from './paginas.mjs';
 import { robots, sitemap, headers, llms, head, INDEXNOW_KEY } from './seo.mjs';
 import { page, header, footer } from './partes.mjs';
 
@@ -22,6 +22,7 @@ const h = home(m);
 const ms = massages(m);
 write('index.html', h.html);
 write('massagens-porto/index.html', ms.html);
+const areas = m.areaPages.map((P) => { const a = areaPage(m, P); write(P.path.slice(1) + 'index.html', a.html); return a; });
 
 /* Página de regresso do pagamento com cartão (fora do Google) */
 write('pagamento/index.html', page(m, {
@@ -45,7 +46,7 @@ write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nw
 
 /* Catálogo para o servidor de pagamentos (netlify/functions): os mesmos preços que o site mostra.
    Relaxar fatura como TPREV (Terapêuticas de Prevenção), o resto como TREAB (Reabilitação). */
-const PAGINAS = ['/', '/massagens-porto/'];
+const PAGINAS = ['/', '/massagens-porto/', ...m.areaPages.map((p) => p.path)];
 const catalogo = {
   gerado: new Date().toISOString(),
   spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
@@ -61,6 +62,6 @@ write('robots.txt', robots(m));
 write('sitemap.xml', sitemap(m, PAGINAS));
 write(INDEXNOW_KEY + '.txt', INDEXNOW_KEY);
 write('_headers', headers(m));
-write('llms.txt', llms(m, h.faqItems.concat(ms.faqItems)));
+write('llms.txt', llms(m, h.faqItems.concat(ms.faqItems, ...areas.map((a) => a.faqItems))));
 
 console.log('Site gerado em dist/ · ' + (m.s.indexar ? 'indexável' : 'noindex') + ' · campanha: ' + (m.campaign ? m.campaign.titulo + ' ' + (m.campaign.titulo_destaque || '') : 'nenhuma'));

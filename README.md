@@ -13,6 +13,7 @@ o site não é indexado: `noindex` nas páginas e em `_headers`.
 | Campanhas | Uma ficha por campanha: título, texto, fotografia, preço, datas, botão, ligada ou desligada. A primeira pela ordem é a principal; o selo «Em campanha» marca o tratamento na lista |
 | Página inicial | Uma ficha por secção (topo, cuidar, rituais, visita, equipa, reservar, oferecer, afiliações, avaliações, perguntas, como chegar, Google) |
 | Página Massagens | Topo, tabela, perguntas, onde estamos e Google |
+| Páginas de tratamentos | Uma página por área (fisioterapia, Pilates, drenagem): endereço, textos, perguntas e Google. Os tratamentos, preços e durações vêm da lista de tratamentos |
 | Tratamentos e preços | Um tratamento por ficha, agrupados por área: nome, textos, duração, preço, fotografia e ordem |
 | Equipa | Pessoas, retratos, especialidades e os tratamentos que cada uma faz |
 | Contactos e horário | Contactos, horário, newsletter, a casa e o interruptor «Site visível no Google» |

@@ -737,3 +737,11 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .pg .vc-seg { grid-template-columns: repeat(3, 1fr); }
 .pg [data-voltar] { justify-self: start; }
 .pg-pagina { padding-block: 160px 100px; min-height: 60vh; }
+
+/* Ligações para as páginas de cada área */
+.group-t__link { float: right; letter-spacing: .2em; color: var(--linen); opacity: .75; border-bottom: 1px solid rgba(181, 162, 136, .4); }
+.group-t__link:hover { opacity: 1; color: var(--flame); }
+.foot__areas { margin-top: 40px; display: flex; flex-wrap: wrap; gap: 10px 28px; font-size: 13px; }
+.foot__areas a { border-bottom: 1px solid rgba(181, 162, 136, .4); }
+.area-links a { border-bottom: 1px solid rgba(181, 162, 136, .5); }
+@media (max-width: 640px) { .group-t__link { float: none; display: block; margin-top: 8px; } }

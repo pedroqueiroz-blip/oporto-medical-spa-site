@@ -183,6 +183,21 @@
   ['topo', 'cuidar', 'rituais', 'visita', 'equipa_intro', 'reservar', 'oferecer', 'afiliacoes', 'avaliacoes', 'perguntas', 'como_chegar', 'google', 'tabela', 'onde']
     .forEach(function (n) { CMS.registerPreviewTemplate(n, SecaoPreview); });
 
+  /* Páginas de tratamentos: o topo, as perguntas e o resultado no Google */
+  var PaginaPreview = createClass({
+    render: function () {
+      var d = js(this.props.entry.get('data')) || {}, p = this.props;
+      var seo = d.seo || {}, q = d.perguntas || {};
+      var topo = { etiqueta: d.etiqueta, titulo: d.titulo, titulo_destaque: d.titulo_destaque, texto: d.texto, citacao: d.citacao, nota: d.nota, lista: q.lista || [] };
+      var fake = function (data) { return { get: function () { return data; } }; };
+      return h('div', {},
+        h('p', { className: 'pv-note', style: { padding: '24px 0 0 40px' } }, 'oportomedicalspa.com/' + (d.endereco || '') + '/ · área ' + (d.grupo || '') + ': os tratamentos, preços e durações vêm de «Tratamentos e preços».'),
+        h(SecaoPreview, { entry: fake(topo), getAsset: p.getAsset }),
+        h(SecaoPreview, { entry: fake({ titulo: seo.titulo, descricao: seo.descricao || '' }), getAsset: p.getAsset }));
+    }
+  });
+  CMS.registerPreviewTemplate('paginas', PaginaPreview);
+
   /* Tratamentos: a linha como aparece em «Rituais e tratamentos» */
   var TratamentoPreview = createClass({
     render: function () {

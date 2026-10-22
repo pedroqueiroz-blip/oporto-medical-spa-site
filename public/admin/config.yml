@@ -214,7 +214,7 @@ collections:
             fields:
               - { name: pergunta, label: Pergunta, widget: string }
               - { name: pergunta_seo, label: Pergunta para o Google (opcional), widget: string, required: false, hint: 'Versão mais completa, ex.: «... no Porto, no Oporto Medical Spa?»' }
-              - { name: automatica, label: Resposta automática, widget: select, required: false, default: '', options: [{ label: 'Não, escrevo a resposta', value: '' }, { label: 'Morada e horário', value: morada }, { label: 'Preços das massagens', value: precos_relaxar }, { label: 'Intervalo de preços das massagens', value: intervalo_relaxar }, { label: 'Preços de fisioterapia e Pilates', value: precos_fisio }], hint: 'As respostas automáticas acompanham os preços e os contactos.' }
+              - { name: automatica, label: Resposta automática, widget: select, required: false, default: '', options: [{ label: 'Não, escrevo a resposta', value: '' }, { label: 'Morada e horário', value: morada }, { label: 'Preços das massagens', value: precos_relaxar }, { label: 'Intervalo de preços das massagens', value: intervalo_relaxar }, { label: 'Preços de fisioterapia e Pilates', value: precos_fisio }, { label: 'Preços da área desta página (páginas de tratamentos)', value: precos_area }], hint: 'As respostas automáticas acompanham os preços e os contactos.' }
               - { name: resposta, label: Resposta, widget: text, required: false, hint: *texto_hint }
               - { name: acrescento, label: Acrescento à resposta, widget: text, required: false }
       - name: como_chegar
@@ -287,6 +287,47 @@ collections:
         preview_path: /massagens-porto/
         fields:
           - { name: titulo, label: Título no Google, widget: string }
+          - { name: descricao, label: Descrição no Google, widget: text, required: false, hint: 'Deixe vazio para ser escrita sozinha com os preços atuais.' }
+          - { name: titulo_partilha, label: Título ao partilhar, widget: string, required: false }
+
+  - name: paginas
+    label: Páginas de tratamentos
+    label_singular: página
+    description: 'Uma página por área (fisioterapia, Pilates, drenagem…), com os tratamentos, os preços e as durações dessa área, uma tabela, perguntas frequentes e os dados para o Google. Os tratamentos vêm de «Tratamentos e preços».'
+    folder: content/paginas
+    extension: json
+    format: json
+    create: true
+    slug: '{{fields.endereco}}'
+    identifier_field: nome_menu
+    summary: '{{nome_menu}} · /{{endereco}}/'
+    sortable_fields: [{ field: ordem, default_sort: true }, nome_menu]
+    fields:
+      - { name: ordem, label: Ordem, widget: number, value_type: int, default: 100 }
+      - { name: endereco, label: Endereço da página, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas sem acentos, números e hífenes'], hint: 'Ex.: fisioterapia-porto. A página fica em oportomedicalspa.com/fisioterapia-porto/. Depois de publicada, evite mudar: o Google já a conhece por este endereço.' }
+      - { name: grupo, label: Área, widget: select, options: [Fortalecer, Recuperar, Cuidar], hint: 'A página mostra todos os tratamentos desta área. A área Relaxar tem a página de massagens.' }
+      - { name: nome_menu, label: Nome nas ligações, widget: string, hint: 'Aparece no rodapé, na página inicial e no caminho de navegação. Ex.: Fisioterapia no Porto.' }
+      - { name: etiqueta, label: Etiqueta do topo, widget: string }
+      - { name: titulo, label: Título, widget: string }
+      - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+      - { name: resumo_tipo, label: Tipo de tratamentos (para a frase automática), widget: string, hint: 'Ex.: fisioterapia e osteopatia. O topo começa com uma frase automática com os tratamentos e os preços atuais, que o Google e os assistentes de IA citam.' }
+      - { name: texto, label: Texto do topo, widget: text, hint: *texto_hint }
+      - { name: citacao, label: Citação (opcional), widget: text, required: false, hint: *texto_hint }
+      - { name: tabela_titulo, label: Título da tabela, widget: string, required: false }
+      - { name: tabela_destaque, label: Final em itálico, widget: string, required: false }
+      - { name: nota, label: Nota por baixo da tabela (opcional), widget: text, required: false, hint: *texto_hint }
+      - label: Perguntas frequentes
+        name: perguntas
+        widget: object
+        fields:
+          - { name: etiqueta, label: Etiqueta, widget: string }
+          - { name: titulo, label: Título, widget: string }
+          - *perguntas
+      - label: Google e partilhas
+        name: seo
+        widget: object
+        fields:
+          - { name: titulo, label: Título no Google, widget: string, hint: 'Até cerca de 60 caracteres. Comece pelo que as pessoas procuram.' }
           - { name: descricao, label: Descrição no Google, widget: text, required: false, hint: 'Deixe vazio para ser escrita sozinha com os preços atuais.' }
           - { name: titulo_partilha, label: Título ao partilhar, widget: string, required: false }
 

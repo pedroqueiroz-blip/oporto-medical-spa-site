@@ -1,0 +1,29 @@
+{
+  "ordem": 30,
+  "endereco": "drenagem-linfatica-porto",
+  "grupo": "Cuidar",
+  "nome_menu": "Drenagem linfática no Porto",
+  "etiqueta": "Drenagem linfática e corpo · Porto",
+  "titulo": "Leveza",
+  "titulo_destaque": "que se sente.",
+  "resumo_tipo": "drenagem linfática manual e tratamentos corporais",
+  "texto": "Do toque lento e rítmico da drenagem aos movimentos firmes do tratamento modelador, cada protocolo é feito à mão, em sala privada, ao ritmo do seu corpo.",
+  "citacao": "",
+  "tabela_titulo": "Que tratamento",
+  "tabela_destaque": "escolher?",
+  "nota": "Procura um momento só para relaxar? Veja as [massagens de relaxamento](/massagens-porto/).",
+  "perguntas": {
+    "etiqueta": "Perguntas sobre drenagem",
+    "titulo": "Antes de reservar.",
+    "lista": [
+      { "pergunta": "Quanto custa uma drenagem linfática no Porto?", "pergunta_seo": "Quanto custa uma drenagem linfática manual no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_area", "acrescento": "" },
+      { "pergunta": "Para quem é a drenagem linfática manual?", "resposta": "É uma massagem suave, lenta e rítmica, indicada para pernas pesadas, retenção de líquidos e recuperação pós-operatória.", "automatica": "", "acrescento": "" },
+      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "" }
+    ]
+  },
+  "seo": {
+    "titulo": "Drenagem Linfática Manual no Porto · Oporto Medical Spa",
+    "descricao": "",
+    "titulo_partilha": "Drenagem linfática no Porto · Oporto Medical Spa"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "ordem": 10,
+  "endereco": "fisioterapia-porto",
+  "grupo": "Fortalecer",
+  "nome_menu": "Fisioterapia no Porto",
+  "etiqueta": "Fisioterapia e osteopatia · Porto",
+  "titulo": "Cuidar da causa,",
+  "titulo_destaque": "não só da dor.",
+  "resumo_tipo": "fisioterapia e osteopatia",
+  "texto": "Cada sessão começa por uma avaliação. A fisioterapeuta ouve o que o seu corpo conta, procura a origem do desconforto e só depois escolhe as mãos, os exercícios e o ritmo certos para si.",
+  "citacao": "Somos um medical spa: *a saúde e o bem-estar na mesma casa*, com o tempo e o silêncio que a recuperação pede.",
+  "tabela_titulo": "Que tratamento",
+  "tabela_destaque": "escolher?",
+  "nota": "Prefere começar por relaxar? Veja as [massagens de relaxamento](/massagens-porto/).",
+  "perguntas": {
+    "etiqueta": "Perguntas sobre fisioterapia",
+    "titulo": "Antes de reservar.",
+    "lista": [
+      { "pergunta": "Quanto custa uma sessão de fisioterapia no Porto?", "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_area", "acrescento": "" },
+      { "pergunta": "Como é a primeira sessão?", "resposta": "A fisioterapeuta começa por avaliar e indicar a melhor forma de cuidar da sua saúde. A terapêutica de reabilitação começa logo a seguir, na mesma sessão.", "automatica": "", "acrescento": "" },
+      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "" }
+    ]
+  },
+  "seo": {
+    "titulo": "Fisioterapia e Osteopatia no Porto · Oporto Medical Spa",
+    "descricao": "",
+    "titulo_partilha": "Fisioterapia no Porto · Oporto Medical Spa"
+  }
+}

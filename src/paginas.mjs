@@ -1,7 +1,7 @@
-/* As duas páginas do site, montadas a partir do conteúdo do backoffice. */
+/* As páginas do site, montadas a partir do conteúdo do backoffice. */
 import { esc, eur, minutes, picture, telHref } from './lib.mjs';
 import { header, footer, mbar, page, title, maps, MAP_SVG } from './partes.mjs';
-import { head, homeDescription, massagesDescription, homeLD, massagesLD } from './seo.mjs';
+import { head, homeDescription, massagesDescription, areaDescription, homeLD, massagesLD, areaLD } from './seo.mjs';
 
 const NUM = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 const STARS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -100,7 +100,8 @@ export function home(m) {
   const rituals = m.groups.map((g, gi) => {
     const all = m.inGroup(g), n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
     const shown = all.slice(0, n), rest = all.slice(n), id = 'mais-' + gi;
-    return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
+    const pg = m.pageFor(g);
+    return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}${pg ? ' <a class="group-t__link" href="' + esc(pg.path) + '">' + esc(pg.nome_menu) + ' →</a>' : ''}</p>
         ${shown.map(ritual).join('\n        ')}${rest.length ? `
         <div class="rituals__more" id="${id}" hidden>
         ${rest.map(ritual).join('\n        ')}
@@ -430,4 +431,115 @@ ${mbar(m, { home: false })}`;
       scripts: ['/site.js']
     })
   };
+}
+
+/* Página de uma área (fisioterapia, Pilates, drenagem…): resposta direta com preços, tratamentos, tabela, perguntas e morada */
+export function areaPage(m, P) {
+  const t = m.text, s = m.s, mp = maps(m), M = m.massagens;
+  const list = m.inGroup(P.grupo);
+  const faqItems = m.faq((P.perguntas || {}).lista, P.grupo);
+  const path = P.path;
+  const summary = areaSummary(m, P);
+  const others = [m.pageFor('Relaxar'), ...m.areaPages].filter((x) => x && x.path !== path);
+
+  const body = `${header(m, { home: false, current: path })}
+
+<main>
+  <nav class="crumbs wrap" aria-label="Está aqui"><ol><li><a href="/">Início</a></li><li aria-current="page">${esc(P.nome_menu || P.titulo)}</li></ol></nav>
+
+  <section class="hero2" id="hero" style="padding-top:clamp(30px,5vw,70px)">
+    <div class="hero2__bg" id="glow" aria-hidden="true"></div>
+    <div class="wrap">
+      <h1><span class="h1-kicker">${esc(P.etiqueta)}</span> <span class="h1-title" style="font-size:clamp(44px,7vw,110px)">${title(P.titulo, P.titulo_destaque)}<span class="flame" aria-hidden="true"></span></span></h1>
+      <p class="hero2__lead">${summary ? '<strong>' + esc(summary) + '</strong> ' : ''}${t.inline(P.texto)}</p>
+      <div class="hero2__cta">
+        <a class="btn btn--primary" href="/#reservar">${esc(P.botao || 'Reservar')} <span aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="/#oferecer">${esc(P.botao_oferecer || 'Oferecer')}</a>
+      </div>
+    </div>
+  </section>
+
+  ${P.citacao ? `<section class="section" style="padding-top:0;padding-bottom:0">
+    <div class="wrap"><blockquote class="d mq">${t.inline(P.citacao)}</blockquote></div>
+  </section>` : ''}
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="rituals" style="margin-top:0">
+        ${list.map((x) => `<article class="ritual" id="t-${esc(x.id)}"><h2 class="d" style="font-size:clamp(26px,2.8vw,36px)">${esc(x.nome)}</h2><p>${t.inline(x.texto_pagina || x.texto)}</p><p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p><button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button></article>`).join('\n        ')}
+      </div>
+
+      ${list.length > 1 ? `<h2 class="d" style="font-size:clamp(30px,3.4vw,46px);margin-top:80px">${title(P.tabela_titulo || 'Que tratamento', P.tabela_destaque || 'escolher?')}</h2>
+      <div class="cmp-wrap" style="margin-top:24px" tabindex="0" role="region" aria-label="Comparação de tratamentos">
+        <table class="cmp">
+          <caption>${esc(cap(P.resumo_tipo || P.grupo))} no ${esc(s.nome)}, ${esc(s.localidade)}. Preços em vigor.</caption>
+          <thead><tr><th scope="col">Tratamento</th><th scope="col">Indicado para</th><th scope="col">Como é</th><th scope="col">Duração</th><th scope="col">Preço</th></tr></thead>
+          <tbody>
+            ${[...list].sort((a, b) => a.preco - b.preco).map((x) => `<tr><th scope="row">${esc(x.nome)}</th><td>${esc(x.indicado_para || '')}</td><td>${esc(x.como_e || '')}</td><td class="num">${minutes(x.duracao)}</td><td class="num">${eur(x.preco)}</td></tr>`).join('\n            ')}
+          </tbody>
+        </table>
+      </div>` : ''}
+      ${P.nota ? '<p class="prose" style="max-width:70ch">' + t.inline(P.nota) + '</p>' : ''}
+    </div>
+  </section>
+
+  ${faqItems.length ? `<section class="section visit" id="perguntas">
+    <div class="wrap split" style="align-items:start">
+      <div>
+        <p class="kicker">${esc(P.perguntas.etiqueta || 'Perguntas')}</p>
+        <h2 class="d" style="font-size:clamp(34px,4vw,56px)">${esc(P.perguntas.titulo || 'Antes de reservar.')}</h2>
+      </div>
+      ${faqHtml(faqItems, { collapse: false })}
+    </div>
+  </section>` : ''}
+
+  <section class="section">
+    <div class="wrap visitus">
+      <div>
+        <p class="kicker">Onde estamos</p>
+        <h2 class="d" style="font-size:clamp(32px,4vw,54px)">${title(M.onde_titulo, M.onde_destaque)}</h2>
+        <address>
+          <strong style="font-weight:500">${esc(s.nome)}</strong>
+          <span>${esc(s.rua)}</span>
+          <span>${esc(s.codigo_postal + ' ' + s.localidade)}</span>
+          <a href="${telHref(s.telefone)}">${esc(s.telefone)}</a>
+        </address>
+        ${M.onde_texto ? '<p class="prose">' + t.inline(M.onde_texto) + '</p>' : ''}
+        ${others.length ? '<p class="prose area-links">Também no ' + esc(s.nome) + ': ' + others.map((o) => '<a href="' + esc(o.path) + '">' + esc(o.nome_menu) + '</a>').join(' · ') + '</p>' : ''}
+      </div>
+      <div class="mapf">
+        ${MAP_SVG}
+        <div class="mapf__pin"><img src="/logo-beige.svg" alt="" width="29" height="53" loading="lazy"><span></span></div>
+        <div class="mapf__go"><a href="${esc(mp.google)}" target="_blank" rel="noopener">Como chegar</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+${footer(m, { home: false })}
+
+${mbar(m, { home: false })}`;
+
+  return {
+    faqItems,
+    html: page(m, {
+      headHtml: head(m, { title: P.seo.titulo, description: areaDescription(m, P), path, ogTitle: P.seo.titulo_partilha }),
+      ld: areaLD(m, P, faqItems),
+      body,
+      scripts: ['/site.js']
+    })
+  };
+}
+
+const cap = (x) => String(x || '').charAt(0).toUpperCase() + String(x || '').slice(1);
+
+/* Frase-resposta do topo (BLUF), pensada para ser citada pelos motores de IA */
+export function areaSummary(m, P) {
+  const s = m.s, list = m.inGroup(P.grupo);
+  if (!list.length) return '';
+  const d = m.range(list, 'duracao');
+  return 'No ' + s.nome + ', no ' + s.localidade + ' ocidental' + (s.zona ? ', ' + s.zona : '') + ', ' +
+    'os tratamentos de ' + (P.resumo_tipo || P.grupo.toLowerCase()) + ' são ' +
+    list.map((x) => x.nome + ' (' + eur(x.preco) + ')').join(', ').replace(/, ([^,]*)$/, ' e $1') +
+    (d ? (d.min === d.max ? ', sessões de ' + d.min + ' minutos.' : ', sessões de ' + d.min + ' a ' + d.max + ' minutos.') : '.');
 }

@@ -71,6 +71,7 @@ export function footer(m, { home }) {
       <div><h4>Contactos</h4><p><a href="${telHref(s.telefone)}">${esc(s.telefone)}</a></p>${s.telemovel ? `<p><a href="${telHref(s.telemovel)}">${esc(s.telemovel)}</a></p>` : ''}<p><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></p></div>
       <div><h4>Horário</h4><p>Segunda a sexta · ${hh(h.semana_abre)} às ${hh(h.semana_fecha)}</p>${h.sabado_aberto ? `<p>Sábado · ${hh(h.sabado_abre)} às ${hh(h.sabado_fecha)}</p>` : '<p>Sábado · fechado</p>'}<p>Domingo · fechado</p></div>
     </div>
+    ${m.areaPages && m.areaPages.length ? `<nav class="foot__areas" aria-label="Tratamentos">${[m.pageFor('Relaxar'), ...m.areaPages].map((p) => `<a href="${esc(p.path)}">${esc(p.nome_menu)}</a>`).join('')}</nav>` : ''}
     <div class="foot__legal"><span>© ${year} ${esc(s.nome)} · Registo ERS n.º ${s.registo_ers ? esc(s.registo_ers) : '<mark class="tbc">confirmar</mark>'}</span><span><a href="#">Privacidade</a> · <a href="#">Termos</a> · <a href="https://www.livroreclamacoes.pt/" target="_blank" rel="noopener">Livro de Reclamações</a></span></div>
   </div>
 </footer>`;

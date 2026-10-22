@@ -51,7 +51,7 @@ export function loadModel(today = new Date()) {
   const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
 
   /* Respostas que se escrevem sozinhas a partir dos preços e da morada */
-  function auto(kind) {
+  function auto(kind, grupo) {
     const relax = inGroup('Relaxar');
     const rec = inGroup('Recuperar'), fort = inGroup('Fortalecer');
     switch (kind) {
@@ -73,6 +73,12 @@ export function loadModel(today = new Date()) {
         return 'No ' + s.nome + ', ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
           ', conforme o ritual e a duração (' + (d.min === d.max ? minutes(d.min) : d.min + ' ou ' + d.max + ' minutos') + ').';
       }
+      case 'precos_area': {
+        /* Preço e duração de cada tratamento da área da página */
+        const all = inGroup(grupo);
+        if (!all.length) return '';
+        return 'No ' + s.nome + ': ' + listPT(all.map((t) => t.nome_completo + ', ' + eur(t.preco) + ' (' + minutes(t.duracao) + ')')) + '.';
+      }
       case 'precos_fisio': {
         const all = rec.concat(fort);
         if (!all.length) return '';
@@ -83,9 +89,9 @@ export function loadModel(today = new Date()) {
     }
     return '';
   }
-  function faq(list) {
+  function faq(list, grupo) {
     return (list || []).map((q) => {
-      const base = q.automatica ? auto(q.automatica) : q.resposta;
+      const base = q.automatica ? auto(q.automatica, grupo) : q.resposta;
       const full = [base, q.acrescento].filter(Boolean).join(' ');
       return { q: q.pergunta, qSeo: q.pergunta_seo || q.pergunta, html: text.inline(full), plain: text.plain(base) && !text.hasTbc(base) ? text.plain(base) : '' };
     }).filter((x) => x.html);
@@ -139,12 +145,17 @@ export function loadModel(today = new Date()) {
     .flatMap((c) => [c.inicio && c.inicio.slice(0, 10), c.fim && nextDay(c.fim)]).filter((d) => d && d <= day);
   const changed = lastChange();
 
+  /* Páginas por área (fisioterapia, Pilates, drenagem…); a área Relaxar tem a página de massagens */
+  const areaPages = readList('paginas').filter((p) => p.endereco && p.grupo && inGroup(p.grupo).length)
+    .map((p) => ({ ...p, path: '/' + p.endereco.replace(/^\/+|\/+$/g, '') + '/' }));
+  const pageFor = (g) => g === 'Relaxar' ? { path: '/massagens-porto/', nome_menu: 'Massagens no ' + s.localidade } : areaPages.find((p) => p.grupo === g) || null;
+
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, day, changed, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, day, changed, areaPages, pageFor, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
 }

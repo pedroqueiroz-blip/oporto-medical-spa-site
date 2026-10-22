@@ -1,0 +1,29 @@
+{
+  "ordem": 20,
+  "endereco": "pilates-clinico-porto",
+  "grupo": "Recuperar",
+  "nome_menu": "Pilates clínico no Porto",
+  "etiqueta": "Pilates clínico · Porto",
+  "titulo": "Força serena,",
+  "titulo_destaque": "postura de dentro para fora.",
+  "resumo_tipo": "Pilates clínico e reeducação postural",
+  "texto": "Sessões individuais, orientadas por fisioterapeuta, no solo ou no Reformer. Cada exercício tem um porquê, e o ritmo é sempre o do seu corpo.",
+  "citacao": "",
+  "tabela_titulo": "Que sessão",
+  "tabela_destaque": "escolher?",
+  "nota": "Tem dor que precisa de ser avaliada primeiro? Veja a [fisioterapia](/fisioterapia-porto/).",
+  "perguntas": {
+    "etiqueta": "Perguntas sobre Pilates",
+    "titulo": "Antes de reservar.",
+    "lista": [
+      { "pergunta": "Quanto custa uma sessão de Pilates clínico no Porto?", "pergunta_seo": "Quanto custa uma sessão de Pilates clínico no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_area", "acrescento": "" },
+      { "pergunta": "Qual a diferença entre Pilates Clínico e Pilates Aparelhos?", "resposta": "O Pilates Clínico é uma sessão individual orientada por fisioterapeuta. O Pilates Aparelhos é também individual, mas feito no Reformer. A Reeducação Postural junta Pilates Clínico e terapia manual na mesma sessão.", "automatica": "", "acrescento": "" },
+      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "" }
+    ]
+  },
+  "seo": {
+    "titulo": "Pilates Clínico e Reformer no Porto · Oporto Medical Spa",
+    "descricao": "",
+    "titulo_partilha": "Pilates clínico no Porto · Oporto Medical Spa"
+  }
+}
