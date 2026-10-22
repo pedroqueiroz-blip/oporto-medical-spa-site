@@ -2,7 +2,7 @@
    preços, intervalos, horário, respostas automáticas e a campanha em vigor. */
 import { readJSON, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
 
-const GROUP_AREA = { Relaxar: 'Relaxamento', Recuperar: 'Fisioterapia', Fortalecer: 'Pilates' };
+const GROUP_AREA = { Fortalecer: 'Fisioterapia', Recuperar: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
 
 export function loadModel(today = new Date()) {
   const s = readJSON('definicoes');
@@ -98,9 +98,11 @@ export function loadModel(today = new Date()) {
     if (p) parts.push('As massagens de relaxamento custam ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
       ' e duram ' + (d.min === d.max ? d.min + ' minutos' : d.min + ' a ' + d.max + ' minutos') + '.');
     const bits = [];
-    const pr = range(inGroup('Recuperar'), 'preco');
-    if (pr) bits.push('Os tratamentos de fisioterapia custam ' + (pr.min === pr.max ? eur(pr.min) : 'entre ' + eur(pr.min) + ' e ' + eur(pr.max)) + ' por sessão');
-    inGroup('Fortalecer').forEach((t) => bits.push(art(t) + ' ' + t.nome_completo + ' ' + eur(t.preco)));
+    const AREA_TXT = { Fortalecer: 'de fisioterapia e osteopatia', Recuperar: 'de Pilates e reeducação postural', Cuidar: 'de corpo' };
+    groups.filter((g) => g !== 'Relaxar').forEach((g) => {
+      const pr = range(inGroup(g), 'preco');
+      if (pr) bits.push('os tratamentos ' + (AREA_TXT[g] || g.toLowerCase()) + ' custam ' + (pr.min === pr.max ? eur(pr.min) : 'entre ' + eur(pr.min) + ' e ' + eur(pr.max)) + ' por sessão');
+    });
     if (bits.length) parts.push(cap(listPT(bits)) + '.');
     parts.push('Todos se reservam online, escolhendo a terapeuta e a hora.');
     return parts.join(' ');
@@ -110,18 +112,29 @@ export function loadModel(today = new Date()) {
   const day = today.toISOString().slice(0, 10);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
   const campTreatment = camp.tratamento ? byId(camp.tratamento) : null;
-  const campaign = campaignOn ? {
-    ...camp,
-    preco: camp.preco || (campTreatment && campTreatment.preco) || null,
-    duracao: camp.duracao || (campTreatment && campTreatment.duracao) || null
-  } : null;
+
+
+  /* Campanhas extra: aparecem por baixo da principal, escondidas atrás do botão "Ver + campanhas do mês" */
+  const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
+  const withTreatment = (c) => {
+    const tr = c.tratamento ? byId(c.tratamento) : null;
+    const preco = c.preco || (tr && tr.preco) || null;
+    /* Preço antigo riscado: o do campo próprio ou, se a campanha tiver preço, o do tratamento */
+    const antigo = Number(c.preco_antigo) || (c.preco && tr ? tr.preco : null);
+    return { ...c, preco, preco_antigo: antigo && antigo !== preco ? antigo : null, duracao: c.duracao || (tr && tr.duracao) || null };
+  };
+  const campaign = campaignOn ? withTreatment(camp) : null;
+  const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
+  /* Tratamento da lista com o selo "Em campanha" (só com alguma campanha no site) */
+  const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
+  const campaignPrice = campaignTreatment && Number(camp.destaque_preco) > 0 ? Number(camp.destaque_preco) : null;
 
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, inicio, massagens, campaign, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
 }

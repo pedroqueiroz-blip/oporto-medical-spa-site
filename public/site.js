@@ -44,6 +44,42 @@
     });
   });
 
+  // Ligação para um tratamento escondido em «Descubra todos»: abre a área primeiro
+  function openFor(hash) {
+    var el = hash && hash.length > 1 && document.getElementById(hash.slice(1));
+    var box = el && el.closest('.rituals__more');
+    if (box && box.hidden) { var b = document.querySelector('[data-toggle="' + box.id + '"]'); if (b) b.click(); }
+  }
+  openFor(location.hash);
+  window.addEventListener('hashchange', function () { openFor(location.hash); });
+
+  // Campanhas do mês: rodam a cada 3 segundos; param com o rato por cima, com o foco ou com «reduzir movimento»
+  document.querySelectorAll('[data-carousel]').forEach(function (box) {
+    var slides = box.querySelectorAll('.camp-slide'), dots = box.querySelectorAll('.camp-dot'), count = box.querySelector('.camp-count');
+    var cur = 0, timer = null, paused = false, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.classList.add('is-js');
+    function show(i) {
+      cur = (i + slides.length) % slides.length;
+      slides.forEach(function (s, k) { s.classList.toggle('is-on', k === cur); s.setAttribute('aria-hidden', k === cur ? 'false' : 'true'); s.inert = k !== cur; });
+      dots.forEach(function (d, k) { d.classList.toggle('is-on', k === cur); if (k === cur) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
+      if (count) count.textContent = (cur + 1) + ' de ' + slides.length;
+    }
+    function start() { stop(); if (!still && !paused) timer = setInterval(function () { show(cur + 1); }, 3000); }
+    function stop() { if (timer) clearInterval(timer); timer = null; }
+    dots.forEach(function (d) { d.addEventListener('click', function () { show(+d.getAttribute('data-slide')); start(); }); });
+    box.addEventListener('mouseenter', function () { paused = true; stop(); });
+    box.addEventListener('mouseleave', function () { paused = false; start(); });
+    box.addEventListener('focusin', function () { paused = true; stop(); });
+    box.addEventListener('focusout', function () { paused = false; start(); });
+    show(0); start();
+  });
+
+  // Newsletter: mensagem de agradecimento depois de subscrever
+  if (/[?&]newsletter=ok/.test(location.search)) {
+    var thanks = document.querySelector('.news__thanks'), row = document.querySelector('.news__row');
+    if (thanks) { thanks.hidden = false; if (row) row.hidden = true; var ok = document.querySelector('.news__ok'); if (ok) ok.hidden = true; }
+  }
+
   // Brilho de vela que segue o cursor
   var hero = $('#hero'), glow = $('#glow');
   if (hero && glow && !matchMedia('(prefers-reduced-motion: reduce)').matches) {

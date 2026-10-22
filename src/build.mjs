@@ -24,7 +24,11 @@ write('massagens-porto/index.html', ms.html);
 
 /* Dados para a agenda e os vouchers (prototype.js) */
 const dados = {
-  treatments: m.treatments.map((t) => ({ id: t.id, area: m.GROUP_AREA[t.grupo] || t.grupo, name: t.nome_completo, min: t.duracao, price: t.preco, text: t.texto })),
+  treatments: m.treatments.map((t) => {
+    /* Tratamento em campanha: preço de campanha, com o normal guardado para aparecer riscado */
+    const camp = t.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== t.preco;
+    return { id: t.id, area: t.grupo, name: t.nome, min: t.duracao, price: camp ? m.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
+  }),
   team: m.team.map((p, i) => ({ id: p.id, name: p.nome, role: p.funcao, focus: p.foco, bio: p.bio, does: p.faz || [], tone: (i % 4) + 1, photo: p.foto || '' }))
 };
 write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nwindow.OMS_DATA = ' + JSON.stringify(dados) + ';\n');

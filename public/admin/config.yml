@@ -50,11 +50,35 @@ collections:
           - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
           - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Se ficar vazio, o botão leva à agenda. Se escolher um tratamento, o preço e a duração vêm dele quando os campos abaixo estão vazios.' }
           - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
-          - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0, required: false }
+          - { name: preco, label: Preço de campanha (€), widget: number, value_type: float, min: 0, required: false }
+          - { name: preco_antigo, label: Preço antigo riscado (€), widget: number, value_type: float, min: 0, required: false, hint: 'Aparece riscado por baixo do preço de campanha. Vazio = usa o preço normal do tratamento escolhido, quando o preço de campanha é diferente.' }
           - { name: selo, label: Mostrar selo de marca registada, widget: boolean, required: false, default: false }
           - { name: selo_texto, label: Texto do selo, widget: string, required: false }
           - { name: selo_numero, label: Número do selo, widget: string, required: false }
           - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
+          - { name: destaque_tratamento, label: Tratamento com o selo «Em campanha», widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Aparece um pequeno botão dourado «Em campanha» ao lado do nome, em «Rituais e tratamentos». Ao carregar, desce até às campanhas do mês. Vazio = sem selo.' }
+          - { name: destaque_preco, label: Preço em campanha (€), widget: number, value_type: float, min: 0, required: false, hint: 'Aparece no lugar do preço do tratamento escolhido acima, com o preço normal riscado por baixo. Vazio = mostra só o preço normal.' }
+          - label: Mais campanhas do mês
+            name: extras
+            widget: list
+            required: false
+            summary: '{{fields.titulo}} {{fields.titulo_destaque}}'
+            hint: 'Com mais de uma campanha ativa, rodam a cada 3 segundos, com pontos por baixo a mostrar qual se vê (1 de 3).'
+            fields:
+              - { name: ativa, label: Mostrar esta campanha, widget: boolean, default: false, required: false }
+              - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
+              - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false }
+              - { name: etiqueta, label: Etiqueta por cima do título, widget: string, required: false }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, required: false, hint: *texto_hint }
+              - { name: imagem, label: Fotografia, widget: image, required: false }
+              - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false }
+              - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
+              - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false }
+              - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
+              - { name: preco, label: Preço de campanha (€), widget: number, value_type: float, min: 0, required: false }
+              - { name: preco_antigo, label: Preço antigo riscado (€), widget: number, value_type: float, min: 0, required: false, hint: 'Aparece riscado por baixo do preço de campanha. Vazio = usa o preço normal do tratamento escolhido, quando o preço de campanha é diferente.' }
 
   - name: paginas
     label: Páginas
@@ -95,8 +119,6 @@ collections:
               - { name: titulo, label: Título, widget: string }
               - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
               - { name: texto, label: Texto, widget: text, hint: *texto_hint }
-              - { name: imagem, label: Fotografia, widget: image }
-              - { name: imagem_alt, label: Descrição da fotografia, widget: string }
               - label: Pilares
                 name: pilares
                 widget: list
@@ -105,7 +127,9 @@ collections:
                   - { name: titulo, label: Título, widget: string }
                   - { name: texto, label: Texto, widget: text }
                   - { name: botao, label: Texto do botão, widget: string }
-                  - { name: tratamento, label: O botão abre a agenda neste tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Vazio = leva à lista de tratamentos.' }
+                  - { name: tratamento, label: Ao carregar no quadrado vai para este tratamento, widget: relation, collection: catalogo, file: tratamentos, value_field: 'lista.*.id', search_fields: ['lista.*.nome'], display_fields: ['lista.*.nome'], required: false, hint: 'Leva à zona deste tratamento em «Rituais e tratamentos». Vazio = início da lista.' }
+                  - { name: imagem, label: Fotografia pequena, widget: image, required: false, hint: 'Aparece em cima do quadrado, recortada em quadrado.' }
+                  - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false }
               - { name: citacao, label: Citação, widget: text, required: false }
           - label: Rituais e tratamentos
             name: rituais
@@ -118,6 +142,9 @@ collections:
               - { name: texto, label: Texto, widget: text, hint: *texto_hint }
               - { name: imagem, label: Fotografia lateral, widget: image }
               - { name: imagem_alt, label: Descrição da fotografia, widget: string }
+              - { name: mostrar, label: Tratamentos visíveis por área, widget: number, value_type: int, min: 1, default: 2, required: false, hint: 'Os restantes ficam por trás do botão «Descubra todos».' }
+              - { name: mostrar_relaxar, label: Tratamentos visíveis em Relaxar, widget: number, value_type: int, min: 1, default: 3, required: false }
+              - { name: botao_todos, label: Texto do botão que mostra todos, widget: string, required: false }
               - { name: escolher_titulo, label: 'Título de «Que tratamento escolher?»', widget: string }
               - { name: escolher_destaque, label: Final em itálico, widget: string, required: false }
               - { name: escolher_texto, label: Texto, widget: text }
@@ -255,7 +282,7 @@ collections:
               - { name: nome_completo, label: Nome completo, widget: string, hint: 'Ex.: Massagem Oil & Candle. Usado na agenda, nos vouchers e no Google.' }
               - { name: artigo, label: Artigo, widget: select, options: [{ label: a, value: a }, { label: o, value: o }], default: a, hint: '«a Drenagem», «o Pilates». Usado nas frases automáticas.' }
               - { name: id, label: Código, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas, números e hífenes'], hint: 'Curto e sem acentos, ex.: drenagem. Não mude depois de publicado: a agenda e a equipa usam-no.' }
-              - { name: grupo, label: Grupo, widget: select, options: [Relaxar, Recuperar, Fortalecer], hint: 'Os de «Relaxar» também aparecem na página de massagens.' }
+              - { name: grupo, label: Grupo, widget: select, options: [Fortalecer, Recuperar, Cuidar, Relaxar], hint: 'Os de «Relaxar» também aparecem na página de massagens. A ordem das áreas no site segue a ordem da lista.' }
               - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0 }
               - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0 }
               - { name: texto, label: Descrição no site, widget: text }
@@ -330,8 +357,22 @@ collections:
           - { name: comodidades, label: Comodidades, widget: list, field: { name: item, label: Comodidade, widget: string } }
           - { name: conhecimentos, label: Especialidades (Google), widget: list, field: { name: item, label: Especialidade, widget: string } }
           - { name: afiliacoes, label: Associações de que é membro, widget: list, field: { name: item, label: Associação, widget: string } }
+          - { name: instagram, label: Instagram (ligação no topo do site), widget: string, required: false, hint: 'Endereço completo, ex.: https://www.instagram.com/oportomedicalspa/. Vazio = sem ícone.' }
           - { name: redes, label: Perfis (Google Business, Instagram, Facebook), widget: list, required: false, field: { name: url, label: Endereço, widget: string }, hint: 'Ligam o site aos perfis oficiais no Google.' }
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: registo_ers, label: N.º de registo ERS, widget: string, required: false }
+          - label: Newsletter
+            name: newsletter
+            widget: object
+            collapsed: true
+            hint: 'Zona de subscrição por cima do rodapé, em todas as páginas. Os emails ficam no Netlify, em Forms › newsletter.'
+            fields:
+              - { name: mostrar, label: Mostrar a newsletter, widget: boolean, default: true, required: false }
+              - { name: titulo, label: Título, widget: string }
+              - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+              - { name: texto, label: Texto, widget: text, required: false }
+              - { name: botao, label: Texto do botão, widget: string }
+              - { name: consentimento, label: Frase da caixa de consentimento, widget: string }
+              - { name: obrigado, label: Mensagem depois de subscrever, widget: string }
           - { name: frase_rodape, label: Frase do rodapé, widget: string, required: false }
           - { name: indexar, label: Site visível no Google, widget: boolean, required: false, default: false, hint: 'Deixe desligado até ao lançamento. Pode guardar e publicar alterações com isto desligado: o site atualiza-se na mesma e continua escondido do Google.' }

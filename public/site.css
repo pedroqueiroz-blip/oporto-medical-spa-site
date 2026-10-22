@@ -286,7 +286,7 @@ body { margin: 0; }
 @media (max-width: 900px) { .hero2__grid { grid-template-columns: 1fr; } .frame { display: none; } }
 
 .marquee { overflow: hidden; border-block: 1px solid var(--line); padding: 20px 0; background: #120D09; }
-.marquee__track { display: flex; width: max-content; gap: 48px; font-family: var(--display); font-size: 28px; color: rgba(232, 220, 200, .55); white-space: nowrap; animation: slide 60s linear infinite; }
+.marquee__track { display: flex; width: max-content; gap: 48px; font-family: var(--display); font-size: 28px; color: rgba(232, 220, 200, .55); white-space: nowrap; animation: slide 130s linear infinite; }
 .marquee__track i { color: var(--flame); font-style: normal; }
 @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -617,3 +617,116 @@ blockquote.d, .trust p { font-style: italic; }
 /* Letras pequenas do topo e de "A casa" com mais 1 ponto */
 .hero2__facts { font-size: 14px; }
 .pillars p { font-size: 15px; }
+/* Cuidar de si: texto à esquerda, três quadrados com fotografia à direita; cada um leva ao tratamento na lista */
+.house3 { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); align-items: center; }
+.house3 .house2__quote { margin-top: 36px; }
+.pillars--cards { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.pillars--cards li, .pillars--cards li + li { padding: 0; border: 0; background: none; cursor: auto; }
+.pillars--cards li:hover { background: none; }
+.pillars--cards .pillar { align-self: stretch; margin: 0; display: flex; flex-direction: column; gap: 10px; height: 100%; padding: 14px 14px 20px; border: 1px solid var(--line); border-radius: 4px; color: inherit; font: inherit; letter-spacing: normal; text-transform: none; text-decoration: none; transition: background .2s, border-color .2s; }
+.pillars--cards .pillar:hover, .pillars--cards .pillar:focus-visible { color: inherit; background: var(--cacao); border-color: rgba(217, 168, 108, .5); outline: none; }
+.pillar__img { display: block; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 2px; margin-bottom: 8px; }
+.pillar__img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s; }
+.pillar:hover .pillar__img img { transform: scale(1.04); }
+.pillar h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 26px; }
+.pillar p { margin: 0; font-size: 15px; color: var(--oat); flex: 1; }
+.pillar__cta { align-self: flex-start; margin-top: 8px; border-bottom: 1px solid var(--flame); padding-bottom: 3px; font: 500 11px var(--body); letter-spacing: .2em; text-transform: uppercase; color: var(--linen); }
+.pillar:hover .pillar__cta { color: var(--flame); }
+.ritual { scroll-margin-top: 110px; }
+.ritual:target { background: rgba(217, 168, 108, .08); box-shadow: inset 2px 0 0 var(--flame); }
+@media (max-width: 1100px) { .house3 { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .pillars--cards { grid-template-columns: 1fr; } .pillar__img { aspect-ratio: 16 / 9; } }
+
+/* Cuidar de si: título a toda a largura; citação separada por uma linha do texto e dos quadrados */
+.house3 { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; row-gap: 40px; }
+.house3__head { grid-column: 1 / -1; }
+.house3__head h2 { margin: 0; max-width: none; text-wrap: wrap; }
+.house3__lead { margin: 0; align-self: center; }
+.house3 .house3__quote { grid-column: 1 / -1; margin: 0; max-width: none; padding: 40px 0 0; border-left: 0; border-top: 1px solid var(--line); text-align: center; }
+@media (max-width: 1100px) { .house3 { grid-template-columns: 1fr; } }
+
+/* Instagram no topo */
+.top__ig { display: inline-flex; color: var(--oat); }
+.top__ig svg { width: 20px; height: 20px; }
+.top__ig:hover { color: var(--flame); }
+
+/* Selo "Em campanha" na lista de rituais */
+.camp-badge { display: table; margin-top: 10px; padding: 4px 9px 3px; border-radius: 2px; background: var(--flame); color: var(--night); font: 600 10px var(--body); letter-spacing: .2em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
+.ritual h3 a.camp-badge:hover { color: var(--night); background: var(--linen); }
+
+/* Campanhas extra do mês */
+.camp-more-btn { margin-top: 48px; text-align: center; }
+.camp-extra { margin-top: 64px; padding-top: 64px; border-top: 1px solid var(--line); }
+.camp-extra .sig-title { font-size: clamp(34px, 4vw, 56px); }
+
+/* Newsletter */
+.news { padding-block: clamp(56px, 8vw, 96px); border-top: 1px solid var(--line); background: var(--cacao); }
+.news__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 64px; align-items: center; }
+.news h2 { margin: 0; font-size: clamp(32px, 3.6vw, 50px); }
+.news__text { margin: 16px 0 0; color: var(--oat); max-width: 46ch; }
+.news__form { display: grid; gap: 14px; }
+.news__row { display: flex; gap: 10px; }
+.news__row input { flex: 1; min-width: 0; min-height: 48px; padding: 0 16px; border: 1px solid var(--line); border-radius: 2px; background: var(--night); color: var(--linen); font: inherit; }
+.news__row input:focus { outline: none; border-color: var(--flame); }
+.news__ok { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--oat); }
+.news__ok input { margin-top: 3px; accent-color: var(--flame); }
+.news__thanks { margin: 0; font-family: var(--display); font-size: 24px; color: var(--flame); }
+@media (max-width: 860px) { .news__grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) { .news__row { flex-direction: column; } }
+
+/* Rituais e tratamentos: botão «Descubra todos» em cada área */
+.rituals__btn { margin: 22px 0 0; }
+
+/* Cuidar de si: título e texto a toda a largura, quatro áreas por baixo e a citação no fim */
+.house3 { grid-template-columns: minmax(0, 1fr); }
+.house3 .house3__lead { margin: 28px 0 0; max-width: none; }
+.house3 .pillars--cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.house3 .pillar__img { aspect-ratio: 4 / 3; }
+@media (max-width: 1100px) { .house3 .pillars--cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .house3 .pillars--cards { grid-template-columns: 1fr; } .house3 .pillar__img { aspect-ratio: 16 / 9; } }
+
+/* Campanhas do mês em carrossel: as campanhas sobrepõem-se e a visível aparece por cima */
+.camp-carousel.is-js .camp-track { display: grid; }
+.camp-carousel.is-js .camp-slide { grid-area: 1 / 1; opacity: 0; visibility: hidden; transition: opacity .6s, visibility 0s .6s; }
+.camp-carousel.is-js .camp-slide.is-on { opacity: 1; visibility: visible; transition: opacity .6s; }
+.camp-carousel.is-js .camp-extra { margin-top: 0; padding-top: 0; border-top: 0; }
+.camp-carousel:not(.is-js) .camp-dots { display: none; }
+.camp-dots { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 40px; }
+.camp-count { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--oat); }
+.camp-dots__row { display: flex; gap: 4px; }
+.camp-dot { width: 28px; height: 28px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.camp-dot::before { content: ""; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--oat); transition: background .3s, border-color .3s, box-shadow .3s; }
+.camp-dot.is-on::before { background: var(--flame); border-color: var(--flame); box-shadow: 0 0 10px 2px rgba(217, 168, 108, .55); }
+.camp-dot:focus-visible { outline: 1px solid var(--flame); outline-offset: 2px; border-radius: 50%; }
+@media (prefers-reduced-motion: reduce) { .camp-carousel.is-js .camp-slide { transition: none; } }
+
+/* Preço em campanha, com o preço normal riscado por baixo */
+.price-camp { vertical-align: top; display: inline-flex; flex-direction: column; align-items: flex-end; font-weight: inherit; color: var(--flame); line-height: 1.2; }
+.price-camp s { font-size: 13px; color: var(--oat); text-decoration-thickness: 1px; }
+.price-d { display: inline-flex; flex-direction: column; line-height: 1.1; }
+.price-d s { margin-top: 4px; font-family: var(--body); font-size: 15px; color: var(--oat); text-decoration-thickness: 1px; }
+
+/* Reservar: escolha do tratamento compacta, só nome, duração e preço */
+.bk-options--list { grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 8px; }
+.bk-option--row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; }
+.bk-option--row .bk-option__title { font-size: 19px; }
+.bk-option--row .bk-option__meta { flex: none; gap: 14px; padding: 0; border: 0; white-space: nowrap; }
+.bk-group + .bk-group { margin-top: 22px; }
+
+/* Reservar: cada área é uma lista suspensa, no telemóvel e no computador */
+button.bk-group__t { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; text-transform: uppercase; letter-spacing: .28em; }
+button.bk-group__t { pointer-events: auto; cursor: pointer; margin: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 4px; background: var(--cacao); font-size: 12px; color: var(--linen); }
+button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1px solid var(--flame); border-bottom: 1px solid var(--flame); transform: rotate(45deg) translateY(-3px); transition: transform .2s; }
+.bk-group.is-open button.bk-group__t { border-color: var(--flame); }
+.bk-group.is-open button.bk-group__t::after { transform: rotate(-135deg) translateY(-3px); }
+.bk-group__n { display: inline; font-size: 11px; letter-spacing: .1em; color: var(--oat); }
+.bk-group:not(.is-open) .bk-options { display: none; }
+.bk-group.is-open .bk-options { margin-top: 8px; }
+.bk-group + .bk-group { margin-top: 10px; }
+
+/* Reservar: tratamento em campanha */
+.bk-camp { display: inline-block; vertical-align: middle; margin-left: 6px; padding: 3px 7px 2px; border-radius: 2px; background: var(--flame); color: var(--night); font: 600 9px var(--body); letter-spacing: .18em; text-transform: uppercase; }
+.bk-option__price.is-camp { display: inline-flex; flex-direction: column; align-items: flex-end; line-height: 1.2; color: var(--flame); }
+.bk-option__price s { font-size: 12px; color: var(--oat); }
+.bk-option--row .bk-option__meta { align-items: center; }
+@media (max-width: 640px) { .bk-camp { display: table; margin: 6px 0 0; } }

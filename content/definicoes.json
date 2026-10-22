@@ -26,8 +26,18 @@
   "comodidades": ["Roupão, toalhas e chinelos", "Ritual do chá à chegada", "Atendimento individual em sala privada"],
   "conhecimentos": ["Massagem de relaxamento", "Aromaterapia", "Fisioterapia", "Reeducação postural", "Fisioterapia dermato-funcional", "Drenagem linfática manual", "Pilates clínico", "Fitoterapia"],
   "afiliacoes": ["International Medical SPA Association", "Spa Industry Association"],
-  "redes": [],
+  "instagram": "https://www.instagram.com/oportomedicalspa/",
+  "redes": ["https://www.instagram.com/oportomedicalspa/"],
   "imagem_partilha": "",
-  "registo_ers": "",
+  "registo_ers": "E138084",
+  "newsletter": {
+    "mostrar": true,
+    "titulo": "Cartas da casa",
+    "titulo_destaque": "uma vez por mês.",
+    "texto": "Os rituais do mês, as campanhas e pequenos conselhos para cuidar de si, no seu email. Sem excessos.",
+    "botao": "Subscrever",
+    "consentimento": "Aceito receber a newsletter do Oporto Medical Spa. Posso cancelar a qualquer momento.",
+    "obrigado": "Obrigado. A próxima carta segue para o seu email."
+  },
   "frase_rodape": "Um compromisso pelos resultados terapêuticos."
 }

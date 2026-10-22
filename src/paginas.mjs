@@ -30,9 +30,7 @@ function faqHtml(items, { id, firstOpen = true, collapse = true, visible = 3 }) 
       </div>`;
 }
 
-function campaignSection(m) {
-  const c = m.campaign;
-  if (!c) return '';
+function campaignBlock(m, c, extra) {
   const t = m.text;
   const img = c.imagem
     ? `<figure class="arch arch--photo">${picture(c.imagem, { widths: [480, 760, 1040], sizes: '(max-width: 860px) 86vw, 40vw', alt: c.imagem_alt || '' })}</figure>`
@@ -41,22 +39,40 @@ function campaignSection(m) {
   if (c.duracao) items.push('<li>Duração: ' + minutes(c.duracao) + '</li>');
   else if (!items.some((x) => /Duração/.test(x))) items.push('<li><mark class="tbc">Duração: a confirmar</mark></li>');
   const book = c.tratamento ? `<button type="button" class="btn btn--primary" data-book="${esc(c.tratamento)}">Reservar</button>` : '<a class="btn btn--primary" href="#reservar">Reservar</a>';
-  return `<section class="section month2" id="campanha">
-    <div class="wrap split">
+  const h = extra ? 'h3' : 'h2';
+  return `<div class="wrap split${extra ? ' camp-extra' : ''}">
       ${img}
       <div style="display:grid;gap:24px">
-        <p class="kicker" style="margin:0">${esc(c.etiqueta)}</p>
-        <h2 class="d sig-title">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</h2>
+        ${c.etiqueta ? '<p class="kicker" style="margin:0">' + esc(c.etiqueta) + '</p>' : ''}
+        <${h} class="d sig-title">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</${h}>
         ${c.texto ? '<p style="margin:0;font-size:18px;max-width:46ch">' + t.inline(c.texto) + '</p>' : ''}
         ${c.selo ? `<p class="sig-seal"><span class="sig-seal__r" aria-hidden="true">®</span><span>${esc(c.selo_texto)}<br><b>${esc(c.selo_numero)}</b></span></p>` : ''}
         ${items.length ? '<ul>\n          ' + items.join('\n          ') + '\n        </ul>' : ''}
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px">
-          <span class="price-d">${c.preco ? esc(eur(c.preco)) : '<mark class="tbc">preço a confirmar</mark>'}</span>
+          <span class="price-d">${c.preco ? esc(eur(c.preco)) + (c.preco_antigo ? '<s><span class="sr-only">Preço normal </span>' + esc(eur(c.preco_antigo)) + '</s>' : '') : '<mark class="tbc">preço a confirmar</mark>'}</span>
           ${book}
           <a href="#oferecer" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">Oferecer</a>
         </div>
       </div>
+    </div>`;
+}
+
+/* Ritual do mês: com mais de uma campanha ativa, rodam a cada 3 segundos, com pontos por baixo */
+function campaignSection(m) {
+  const list = [m.campaign, ...(m.extraCampaigns || [])].filter(Boolean);
+  if (!list.length) return '';
+  if (list.length === 1) return `<section class="section month2" id="campanha">
+    ${campaignBlock(m, list[0], false)}
+  </section>`;
+  const slides = list.map((c, i) => `<div class="camp-slide${i ? '' : ' is-on'}" id="camp-${i + 1}" role="group" aria-roledescription="campanha" aria-label="${i + 1} de ${list.length}">
+    ${campaignBlock(m, c, i > 0)}
+    </div>`).join('\n    ');
+  const dots = list.map((c, i) => `<button type="button" class="camp-dot${i ? '' : ' is-on'}" data-slide="${i}" aria-controls="camp-${i + 1}" aria-label="Campanha ${i + 1} de ${list.length}: ${esc([c.titulo, c.titulo_destaque].filter(Boolean).join(' '))}"${i ? '' : ' aria-current="true"'}></button>`).join('');
+  return `<section class="section month2 camp-carousel" id="campanha" aria-roledescription="carrossel" aria-label="Campanhas do mês" data-carousel>
+    <div class="camp-track">
+    ${slides}
     </div>
+    <div class="wrap camp-dots"><span class="camp-count" aria-live="polite">1 de ${list.length}</span><span class="camp-dots__row">${dots}</span></div>
   </section>`;
 }
 
@@ -73,14 +89,24 @@ export function home(m) {
   const faqItems = m.faq(I.perguntas.lista);
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
-  const rituals = m.groups.map((g, gi) => `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
-        ${m.inGroup(g).map((x) => `<article class="ritual">
-          <h3>${x.grupo === 'Relaxar' ? '<a href="/massagens-porto/">' + esc(x.nome) + '</a>' : esc(x.nome)}</h3>
+  const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
+          <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha">Em campanha</a>' : ''}</h3>
           <p>${t.inline(x.texto)}</p>
-          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p>
+          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${x.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== x.preco ? '<b class="price-camp">' + eur(m.campaignPrice) + '<s><span class="sr-only">Preço normal </span>' + eur(x.preco) + '</s></b>' : eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="Reservar ${esc(x.nome)}">→</button>
-        </article>`).join('\n        ')}`).join('\n        ');
-  const pillars = (I.casa.pilares || []).map((p, i) => `<li tabindex="0" aria-selected="false"><span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p>${p.tratamento ? `<button type="button" data-book="${esc(p.tratamento)}">${esc(p.botao)} <span aria-hidden="true">→</span></button>` : `<a href="#rituais">${esc(p.botao)} <span aria-hidden="true">→</span></a>`}</li>`).join('\n          ');
+        </article>`;
+  /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */
+  const rituals = m.groups.map((g, gi) => {
+    const all = m.inGroup(g), n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
+    const shown = all.slice(0, n), rest = all.slice(n), id = 'mais-' + gi;
+    return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(g)}</p>
+        ${shown.map(ritual).join('\n        ')}${rest.length ? `
+        <div class="rituals__more" id="${id}" hidden>
+        ${rest.map(ritual).join('\n        ')}
+        </div>
+        <button type="button" class="more-btn rituals__btn" aria-expanded="false" aria-controls="${id}" data-toggle="${id}" data-open-label="Ver menos">${esc(I.rituais.botao_todos || 'Descubra todos')}</button>` : ''}`;
+  }).join('\n        ');
+  const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, (max-width: 1100px) 44vw, 22vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 
   const body = `${header(m, { home: true, current: '/' })}
@@ -118,19 +144,16 @@ export function home(m) {
   </section>
 
   <section class="section">
-    <div class="wrap house2">
-      <figure class="house2__fig">
-        <div class="house2__arch">${picture(I.casa.imagem, { widths: [560, 1040], sizes: '(max-width: 860px) 86vw, 36vw', alt: I.casa.imagem_alt })}</div>
-      </figure>
-      <div class="house2__text">
+    <div class="wrap house3">
+      <div class="house3__head">
         <p class="kicker">${esc(I.casa.etiqueta)}</p>
         <h2 class="d" style="font-size:clamp(40px,5vw,76px)">${title(I.casa.titulo, I.casa.titulo_destaque)}</h2>
-        <p class="house2__lead">${t.inline(I.casa.texto)}</p>
-        <ol class="pillars" data-select>
-          ${pillars}
-        </ol>
-        ${I.casa.citacao ? '<blockquote class="d house2__quote">' + t.inline(I.casa.citacao) + '</blockquote>' : ''}
+        <p class="house2__lead house3__lead">${t.inline(I.casa.texto)}</p>
       </div>
+      <ol class="pillars pillars--cards">
+          ${pillars}
+      </ol>
+      ${I.casa.citacao ? '<blockquote class="d house2__quote house3__quote">' + t.inline(I.casa.citacao) + '</blockquote>' : ''}
     </div>
   </section>
 
