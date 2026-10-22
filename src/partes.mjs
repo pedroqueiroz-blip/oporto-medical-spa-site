@@ -52,7 +52,7 @@ export function footer(m, { home }) {
   const n = s.newsletter;
   const news = n && n.mostrar ? `<section class="news" id="newsletter" aria-labelledby="news-t">
     <div class="wrap news__grid">
-      <div><p class="kicker">Newsletter</p><h2 class="d" id="news-t">${title(n.titulo, n.titulo_destaque)}</h2>${n.texto ? '<p class="news__text">' + esc(n.texto) + '</p>' : ''}</div>
+      <div><p class="kicker">Newsletter</p><h2 class="d" id="news-t">${title(n.titulo, n.titulo_destaque)}</h2>${n.texto ? '<p class="news__text">' + esc(n.texto) + '</p>' : ''}${n.oferta ? '<p class="news__offer">' + esc(n.oferta) + '</p>' : ''}</div>
       <form class="news__form" name="newsletter" method="POST" action="/?newsletter=ok#newsletter" data-netlify="true" netlify-honeypot="empresa">
         <input type="hidden" name="form-name" value="newsletter">
         <p hidden><label>Não preencher <input name="empresa"></label></p>

@@ -35,7 +35,7 @@
       does: ['aroma', 'world', 'oil'], tone: 4 }
   ];
 
-  var HOURS = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+  var HOURS = ['08:00', '09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
   var WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   var MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
@@ -248,40 +248,36 @@
   /* ---------- Vouchers ---------- */
   function mountVoucher(root, opts) {
     opts = opts || {};
-    var AMOUNTS = [50, 100, 150, 250];
-    var v = { mode: 'valor', amount: 100, custom: '', exp: 'oil', format: 'digital', to: '', from: '', msg: '' };
+    var first = byId(TREATMENTS, 'oil') ? 'oil' : TREATMENTS[0].id;
+    var v = { exp: first, format: 'digital', to: '', from: '', msg: '' };
+    var S = DATA.spa || {};
 
-    function value() {
-      if (v.mode === 'exp') return byId(TREATMENTS, v.exp).price;
-      var c = parseInt(v.custom, 10);
-      return v.custom && c > 0 ? c : v.amount;
-    }
+    function value() { return byId(TREATMENTS, v.exp).price; }
     function total() { return value() + (v.format === 'caixa' ? 6 : 0); }
+    // Válido até ao último dia do mês, daqui a 12 meses
+    function validUntil() {
+      var d = new Date(), end = new Date(d.getFullYear() + 1, d.getMonth() + 1, 0);
+      return end.getDate() + ' de ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][end.getMonth()] + ' de ' + end.getFullYear();
+    }
 
     function card() {
-      var what = v.mode === 'exp' ? byId(TREATMENTS, v.exp).name : 'Um momento à sua escolha';
+      var t = byId(TREATMENTS, v.exp);
       return '<div class="vc-card' + (v.format === 'caixa' ? ' vc-card--box' : '') + '" aria-live="polite">' +
         '<img class="vc-card__logo" src="logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
         '<div class="vc-card__top"><span class="vc-card__kind">Voucher oferta</span></div>' +
-        '<p class="vc-card__what">' + esc(what) + '</p>' +
-        '<p class="vc-card__value">' + eur(value()) + '</p>' +
+        '<p class="vc-card__name">' + esc(t.name) + '</p>' +
+        '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? ' (Reserve ' + t.min + ' min.)' : '') + '</p>' +
         '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : 'A sua mensagem aparece aqui.') + '</p>' +
         '<div class="vc-card__foot"><span>Para ' + esc(v.to || '…') + '</span><span>De ' + esc(v.from || '…') + '</span></div>' +
-        '<span class="vc-card__code">OMS·' + (1000 + hash(v.to + v.from + value()) % 9000) + '</span></div>';
+        '<p class="vc-card__info">Válido até ' + validUntil() + '.' + (S.telefone ? '<br>' + esc(S.telefone) : '') + '</p></div>';
     }
 
     function form() {
+      var t = byId(TREATMENTS, v.exp);
       return '<div class="vc-form">' +
-        '<div class="vc-row"><p class="vc-label">O que quer oferecer</p><div class="vc-seg" role="group">' +
-        '<button type="button" data-mode="valor" aria-pressed="' + (v.mode === 'valor') + '">Um valor</button>' +
-        '<button type="button" data-mode="exp" aria-pressed="' + (v.mode === 'exp') + '">Uma experiência</button></div></div>' +
-        (v.mode === 'valor'
-          ? '<div class="vc-row"><p class="vc-label">Valor</p><div class="vc-chips">' + AMOUNTS.map(function (a) {
-              return '<button type="button" data-amount="' + a + '" aria-pressed="' + (!v.custom && v.amount === a) + '">' + eur(a) + '</button>';
-            }).join('') + '<label class="vc-custom"><span class="sr-only">Outro valor</span><input id="vc-custom" inputmode="numeric" placeholder="Outro" value="' + esc(v.custom) + '"><span>€</span></label></div></div>'
-          : '<div class="vc-row"><label class="vc-label" for="vc-exp">Experiência</label><select id="vc-exp" class="vc-select">' + TREATMENTS.map(function (t) {
-              return '<option value="' + t.id + '"' + (v.exp === t.id ? ' selected' : '') + '>' + esc(t.name) + ' · ' + eur(t.price) + '</option>';
-            }).join('') + '</select></div>') +
+        '<div class="vc-row"><label class="vc-label" for="vc-exp">Massagem ou ritual a oferecer</label><select id="vc-exp" class="vc-select">' + TREATMENTS.map(function (x) {
+          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + '</option>';
+        }).join('') + '</select><p class="vc-desc">' + esc(t.text || '') + '</p></div>' +
         '<div class="vc-row"><p class="vc-label">Formato</p><div class="vc-seg" role="group">' +
         '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">Digital, por email</button>' +
         '<button type="button" data-format="caixa" aria-pressed="' + (v.format === 'caixa') + '">Caixa oferta (+6 €)</button></div></div>' +
@@ -291,7 +287,7 @@
         '<div class="vc-buy"><p class="vc-total">Total <strong>' + eur(total()) + '</strong></p>' +
         '<button type="button" class="btn btn--primary" data-buy>Oferecer este voucher</button></div>' +
         '<p class="bk-note" data-bought hidden>Adicionado ao carrinho. Protótipo: nada foi cobrado.</p>' +
-        '<p class="bk-note">Válido 12 meses. ' + (v.format === 'digital' ? 'Enviado de imediato ou na data que escolher.' : 'Entregue em casa em 2 a 3 dias úteis.') + '</p></div>';
+        '<p class="bk-note">Válido até ' + validUntil() + '. O número do voucher segue no email enviado com o voucher. ' + (v.format === 'digital' ? 'Enviado de imediato ou na data que escolher.' : 'Entregue em casa em 2 a 3 dias úteis.') + '</p></div>';
     }
 
     function render(keepFocus) {
@@ -303,13 +299,12 @@
     function soft() { // atualiza só o cartão e o total, sem refazer o formulário
       root.querySelector('.vc-preview').innerHTML = card();
       root.querySelector('.vc-total strong').textContent = eur(total());
+      var d = root.querySelector('.vc-desc'); if (d) d.textContent = byId(TREATMENTS, v.exp).text || '';
     }
 
     root.addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.mode) { v.mode = b.dataset.mode; render(); }
-      else if (b.dataset.amount) { v.amount = +b.dataset.amount; v.custom = ''; render(); }
-      else if (b.dataset.format) { v.format = b.dataset.format; render(); }
+      if (b.dataset.format) { v.format = b.dataset.format; render(); }
       else if (b.hasAttribute('data-buy')) {
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
@@ -326,7 +321,6 @@
       if (id === 'vc-to') v.to = e.target.value;
       else if (id === 'vc-from') v.from = e.target.value;
       else if (id === 'vc-msg') v.msg = e.target.value;
-      else if (id === 'vc-custom') { v.custom = e.target.value.replace(/\D/g, '').slice(0, 4); e.target.value = v.custom; root.querySelectorAll('[data-amount]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); }); }
       else return;
       soft();
     });

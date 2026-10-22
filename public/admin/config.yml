@@ -440,6 +440,7 @@ collections:
           - { name: titulo, label: Título, widget: string }
           - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
           - { name: texto, label: Texto, widget: text, required: false }
+          - { name: oferta, label: "Oferta em destaque (ex.: 10% para novos clientes)", widget: string, required: false }
           - { name: botao, label: Texto do botão, widget: string }
           - { name: consentimento, label: Frase da caixa de consentimento, widget: string }
           - { name: obrigado, label: Mensagem depois de subscrever, widget: string }
