@@ -59,7 +59,15 @@ Regras, emails e configuração: [docs/integracoes.md](docs/integracoes.md).
 
 ## Configuração inicial (uma vez)
 
-O backoffice entra com a conta GitHub de quem tem acesso a este repositório.
+O backoffice entra com a palavra-passe da equipa (`netlify/functions/admin-entrar.mjs`).
+Variáveis no Netlify (*Site configuration → Environment variables*, marcadas como secretas), e depois publicar de novo:
+
+- `BACKOFFICE_PASSWORD`: a palavra-passe da equipa. Para tirar o acesso a alguém, mudar a palavra-passe.
+- `BACKOFFICE_GITHUB_TOKEN`: no GitHub, *Settings → Developer settings → Personal access tokens → Fine-grained tokens*,
+  só para o repositório `oporto-medical-spa-site`, com *Contents* e *Pull requests* em *Read and write*.
+  Todas as alterações feitas no backoffice ficam em nome da conta que criou esta chave.
+
+Sem estas duas variáveis, o backoffice entra com a conta GitHub de quem tem acesso a este repositório:
 
 1. No GitHub: *Settings → Developer settings → OAuth Apps → New OAuth App*.
    *Homepage URL*: o endereço do site no Netlify. *Authorization callback URL*: `https://api.netlify.com/auth/done`.

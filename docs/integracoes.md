@@ -84,6 +84,7 @@ nunca no repositório. Depois de as criar, é preciso publicar de novo (*Deploys
 | `RESEND_API_KEY`, `EMAIL_FROM` | Envio dos emails (Resend), por exemplo `Oporto Medical Spa <reservas@oportomedicalspa.com>` |
 | `EMAIL_RESERVAS` | Opcional: outro email para os avisos à equipa |
 | `CODIGO_VIP` | Opcional: outro código VIP |
+| `BACKOFFICE_PASSWORD`, `BACKOFFICE_GITHUB_TOKEN` | Entrada no backoffice (/admin) com palavra-passe (ver README) |
 | `BUILD_HOOK_URL` | Reconstrução diária do site, para as campanhas mudarem nas datas (ver README) |
 | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | Agenda (fase seguinte) |
 
