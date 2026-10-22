@@ -37,7 +37,16 @@ O build (`src/build.mjs`) gera tudo a partir do conteúdo, por isso nada disto s
 - `FAQPage` com as perguntas frequentes (as respostas sobre preços e morada escrevem-se sozinhas);
 - a frase-resposta de preços na secção de rituais e o resumo da página de massagens;
 - `sitemap.xml`, `robots.txt`, `_headers` e `llms.txt` (resumo factual para assistentes de IA);
-- versões leves das fotografias carregadas no backoffice, via Netlify Image CDN.
+- versões leves das fotografias carregadas no backoffice, via Netlify Image CDN;
+- todas as campanhas ligadas e dentro das datas entram nos dados para o Google e no `llms.txt`;
+- `lastmod` do sitemap com o dia da última alteração publicada (ou da entrada/saída de uma campanha).
+
+Depois de cada publicação, com o site visível no Google, o IndexNow (Bing, Copilot, pesquisa do ChatGPT) é avisado
+das páginas alteradas (`netlify/functions/deploy-succeeded.mjs`). O Google lê o `sitemap.xml` sozinho.
+
+Todos os dias de madrugada o site volta a ser gerado (`netlify/functions/reconstruir.mjs`), para as campanhas
+entrarem e saírem nas datas marcadas sem ninguém publicar. Precisa de um *build hook* no Netlify
+(*Site configuration → Build & deploy → Build hooks*, ramo `main`) guardado na variável `BUILD_HOOK_URL`.
 
 Textos com `[[a confirmar]]` nunca entram nos dados estruturados.
 

@@ -1,5 +1,6 @@
 /* Lê o conteúdo do backoffice (content/*.json) e calcula o que se repete pelo site:
    preços, intervalos, horário, respostas automáticas e a campanha em vigor. */
+import { execFileSync } from 'node:child_process';
 import { readJSON, readList, readCampaigns, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
 
 const GROUP_AREA = { Fortalecer: 'Fisioterapia', Recuperar: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
@@ -107,8 +108,9 @@ export function loadModel(today = new Date()) {
     return parts.join(' ');
   }
 
-  /* Campanha em vigor: ativa e dentro das datas (as datas contam no momento do build) */
-  const day = today.toISOString().slice(0, 10);
+  /* Campanha em vigor: ativa e dentro das datas, no dia de Lisboa (as datas contam no momento do build;
+     o site reconstrói-se todos os dias de madrugada para as campanhas entrarem e saírem sozinhas) */
+  const day = today.toLocaleDateString('sv-SE', { timeZone: 'Europe/Lisbon' });
   const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
   const camp = readCampaigns(live);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
@@ -129,12 +131,28 @@ export function loadModel(today = new Date()) {
   const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
   const campaignPrice = campaignTreatment && Number(camp.destaque_preco) > 0 ? Number(camp.destaque_preco) : null;
 
+  /* Campanhas que entram no Google e no llms.txt: as que estão no site e não têm nada [[a confirmar]] */
+  const campaigns = [campaign, ...extraCampaigns].filter((c) => c && ![c.titulo, c.titulo_destaque, c.texto].some(text.hasTbc));
+  /* Dias em que uma campanha entrou ou saiu do site (para o lastmod do sitemap) */
+  const nextDay = (d) => new Date(Date.parse(d.slice(0, 10)) + 864e5).toISOString().slice(0, 10);
+  const campaignDays = [camp, ...(camp.extras || [])].filter((c) => c && c.ativa)
+    .flatMap((c) => [c.inicio && c.inicio.slice(0, 10), c.fim && nextDay(c.fim)]).filter((d) => d && d <= day);
+  const changed = lastChange();
+
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
-    s, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, day, changed, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
+}
+
+/* Dia (Lisboa) do último commit que mexeu no conteúdo ou no código do site; null sem histórico git */
+function lastChange() {
+  try {
+    const iso = execFileSync('git', ['log', '-1', '--format=%cI', '--', 'content', 'src', 'public'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return iso ? new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'Europe/Lisbon' }) : null;
+  } catch { return null; }
 }

@@ -4,7 +4,7 @@ import path from 'node:path';
 import { ROOT, PUBLIC } from './lib.mjs';
 import { loadModel } from './modelo.mjs';
 import { home, massages } from './paginas.mjs';
-import { robots, sitemap, headers, llms, head } from './seo.mjs';
+import { robots, sitemap, headers, llms, head, INDEXNOW_KEY } from './seo.mjs';
 import { page, header, footer } from './partes.mjs';
 
 const DIST = path.join(ROOT, 'dist');
@@ -45,17 +45,21 @@ write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nw
 
 /* Catálogo para o servidor de pagamentos (netlify/functions): os mesmos preços que o site mostra.
    Relaxar fatura como TPREV (Terapêuticas de Prevenção), o resto como TREAB (Reabilitação). */
+const PAGINAS = ['/', '/massagens-porto/'];
 const catalogo = {
   gerado: new Date().toISOString(),
   spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
-  tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' }))
+  tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' })),
+  /* Para avisar o Bing/IndexNow depois de cada publicação (netlify/functions/deploy-succeeded.mjs) */
+  seo: { indexar: !!m.s.indexar, chave: INDEXNOW_KEY, paginas: PAGINAS.map((p) => m.s.url + p).concat(m.s.url + '/llms.txt') }
 };
 const CAT = path.join(ROOT, 'servidor', 'gerado', 'catalogo.json');
 fs.mkdirSync(path.dirname(CAT), { recursive: true });
 fs.writeFileSync(CAT, JSON.stringify(catalogo, null, 1));
 
 write('robots.txt', robots(m));
-write('sitemap.xml', sitemap(m, ['/', '/massagens-porto/']));
+write('sitemap.xml', sitemap(m, PAGINAS));
+write(INDEXNOW_KEY + '.txt', INDEXNOW_KEY);
 write('_headers', headers(m));
 write('llms.txt', llms(m, h.faqItems.concat(ms.faqItems)));
 
