@@ -730,3 +730,13 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .bk-option__price s { font-size: 12px; color: var(--oat); }
 .bk-option--row .bk-option__meta { align-items: center; }
 @media (max-width: 640px) { .bk-camp { display: table; margin: 6px 0 0; } }
+
+/* Voucher: direito, só a massagem escolhida, com o descritivo de «Rituais e tratamentos» */
+.vc-card { transform: none; aspect-ratio: auto; min-height: 0; overflow: visible; }
+.vc-card__name { margin: 28px 0 0; padding-right: 90px; font-family: var(--display); font-size: clamp(30px, 3.6vw, 46px); line-height: 1.1; }
+.vc-card__desc { margin: 10px 0 0; max-width: 40ch; font-size: 14px; line-height: 1.5; color: #5A4636; }
+.vc-card__desc span { white-space: nowrap; color: #7A6450; }
+.vc-card__info { margin: 12px 0 0; font-size: 11px; line-height: 1.5; color: #7A6450; }
+.vc-desc { margin: 12px 0 0; font-size: 14px; color: var(--oat); }
+.news__offer { margin: 14px 0 0; display: inline-block; padding: 6px 12px; border: 1px solid var(--flame); border-radius: 2px; color: var(--flame); font-size: 14px; }
+@media (max-width: 880px) { .vc-preview { position: static; } }
