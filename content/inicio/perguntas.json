@@ -4,6 +4,79 @@
   "texto": "Reserve aqui, pelo {telefone} ou por {email}. Recomendamos dois dias de antecedência.",
   "lista": [
     {
+      "pergunta": "Como posso fazer uma reserva no Oporto Medical Spa?",
+      "resposta": "Pode efetuar o agendamento do seu tratamento através do nosso website (reserva online), email ({email}) ou através de um dos nossos contactos de telefone.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Qual a política de cancelamento?",
+      "resposta": "Se não comparecer à sessão agendada ou não avisar com 24 horas de antecedência, a sessão será descontada do seu pacote, ou seja, o valor correspondente à sessão será considerado gasto e não lhe será devolvido nem utilizado em outra sessão. Após esse prazo ou em caso de falta, será cobrado 50% do valor do tratamento.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "A que horas devo chegar ao SPA?",
+      "resposta": "Aconselhamos a chegada com 10 minutos de antecedência, para garantir uma experiência tranquila.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Que roupa devo usar para um tratamento no SPA?",
+      "resposta": "Use roupa confortável. Disponibilizamos roupão, toalha, chinelos e cueca descartável.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "O Oporto Medical Spa recebe crianças?",
+      "resposta": "Sim. Atendemos crianças a partir dos 5 anos de idade, com autorização dos pais. Um dos pais pode acompanhar o tratamento.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "O que significa «Medical SPA»?",
+      "resposta": "Somos um SPA médico com foco em resultados terapêuticos. Trabalhamos exclusivamente com fisioterapeutas certificados, promovendo saúde, reabilitação e qualidade de vida.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Posso usar o telemóvel durante a visita?",
+      "resposta": "Para preservar a tranquilidade e o ambiente harmonioso do Oporto Medical Spa, solicitamos que não utilize telemóveis, dispositivos eletrónicos ou equipamentos de áudio durante a sua permanência no espaço. Agradecemos a sua compreensão e colaboração no respeito pelo bem-estar e relaxamento de todos os nossos clientes.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Preciso de prescrição médica para fazer fisioterapia?",
+      "pergunta_seo": "Preciso de prescrição médica para fazer fisioterapia no Porto?",
+      "resposta": "Não. A fisioterapia pode ser iniciada sem prescrição médica. Para reembolso através de seguros de saúde, é necessário apresentar prescrição médica anterior ao início dos tratamentos.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Como posso pedir reembolso dos tratamentos de fisioterapia?",
+      "resposta": "Geralmente precisa dos seguintes documentos: prescrição médica, fatura e relatório do fisioterapeuta. Confirme os requisitos com a sua seguradora ou subsistema de saúde.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quais são os métodos de pagamento disponíveis?",
+      "resposta": "Aceitamos MB WAY, Multibanco, VISA/Mastercard e transferência bancária.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Posso oferecer um voucher presente do Oporto Medical Spa?",
+      "resposta": "Sim. Pode adquirir um voucher digital (recebido por email) ou físico (levantado no Spa ou enviado para a morada desejada).",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
+      "pergunta": "Quais são os termos e condições do voucher?",
+      "resposta": "**Devolução e troca:** o valor do voucher adquirido não poderá ser devolvido, e o Oporto Medical Spa não está obrigado a efetuar a troca do serviço oferecido. **Validade:** o voucher é válido por um ano (12 meses) após a aquisição. Perde a validade quando o agendamento do respetivo serviço não for realizado dentro do prazo indicado no voucher, ou quando, depois de efetuada a reserva, o cancelamento não for feito com mais de 24 horas de antecedência. Caso o prazo tenha expirado, o voucher poderá ser reativado mediante o pagamento de 12,00 €, sendo neste caso a validade estendida por 6 meses.",
+      "automatica": "",
+      "acrescento": ""
+    },
+    {
       "pergunta": "Onde fica o Oporto Medical Spa?",
       "resposta": "",
       "automatica": "morada",
@@ -23,12 +96,6 @@
       "acrescento": ""
     },
     {
-      "pergunta": "Quem faz os tratamentos?",
-      "resposta": "Fisioterapeutas com cédula profissional e terapeutas especializadas. Ao reservar online pode escolher com quem quer marcar.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
       "pergunta": "Há estacionamento?",
       "resposta": "[[confirmar: estacionamento próprio, parque próximo ou rua]]",
       "automatica": "",
@@ -37,42 +104,6 @@
     {
       "pergunta": "Falam inglês e espanhol?",
       "resposta": "[[confirmar idiomas da equipa]]",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "Quando devo chegar?",
-      "resposta": "Dez a quinze minutos antes da hora marcada, para mudar de roupa com calma e tomar o seu chá. Roupão, toalhas e chinelos estão à sua espera.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "E se não puder vir?",
-      "resposta": "Avise-nos com pelo menos 24 horas de antecedência. Depois disso é cobrado 50% do valor da sessão.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "Preciso de exame médico?",
-      "resposta": "Em programas de várias sessões recomendamos uma avaliação, que também fazemos aqui. Numa sessão individual basta indicar, ao marcar, se tem alguma doença ou toma medicação.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "O que devo trazer?",
-      "resposta": "Apenas roupa confortável. Temos roupões, toalhas e chinelos à sua espera. Para o Pilates clínico, traga roupa que lhe permita mexer-se à vontade.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "O que significa medical spa?",
-      "resposta": "Significa, antes de mais, um compromisso com os resultados terapêuticos. As técnicas mais atuais combinam-se com rituais antigos, e quem cuida de si são fisioterapeutas e terapeutas especializadas. O Oporto Medical Spa foi pioneiro deste conceito em Portugal.",
-      "automatica": "",
-      "acrescento": ""
-    },
-    {
-      "pergunta": "Posso oferecer uma massagem?",
-      "resposta": "Sim. Os vouchers oferta compram-se online, escolhendo a massagem ou o ritual a oferecer, e chegam por email no mesmo instante ou numa caixa de linho entregue em casa.",
       "automatica": "",
       "acrescento": ""
     }

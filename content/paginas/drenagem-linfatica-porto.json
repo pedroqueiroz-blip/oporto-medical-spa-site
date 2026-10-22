@@ -16,9 +16,25 @@
     "etiqueta": "Perguntas sobre drenagem",
     "titulo": "Antes de reservar.",
     "lista": [
-      { "pergunta": "Quanto custa uma drenagem linfática no Porto?", "pergunta_seo": "Quanto custa uma drenagem linfática manual no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_area", "acrescento": "" },
-      { "pergunta": "Para quem é a drenagem linfática manual?", "resposta": "É uma massagem suave, lenta e rítmica, indicada para pernas pesadas, retenção de líquidos e recuperação pós-operatória.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "" }
+      {
+        "pergunta": "Quanto custa uma drenagem linfática no Porto?",
+        "pergunta_seo": "Quanto custa uma drenagem linfática manual no Porto, no Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "precos_area",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Para quem é a drenagem linfática manual?",
+        "resposta": "É uma massagem suave que estimula a circulação linfática e ajuda a reduzir o inchaço e a retenção de líquidos. Está indicada para pernas pesadas, retenção de líquidos e recuperação pós-operatória.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Onde fica o Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "morada",
+        "acrescento": ""
+      }
     ]
   },
   "seo": {

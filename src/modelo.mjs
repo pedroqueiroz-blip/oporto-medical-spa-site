@@ -3,7 +3,7 @@
 import { execFileSync } from 'node:child_process';
 import { readJSON, readList, readCampaigns, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
 
-const GROUP_AREA = { Fortalecer: 'Fisioterapia', Recuperar: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
+const GROUP_AREA = { Recuperar: 'Fisioterapia', Fortalecer: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
 
 export function loadModel(today = new Date()) {
   const s = readJSON('definicoes');
@@ -104,7 +104,7 @@ export function loadModel(today = new Date()) {
     if (p) parts.push('As massagens de relaxamento custam ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
       ' e duram ' + (d.min === d.max ? d.min + ' minutos' : d.min + ' a ' + d.max + ' minutos') + '.');
     const bits = [];
-    const AREA_TXT = { Fortalecer: 'de fisioterapia e osteopatia', Recuperar: 'de Pilates e reeducação postural', Cuidar: 'de corpo' };
+    const AREA_TXT = { Recuperar: 'de fisioterapia e osteopatia', Fortalecer: 'de Pilates e reeducação postural', Cuidar: 'de corpo' };
     groups.filter((g) => g !== 'Relaxar').forEach((g) => {
       const pr = range(inGroup(g), 'preco');
       if (pr) bits.push('os tratamentos ' + (AREA_TXT[g] || g.toLowerCase()) + ' custam ' + (pr.min === pr.max ? eur(pr.min) : 'entre ' + eur(pr.min) + ' e ' + eur(pr.max)) + ' por sessão');

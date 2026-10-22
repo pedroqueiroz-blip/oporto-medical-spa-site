@@ -1,7 +1,7 @@
 {
   "ordem": 10,
   "endereco": "fisioterapia-porto",
-  "grupo": "Fortalecer",
+  "grupo": "Recuperar",
   "nome_menu": "Fisioterapia no Porto",
   "etiqueta": "Fisioterapia e osteopatia · Porto",
   "titulo": "Cuidar da causa,",
@@ -16,9 +16,38 @@
     "etiqueta": "Perguntas sobre fisioterapia",
     "titulo": "Antes de reservar.",
     "lista": [
-      { "pergunta": "Quanto custa uma sessão de fisioterapia no Porto?", "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?", "resposta": "", "automatica": "precos_area", "acrescento": "" },
-      { "pergunta": "Como é a primeira sessão?", "resposta": "A fisioterapeuta começa por avaliar e indicar a melhor forma de cuidar da sua saúde. A terapêutica de reabilitação começa logo a seguir, na mesma sessão.", "automatica": "", "acrescento": "" },
-      { "pergunta": "Onde fica o Oporto Medical Spa?", "resposta": "", "automatica": "morada", "acrescento": "" }
+      {
+        "pergunta": "Quanto custa uma sessão de fisioterapia no Porto?",
+        "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "precos_area",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Como é a primeira sessão?",
+        "resposta": "A fisioterapeuta começa por avaliar e indicar a melhor forma de cuidar da sua saúde. A terapêutica de reabilitação começa logo a seguir, na mesma sessão.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Preciso de prescrição médica para fazer fisioterapia?",
+        "pergunta_seo": "Preciso de prescrição médica para fazer fisioterapia no Porto?",
+        "resposta": "Não. A fisioterapia pode ser iniciada sem prescrição médica. Para reembolso através de seguros de saúde, é necessário apresentar prescrição médica anterior ao início dos tratamentos.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Como posso pedir reembolso dos tratamentos de fisioterapia?",
+        "resposta": "Geralmente precisa dos seguintes documentos: prescrição médica, fatura e relatório do fisioterapeuta. Confirme os requisitos com a sua seguradora ou subsistema de saúde.",
+        "automatica": "",
+        "acrescento": ""
+      },
+      {
+        "pergunta": "Onde fica o Oporto Medical Spa?",
+        "resposta": "",
+        "automatica": "morada",
+        "acrescento": ""
+      }
     ]
   },
   "seo": {

@@ -15,7 +15,7 @@
       "imagem_alt": "Taça de cerâmica escura com folhas de chá verde, junto a um bule"
     },
     {
-      "titulo": "Fortalecer",
+      "titulo": "Recuperar",
       "texto": "Dores de costas, contraturas, corrigir postura, reforço muscular.",
       "botao": "Fisioterapia",
       "tratamento": "fisio",
@@ -23,7 +23,7 @@
       "imagem_alt": "Terapeuta a massajar as costas de uma cliente"
     },
     {
-      "titulo": "Recuperar",
+      "titulo": "Fortalecer",
       "texto": "Postura, flexibilidade, força e prevenção de lesões.",
       "botao": "Pilates",
       "tratamento": "pilates",

@@ -95,7 +95,7 @@ collections:
         label: Cuidar de si
         file: content/inicio/casa.json
         preview_path: /
-        description: 'Apresentação da casa e os quadrados das áreas (Relaxar, Fortalecer, Recuperar, Cuidar).'
+        description: 'Apresentação da casa e os quadrados das áreas (Relaxar, Recuperar, Fortalecer, Cuidar).'
         fields:
           - { name: etiqueta, label: Etiqueta, widget: string }
           - { name: titulo, label: Título, widget: string }
@@ -305,7 +305,7 @@ collections:
     fields:
       - { name: ordem, label: Ordem, widget: number, value_type: int, default: 100 }
       - { name: endereco, label: Endereço da página, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas sem acentos, números e hífenes'], hint: 'Ex.: fisioterapia-porto. A página fica em oportomedicalspa.com/fisioterapia-porto/. Depois de publicada, evite mudar: o Google já a conhece por este endereço.' }
-      - { name: grupo, label: Área, widget: select, options: [Fortalecer, Recuperar, Cuidar], hint: 'A página mostra todos os tratamentos desta área. A área Relaxar tem a página de massagens.' }
+      - { name: grupo, label: Área, widget: select, options: [Recuperar, Fortalecer, Cuidar], hint: 'A página mostra todos os tratamentos desta área. A área Relaxar tem a página de massagens.' }
       - { name: nome_menu, label: Nome nas ligações, widget: string, hint: 'Aparece no rodapé, na página inicial e no caminho de navegação. Ex.: Fisioterapia no Porto.' }
       - { name: etiqueta, label: Etiqueta do topo, widget: string }
       - { name: titulo, label: Título, widget: string }
@@ -348,8 +348,8 @@ collections:
       - { label: Área, field: grupo }
     view_filters:
       - { label: Relaxar, field: grupo, pattern: Relaxar }
-      - { label: Fortalecer, field: grupo, pattern: Fortalecer }
       - { label: Recuperar, field: grupo, pattern: Recuperar }
+      - { label: Fortalecer, field: grupo, pattern: Fortalecer }
       - { label: Cuidar, field: grupo, pattern: Cuidar }
       - { label: Escondidos do site, field: visivel, pattern: false }
     editor: { preview: true }
@@ -359,7 +359,7 @@ collections:
       - { name: nome_completo, label: Nome completo, widget: string, hint: 'Ex.: Massagem Oil & Candle. Usado na agenda, nos vouchers e no Google.' }
       - { name: artigo, label: Artigo, widget: select, options: [{ label: a, value: a }, { label: o, value: o }], default: a, hint: '«a Drenagem», «o Pilates». Usado nas frases automáticas.' }
       - { name: id, label: Código, widget: string, pattern: ['^[a-z0-9-]+$', 'Só letras minúsculas, números e hífenes'], hint: 'Curto e sem acentos, ex.: drenagem. Não mude depois de publicado: a agenda e a equipa usam-no.' }
-      - { name: grupo, label: Grupo, widget: select, options: [Fortalecer, Recuperar, Cuidar, Relaxar], hint: 'Os de «Relaxar» também aparecem na página de massagens. A ordem das áreas no site segue a ordem da lista.' }
+      - { name: grupo, label: Grupo, widget: select, options: [Recuperar, Fortalecer, Cuidar, Relaxar], hint: 'Os de «Relaxar» também aparecem na página de massagens. A ordem das áreas no site segue a ordem da lista.' }
       - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0 }
       - { name: preco, label: Preço (€), widget: number, value_type: float, min: 0 }
       - { name: texto, label: Descrição no site, widget: text }
