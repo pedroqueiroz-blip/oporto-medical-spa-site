@@ -1,8 +1,8 @@
 {
   "etiqueta": "Cuidar de si",
-  "titulo": "Dores de costas, drenagens linfáticas",
-  "titulo_destaque": "e também relaxamento.",
-  "texto": "Um refúgio na cidade, longe da vida agitada e das preocupações do dia-a-dia. Aqui, as melhores práticas do ocidente combinam-se com antigos rituais orientais numa experiência sensorial única. Dores de costas, reforço muscular, reabilitação são abordadas em cada massagem de relaxamento. Mas é com o Pilates clínico e a Osteopatia que reforçamos a sua saúde, para que cada visita seja ao mesmo tempo prazer e tratamento.",
+  "titulo": "Um refúgio de Bem-estar,",
+  "titulo_destaque": " com cuidado especializado.",
+  "texto": "No Oporto Medical Spa, encontra um refúgio de serenidade onde o conhecimento clínico se une à arte de cuidar. Num ambiente exclusivo, cada experiência é pensada à sua medida, combinando fisioterapia especializada, movimento e terapias de spa para cuidar do corpo e proporcionar momentos de profundo relaxamento. Um espaço onde recuperar, fortalecer e cuidar de si se torna também uma oportunidade para abrandar, renovar energias e reencontrar o equilíbrio.",
   "imagem": "/img/uploads/oporto-medical-spa-sombras.jpg",
   "imagem_alt": "Logótipo do Oporto Medical Spa na parede, entre sombras de persiana e luz quente",
   "pilares": [
@@ -19,7 +19,7 @@
       "texto": "Dores de costas, contraturas, corrigir postura, reforço muscular.",
       "botao": "Fisioterapia",
       "tratamento": "fisio",
-      "imagem": "/img/massagem-pindas-760.webp",
+      "imagem": "/img/uploads/lady-having-stress-relieving-massage-in-spa-salon.jpg",
       "imagem_alt": "Terapeuta a massajar as costas de uma cliente"
     },
     {
@@ -27,7 +27,7 @@
       "texto": "Postura, flexibilidade, força e prevenção de lesões.",
       "botao": "Pilates",
       "tratamento": "pilates",
-      "imagem": "/img/uploads/pilates-alongamento.jpg",
+      "imagem": "/img/uploads/istock_000015192886medium-copy_edit.jpg",
       "imagem_alt": "Mulher a alongar-se no chão, diante de uma janela redonda"
     },
     {
@@ -35,7 +35,7 @@
       "texto": "Retenção líquidos, edema, celulite.",
       "botao": "Ver tratamentos",
       "tratamento": "dren",
-      "imagem": "/img/corpo-728.webp",
+      "imagem": "/img/uploads/massage.jpg",
       "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo"
     }
   ],
