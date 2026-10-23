@@ -1,15 +1,15 @@
 {
-  "etiqueta": "Rituais e tratamentos",
-  "titulo": "Permita-se ao luxo",
-  "titulo_destaque": "de cuidar de si.",
-  "texto": "Três caminhos, um só compromisso: que saia daqui mais leve do que entrou. Cada sessão começa com uma conversa e um chá.",
-  "imagem": "/img/meditacao-560.webp",
-  "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
   "mostrar": 2,
+  "texto": "Três caminhos, um só compromisso: que saia daqui mais leve do que entrou. Cada sessão começa com uma conversa e um chá.",
   "mostrar_relaxar": 3,
   "botao_todos": "Descubra todos",
-  "escolher_titulo": "Que tratamento",
-  "escolher_destaque": "escolher?",
   "escolher_texto": "Se procura sobretudo descanso, escolha uma massagem. Se tem dor ou uma limitação, comece pela fisioterapia. O Pilates clínico mantém o resultado.",
-  "botao_comparar": "Conheça todos os rituais e tratamentos"
+  "titulo_destaque": "de cuidar de si.",
+  "imagem": "/img/uploads/pilates-alongamento.jpg",
+  "etiqueta": "Rituais e tratamentos",
+  "escolher_titulo": "Que tratamento",
+  "titulo": "Permita-se ao luxo",
+  "botao_comparar": "Conheça todos os rituais e tratamentos",
+  "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
+  "escolher_destaque": "escolher?"
 }
