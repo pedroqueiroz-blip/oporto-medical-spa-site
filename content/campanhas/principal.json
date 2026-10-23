@@ -1,9 +1,10 @@
 {
   "tratamento": "world",
   "ativa": true,
-  "texto": "A massagem de assinatura do Oporto Medical Spa, criada na casa e registada como marca. Só a encontra aqui.",
+  "texto": "A Massagem de assinatura do Oporto Medical Spa, desenvolvida exclusivamente pela nossa equipa e registada como marca, é uma experiência única e exclusiva, disponível apenas no nosso spa.",
   "inclui": [
-    "[[O que inclui: a confirmar]]"
+    "[[O que inclui: Uma experiência sensorial inspirada em rituais orientais]]",
+    "Best-Seller - O favorito dos nossos clientes"
   ],
   "inicio": "",
   "selo_numero": "N.º 480541",
@@ -11,7 +12,7 @@
   "ordem": 10,
   "fim": "",
   "assinatura": "by Oporto Medical SPA",
-  "preco": null,
+  "preco": 65,
   "duracao": 75,
   "imagem": "/img/uploads/young-lady-have-anti-age-massage-of-face.jpg",
   "tipo_servico": "Massagem de assinatura",
@@ -20,5 +21,6 @@
   "selo": true,
   "selo_texto": "Marca registada no INPI",
   "titulo": "A Melhor Massagem",
+  "preco_antigo": 88,
   "imagem_alt": "Massagem com pedras quentes nas costas, junto a uma flor de lótus e uma vela"
 }
