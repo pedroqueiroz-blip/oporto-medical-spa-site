@@ -171,7 +171,7 @@ export function home(m) {
         <div class="sh__text"><p class="kicker">${esc(I.rituais.etiqueta)}</p><h2 class="d">${title(I.rituais.titulo, I.rituais.titulo_destaque, true)}</h2>
         <p class="prose">${t.inline(I.rituais.texto)}</p></div>
       </div>
-      <p class="answer">${esc(m.priceAnswer())}</p>
+      ${I.rituais.mostrar_resumo_precos === false ? '' : `<p class="answer">${I.rituais.resumo_precos ? t.inline(I.rituais.resumo_precos) : esc(m.priceAnswer())}</p>`}
 
       <div class="rituals" style="margin-top:0">
         ${rituals}

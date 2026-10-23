@@ -127,6 +127,8 @@ collections:
           - { name: titulo, label: Título, widget: string }
           - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
           - { name: texto, label: Texto, widget: text, hint: *texto_hint }
+          - { name: mostrar_resumo_precos, label: Mostrar a frase dos preços, widget: boolean, required: false, default: true, hint: 'Desligue para esconder a frase dos preços nesta secção.' }
+          - { name: resumo_precos, label: Frase dos preços, widget: text, required: false, hint: 'Aparece por baixo do texto (ex.: «As massagens de relaxamento custam entre 35 € e 129 €…»). Vazio = frase automática, calculada a partir dos preços e durações dos tratamentos, que se atualiza sozinha. Se escrever aqui, fica este texto e deixa de se atualizar quando mudar os preços.' }
           - { name: imagem, label: Fotografia lateral, widget: image }
           - { name: imagem_alt, label: Descrição da fotografia, widget: string }
           - { name: mostrar, label: Tratamentos visíveis por área, widget: number, value_type: int, min: 1, default: 2, required: false, hint: 'Os restantes ficam por trás do botão «Descubra todos».' }
