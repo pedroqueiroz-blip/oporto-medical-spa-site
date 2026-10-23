@@ -1,21 +1,34 @@
 {
-  "ordem": 40,
-  "id": "sofia",
-  "nome": "Sofia Lemos",
-  "funcao": "Massoterapeuta",
-  "foco": "A Melhor Massagem do Mundo e aromaterapia",
-  "bio": "Formada em técnicas orientais e ocidentais. Trabalha com calma e com intenção.",
-  "credencial": "Formação [[confirmar]]",
-  "cedula": "",
-  "foto": "",
-  "faz": [
-    "aroma",
-    "world",
-    "oil"
-  ],
   "conhece": [
     "A Melhor Massagem do Mundo",
     "Aromaterapia"
   ],
-  "confirmado": false
+  "foto": "",
+  "bio": "Formada em técnicas orientais e ocidentais. Trabalha com calma e com intenção.",
+  "cedula": "",
+  "credencial": "Cédula OF n,º [[12171]]",
+  "ordem": 40,
+  "confirmado": false,
+  "funcao": "Fisioterapeuta",
+  "foco": "Fisioterapia Músculo-Esquelética, Dermatofuncional ",
+  "nome": "Beatriz Tavares",
+  "id": "beatriz",
+  "faz": [
+    "aroma",
+    "world",
+    "oil",
+    "ayurvedica",
+    "body-mind",
+    "dren",
+    "energizante",
+    "esfoliacao",
+    "evasoes",
+    "fisio",
+    "geotermal",
+    "indian-head",
+    "localizada",
+    "modela-360",
+    "modelador",
+    "pos-cirurgico"
+  ]
 }
