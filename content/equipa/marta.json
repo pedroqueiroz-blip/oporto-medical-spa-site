@@ -1,20 +1,38 @@
 {
-  "ordem": 20,
-  "id": "marta",
-  "nome": "Marta Sousa",
-  "funcao": "Fisioterapeuta",
-  "foco": "Fisioterapia dermato-funcional e drenagem",
-  "bio": "Especialista em drenagem e recuperação pós-operatória, com mãos de uma precisão rara.",
-  "credencial": "Cédula OF n.º [[confirmar]]",
-  "cedula": "",
-  "foto": "",
-  "faz": [
-    "dren",
-    "fisio"
-  ],
   "conhece": [
     "Fisioterapia dermato-funcional",
     "Drenagem linfática manual"
   ],
-  "confirmado": false
+  "foto": "",
+  "bio": "Especialista em drenagem e recuperação pós-operatória, com mãos de uma precisão rara.",
+  "cedula": "",
+  "credencial": "Cédula OF n.º [[9428]]",
+  "ordem": 20,
+  "confirmado": false,
+  "funcao": "Fisioterapeuta",
+  "foco": "Fisioterapia dermato-funcional e drenagem",
+  "nome": "Beatriz Pena",
+  "id": "bia",
+  "faz": [
+    "dren",
+    "fisio",
+    "aroma",
+    "ayurvedica",
+    "body-mind",
+    "energizante",
+    "esfoliacao",
+    "evasoes",
+    "geotermal",
+    "indian-head",
+    "localizada",
+    "modela-360",
+    "modelador",
+    "oil",
+    "osteo",
+    "pilates-aparelhos",
+    "pilates",
+    "pos-cirurgico",
+    "pos-parto",
+    "postura"
+  ]
 }
