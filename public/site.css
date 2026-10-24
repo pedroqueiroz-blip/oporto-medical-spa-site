@@ -259,6 +259,8 @@ body { margin: 0; }
 .test-bar { border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--oat); background: #090705; }
 .test-bar .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; padding-block: 10px; }
 .test-bar b { color: var(--flame); font-weight: 500; }
+/* ==destaque== no backoffice: a cor da vela, sem moldura */
+.hl { background: transparent; color: var(--flame); font-style: normal; }
 .tbc { background: transparent; color: var(--flame); border: 1px dashed rgba(217, 168, 108, .7); border-radius: 3px; padding: 0 5px; font-style: normal; font-family: var(--body); font-size: .85em; letter-spacing: 0; text-transform: none; white-space: normal; }
 
 .lang a, .lang span { text-decoration: none; }

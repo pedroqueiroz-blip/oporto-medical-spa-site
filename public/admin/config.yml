@@ -57,10 +57,10 @@ collections:
       - { name: titulo, label: Título, widget: string }
       - { name: titulo_destaque, label: Final do título em itálico bege, widget: string, required: false }
       - { name: assinatura, label: Assinatura por baixo do título, widget: string, required: false }
-      - { name: texto, label: Texto, widget: text, hint: &texto_hint 'Pode usar `*itálico*`, `**negrito**`, `[texto](https://...)` para uma ligação e `[[a confirmar]]` (aparece marcado no site e fica fora do Google). `{telefone}`, `{email}`, `{morada}` e `{horario}` são substituídos pelos contactos.' }
+      - { name: texto, label: Texto, widget: text, hint: &texto_hint 'Pode usar `*itálico*`, `**negrito**`, `[texto](https://...)` para uma ligação, `==destaque==` (na cor bege dourada) e `[[a confirmar]]` (aparece marcado no site e fica fora do Google). `{telefone}`, `{email}`, `{morada}` e `{horario}` são substituídos pelos contactos.' }
       - { name: imagem, label: Fotografia, widget: image, required: false, hint: 'Vertical, de preferência com 1000 px de largura ou mais. O site cria as versões leves sozinho.' }
       - { name: imagem_alt, label: Descrição da fotografia, widget: string, required: false, hint: 'O que se vê na foto, numa frase. Serve a quem não vê a imagem e ao Google.' }
-      - { name: inclui, label: O que inclui, widget: list, required: false, field: { name: item, label: Linha, widget: string } }
+      - { name: inclui, label: O que inclui, widget: list, required: false, hint: 'Pode usar `==destaque==` para uma linha na cor bege dourada, `**negrito**` e `*itálico*`.', field: { name: item, label: Linha, widget: string } }
       - { name: tratamento, label: Botão Reservar abre este tratamento, widget: relation, collection: tratamentos, value_field: id, search_fields: [nome, nome_completo], display_fields: [nome], required: false, hint: 'Se ficar vazio, o botão leva à agenda. Se escolher um tratamento, o preço e a duração vêm dele quando os campos abaixo estão vazios.' }
       - { name: duracao, label: Duração (minutos), widget: number, value_type: int, min: 0, required: false }
       - { name: preco, label: Preço de campanha (€), widget: number, value_type: float, min: 0, required: false }
