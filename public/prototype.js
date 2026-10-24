@@ -20,6 +20,7 @@
       text: 'Sessão individual orientada por fisioterapeuta, para uma coluna forte e um corpo consciente.' }
   ];
 
+  var AREA_TEXT = DATA.areaText || {};
   var TEAM = DATA.team || [
     { id: 'ana', name: 'Ana Ribeiro', role: 'Fisioterapeuta', focus: 'Reeducação postural e Pilates clínico',
       bio: 'Acredita que cada corpo conta uma história. O trabalho dela é ouvi-la antes de a corrigir.',
@@ -98,7 +99,7 @@
       return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a, i) {
         // Cada área abre como lista suspensa (fica aberta a do tratamento escolhido)
         var open = !!(s.openAreas && s.openAreas[a]) || !!(cur && cur.area === a);
-        return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span></button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
+        return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span>' + (AREA_TEXT[a] ? '<span class="bk-group__d">- ' + esc(AREA_TEXT[a]) + '</span>' : '') + '</button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
             return '<button type="button" class="bk-option bk-option--row" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
               '<span class="bk-option__title">' + esc(t.name) + (t.camp ? ' <span class="bk-camp">Em campanha</span>' : '') + '</span>' +

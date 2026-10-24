@@ -111,7 +111,7 @@ export function home(m) {
         <div class="rituals__more" id="${id}" hidden>
         ${rest.map(ritual).join('\n        ')}
         </div>
-        <button type="button" class="more-btn rituals__btn" aria-expanded="false" aria-controls="${id}" data-toggle="${id}" data-open-label="Ver menos">${esc(I.rituais.botao_todos || 'Descubra todos')}</button>` : ''}`;
+        <button type="button" class="more-btn rituals__btn" aria-expanded="false" aria-controls="${id}" data-toggle="${id}" data-open-label="Ver menos">${esc((I.rituais.botao_todos || 'Descubra todos') + ' para ' + g.toLowerCase())}</button>` : ''}`;
   }).join('\n        ');
   const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, (max-width: 1100px) 44vw, 22vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
@@ -220,7 +220,7 @@ export function home(m) {
     <div class="wrap">
       <div class="sh">
         <div><p class="kicker">${esc(I.equipa.etiqueta)}</p><h2 class="d">${title(I.equipa.titulo, I.equipa.titulo_destaque)}</h2></div>
-        <p class="prose">${t.inline(I.equipa.texto)}${m.teamConfirmed ? '' : ' <mark class="tbc">nomes e cédulas ilustrativos</mark>'}</p>
+        <p class="prose">${t.inline(I.equipa.texto)}</p>
       </div>
       <div class="team">
         ${m.team.map((p) => personCard(m, p)).join('\n        ')}
