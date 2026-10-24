@@ -485,3 +485,17 @@ collections:
           - { name: redes, label: "Perfis (Google Business, Instagram, Facebook)", widget: list, required: false, field: { name: url, label: Endereço, widget: string }, hint: 'Ligam o site aos perfis oficiais no Google.' }
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: indexar, label: Site visível no Google, widget: boolean, required: false, default: false, hint: 'Deixe desligado até ao lançamento. Pode guardar e publicar alterações com isto desligado: o site atualiza-se na mesma e continua escondido do Google.' }
+
+  - name: indicacoes
+    label: Indicações
+    label_singular: Indicações
+    description: 'Como formatar os textos: ==destaque== (cor dourada, sem moldura), **negrito**, *itálico*, [texto](endereço) para ligações e [[a confirmar]]. Abra «Indicações» para ver tudo e acrescentar notas. Esta área não aparece no site.'
+    editor: { preview: false }
+    files:
+      - name: indicacoes
+        label: Indicações
+        file: content/indicacoes/indicacoes.json
+        fields:
+          - { name: titulo, label: Título, widget: hidden, default: Indicações }
+          - { name: notas, label: Notas, widget: markdown, buttons: [bold, italic, link, heading-two, bulleted-list], editor_components: [], hint: 'Notas para quem edita o site. Não aparecem no site.' }
+
