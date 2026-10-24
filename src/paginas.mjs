@@ -255,17 +255,18 @@ export function home(m) {
         <div><p class="kicker">${esc(A.etiqueta)}</p><h2 class="d">${title(A.titulo, A.titulo_destaque)}</h2></div>
       </div>
       <div class="reviews__head">
-        <span class="reviews__score"><mark class="tbc">nota</mark></span>
-        <span><span class="stars" role="img" aria-label="Classificação em estrelas">
+        ${A.nota_google ? `<span class="reviews__score">${esc(A.nota_google)}</span>
+        <span><span class="stars" role="img" aria-label="${esc(A.nota_google)} em 5 estrelas no Google">
           ${STARS}
-        </span><br><span style="color:var(--oat);font-size:14px"><mark class="tbc">n.º</mark> avaliações no Google</span></span>
-        <a class="btn btn--ghost" style="margin-left:auto" href="${esc(mp.reviews)}" rel="noopener" target="_blank">${esc(A.botao || 'Ver todas no Google')}</a>
+        </span>${A.total_avaliacoes ? `<br><span style="color:var(--oat);font-size:14px">${esc(A.total_avaliacoes)} avaliações no Google</span>` : ''}</span>` : ''}
+        <a class="btn btn--ghost" style="margin-left:auto" href="${esc(A.perfil_google || mp.reviews)}" rel="noopener" target="_blank">${esc(A.botao || 'Ver todas no Google')}</a>
       </div>
-      <div class="reviews__grid">
-        <article class="review"><b>Avaliação mais recente</b><span>O texto real da avaliação, o nome como aparece no Google e a data. Puxada pela API do Google, sem edição.</span></article>
-        <article class="review"><b>Segunda mais recente</b><span>Mostramos as mais recentes, não só as de cinco estrelas.</span></article>
-        <article class="review"><b>Terceira mais recente</b><span>Cada cartão leva a atribuição “Google”, como as regras da API exigem.</span></article>
-      </div>
+      ${(A.lista || []).length ? `<div class="reviews__grid">
+        ${A.lista.map((r) => `<figure class="review review--real">
+          <figcaption><b>${esc(r.nome)}</b><span class="review__meta">${r.estrelas ? esc(r.estrelas) + '/5 · ' : ''}${r.data ? esc(r.data) + ' · ' : ''}Google</span></figcaption>
+          <blockquote>${esc(r.texto)}</blockquote>
+        </figure>`).join('\n        ')}
+      </div>` : ''}
       <p class="reviews__note">${t.inline(A.nota || '')}</p>
     </div>
   </section>
