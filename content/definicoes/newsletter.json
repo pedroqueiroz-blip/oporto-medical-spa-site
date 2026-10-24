@@ -1,10 +1,10 @@
 {
   "mostrar": true,
-  "titulo": "Cartas da casa",
-  "titulo_destaque": "uma vez por mês.",
+  "titulo": "Novidades do seu SPA",
+  "titulo_destaque": ", uma vez por mês.",
   "texto": "Os rituais do mês, as campanhas e pequenos conselhos para cuidar de si, no seu email. Sem excessos.",
   "oferta": "Novo cliente? Inscreva-se e receba 10% de desconto na primeira marcação.",
   "botao": "Subscrever",
   "consentimento": "Aceito receber a newsletter do Oporto Medical Spa. Posso cancelar a qualquer momento.",
-  "obrigado": "Obrigado. A próxima carta segue para o seu email."
+  "obrigado": "Obrigado. A próxima newsletter segue para o seu email."
 }
