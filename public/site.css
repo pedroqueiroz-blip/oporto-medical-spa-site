@@ -727,7 +727,9 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .bk-group.is-open button.bk-group__t { border-color: var(--flame); }
 .bk-group.is-open button.bk-group__t::after { transform: rotate(-135deg) translateY(-3px); }
 /* Indicação da área (a mesma de «Cuidar de si»), só no computador */
-.bk-group__d { text-transform: none; letter-spacing: .02em; font-size: 14px; color: var(--oat); }
+/* O nome da área tem espaçamento largo entre letras (sobra .28em depois da última); a frase compensa
+   para ficar à mesma distância do número que o número está do nome */
+.bk-group__d { margin-left: .16em; text-transform: none; letter-spacing: .02em; font-size: 14px; color: var(--oat); }
 @media (max-width: 640px) { .bk-group__d { display: none; } }
 .bk-group__n { display: inline; font-size: 11px; letter-spacing: .1em; color: var(--oat); }
 .bk-group:not(.is-open) .bk-options { display: none; }
