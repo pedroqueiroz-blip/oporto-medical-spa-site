@@ -41,7 +41,7 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-/* Texto escrito no backoffice: [[a confirmar]], *itálico*, **negrito**, [ligação](url) e {variáveis}. */
+/* Texto escrito no backoffice: [[a confirmar]], ==destaque==, *itálico*, **negrito**, [ligação](url) e {variáveis}. */
 export function makeText(ctx) {
   function vars(s, html) {
     return s.replace(/\{(\w+)(?::(\w+))?\}/g, (m, k, id) => {
@@ -54,6 +54,7 @@ export function makeText(ctx) {
     let out = esc(s);
     out = vars(out, true);
     out = out.replace(/\[\[(.+?)\]\]/g, '<mark class="tbc">$1</mark>');
+    out = out.replace(/==(.+?)==/g, '<mark class="hl">$1</mark>');
     out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => '<a href="' + u + '">' + t + '</a>');
     out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -63,7 +64,7 @@ export function makeText(ctx) {
   function plain(s) {
     if (!s) return '';
     if (/\[\[/.test(s)) return '';
-    return vars(s, false).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*?(.+?)\*\*?/g, '$1').trim();
+    return vars(s, false).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/==(.+?)==/g, '$1').replace(/\*\*?(.+?)\*\*?/g, '$1').trim();
   }
   function hasTbc(s) { return /\[\[/.test(s || ''); }
   function stripTbc(s) { return (s || '').replace(/\s*\[\[.+?\]\]\s*/g, ' ').trim(); }
