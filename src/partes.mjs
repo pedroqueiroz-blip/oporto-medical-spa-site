@@ -21,7 +21,9 @@ export function maps(m) {
 
 /* Título com a parte final em itálico bege: "Aqui o tempo <em>corre devagar</em>" */
 export function title(t, em, br) {
-  return esc(t || '') + (em ? (br ? '<br>' : ' ') + '<em>' + esc(em) + '</em>' : '');
+  /* Final que começa por pontuação («, uma vez por mês.») fica colado ao título, sem espaço antes da vírgula */
+  const gap = br ? '<br>' : /^[,.;:!?…)]/.test(em || '') ? '' : ' ';
+  return esc(t || '') + (em ? gap + '<em>' + esc(em) + '</em>' : '');
 }
 
 export function header(m, { home, current }) {
