@@ -463,7 +463,7 @@ collections:
           - { name: texto, label: Texto, widget: text, required: false }
           - { name: oferta, label: "Oferta em destaque (ex.: 10% para novos clientes)", widget: string, required: false }
           - { name: botao, label: Texto do botão, widget: string }
-          - { name: consentimento, label: Frase da caixa de consentimento, widget: string }
+          - { name: consentimento, label: Frase da caixa de consentimento, widget: text, hint: 'Cada linha aqui é uma linha no site.' }
           - { name: obrigado, label: Mensagem depois de subscrever, widget: string }
       - name: casa
         label: A casa (Google e IA)

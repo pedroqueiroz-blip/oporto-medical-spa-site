@@ -21,7 +21,9 @@ export function maps(m) {
 
 /* Título com a parte final em itálico bege: "Aqui o tempo <em>corre devagar</em>" */
 export function title(t, em, br) {
-  return esc(t || '') + (em ? (br ? '<br>' : ' ') + '<em>' + esc(em) + '</em>' : '');
+  /* Final que começa por pontuação («, uma vez por mês.») fica colado ao título, sem espaço antes da vírgula */
+  const gap = br ? '<br>' : /^[,.;:!?…)]/.test(em || '') ? '' : ' ';
+  return esc(t || '') + (em ? gap + '<em>' + esc(em) + '</em>' : '');
 }
 
 export function header(m, { home, current }) {
@@ -57,7 +59,7 @@ export function footer(m, { home }) {
         <input type="hidden" name="form-name" value="newsletter">
         <p hidden><label>Não preencher <input name="empresa"></label></p>
         <div class="news__row"><label class="sr-only" for="news-email">Email</label><input id="news-email" type="email" name="email" placeholder="O seu email" autocomplete="email" required><button type="submit" class="btn btn--primary">${esc(n.botao || 'Subscrever')}</button></div>
-        <label class="news__ok"><input type="checkbox" name="consentimento" value="sim" required> <span>${esc(n.consentimento)}</span></label>
+        <label class="news__ok"><input type="checkbox" name="consentimento" value="sim" required> <span>${esc(n.consentimento).trim().replace(/\s*\n\s*/g, '<br>')}</span></label>
         <p class="news__thanks" role="status" hidden>${esc(n.obrigado)}</p>
       </form>
     </div>
