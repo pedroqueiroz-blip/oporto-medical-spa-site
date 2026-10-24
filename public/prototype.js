@@ -256,6 +256,8 @@
     var v = { exp: first, format: 'digital', to: '', from: '', msg: '' };
     var S = DATA.spa || {};
     function cur() { return byId(LIST, v.exp) || TREATMENTS[0]; }
+    // Só os vouchers de campanha trazem o id da campanha em camp; nos tratamentos camp é true/false (campanha principal)
+    function campId(t) { return typeof t.camp === 'string' ? t.camp : ''; }
 
     function value() { return cur().price; }
     function total() { return value() + (v.format === 'caixa' ? 6 : 0); }
@@ -270,7 +272,7 @@
       return '<div class="vc-card' + (v.format === 'caixa' ? ' vc-card--box' : '') + '" aria-live="polite">' +
         '<img class="vc-card__logo" src="logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
         '<div class="vc-card__top"><span class="vc-card__kind">Voucher oferta</span></div>' +
-        (t.camp ? '<p class="vc-card__camp">' + esc(t.label) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
+        (campId(t) ? '<p class="vc-card__camp">' + esc(t.label) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
         '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? ' (Reserve ' + t.min + ' min.)' : '') + '</p>' +
         '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : 'A sua mensagem aparece aqui.') + '</p>' +
         '<div class="vc-card__foot"><span>Para ' + esc(v.to || '…') + '</span><span>De ' + esc(v.from || '…') + '</span></div>' +
@@ -316,7 +318,7 @@
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
           var tr = cur();
-          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
+          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: campId(tr), nomeTratamento: tr.name + (campId(tr) ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!campId(tr) });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;
