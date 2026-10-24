@@ -220,7 +220,7 @@ export function home(m) {
     <div class="wrap">
       <div class="sh">
         <div><p class="kicker">${esc(I.equipa.etiqueta)}</p><h2 class="d">${title(I.equipa.titulo, I.equipa.titulo_destaque)}</h2></div>
-        <p class="prose">${t.inline(I.equipa.texto)}${m.teamConfirmed ? '' : ' <mark class="tbc">nomes e cédulas ilustrativos</mark>'}</p>
+        <p class="prose">${t.inline(I.equipa.texto)}</p>
       </div>
       <div class="team">
         ${m.team.map((p) => personCard(m, p)).join('\n        ')}

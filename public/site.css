@@ -334,6 +334,8 @@ body { margin: 0; }
 .person h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 28px; }
 .person p { margin: 0; font-size: 14px; color: var(--oat); }
 .person .cred { font-size: 12px; }
+/* Número da cédula sem tracejado à volta */
+.person .cred .tbc { border: 0; padding: 0; font-size: inherit; }
 .person button { margin-top: 10px; align-self: flex-start; background: none; border: 0; border-bottom: 1px solid var(--flame); padding: 0 0 3px; color: var(--linen); font: 500 11px var(--body); letter-spacing: .22em; text-transform: uppercase; cursor: pointer; }
 
 /* Avaliações */
@@ -719,6 +721,9 @@ button.bk-group__t { pointer-events: auto; cursor: pointer; margin: 0; padding: 
 button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1px solid var(--flame); border-bottom: 1px solid var(--flame); transform: rotate(45deg) translateY(-3px); transition: transform .2s; }
 .bk-group.is-open button.bk-group__t { border-color: var(--flame); }
 .bk-group.is-open button.bk-group__t::after { transform: rotate(-135deg) translateY(-3px); }
+/* Indicação da área (a mesma de «Cuidar de si»), só no computador */
+.bk-group__d { text-transform: none; letter-spacing: .02em; font-size: 14px; color: var(--oat); margin-left: -4px; }
+@media (max-width: 640px) { .bk-group__d { display: none; } }
 .bk-group__n { display: inline; font-size: 11px; letter-spacing: .1em; color: var(--oat); }
 .bk-group:not(.is-open) .bk-options { display: none; }
 .bk-group.is-open .bk-options { margin-top: 8px; }

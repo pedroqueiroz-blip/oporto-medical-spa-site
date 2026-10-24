@@ -41,6 +41,8 @@ const dados = {
     const camp = t.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== t.preco;
     return { id: t.id, area: t.grupo, name: t.nome, min: t.duracao, price: camp ? m.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
   }),
+  /* Indicação de cada área, igual à do cartão em «Cuidar de si» (aparece à frente da área na agenda, no computador) */
+  areaText: Object.fromEntries(((m.inicio.casa || {}).pilares || []).filter((p) => p.titulo && p.texto).map((p) => [p.titulo, m.text.plain(p.texto)])),
   spa: (() => {
     const h = m.s.horario || {}, f = (x) => String(x || '').replace(/^0/, '').replace(':', 'h');
     return { telefone: m.s.telefone, horario: '2.ª a 6.ª ' + f(h.semana_abre) + '–' + f(h.semana_fecha) + (h.sabado_aberto ? ', sábado ' + f(h.sabado_abre) + '–' + f(h.sabado_fecha) : '') };
