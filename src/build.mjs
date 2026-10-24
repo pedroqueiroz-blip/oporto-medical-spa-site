@@ -6,6 +6,7 @@ import { loadModel } from './modelo.mjs';
 import { home, massages, areaPage } from './paginas.mjs';
 import { robots, sitemap, headers, llms, head, INDEXNOW_KEY } from './seo.mjs';
 import { page, header, footer } from './partes.mjs';
+import { withGoogle } from './google.mjs';
 
 const DIST = path.join(ROOT, 'dist');
 fs.rmSync(DIST, { recursive: true, force: true });
@@ -13,6 +14,7 @@ fs.cpSync(PUBLIC, DIST, { recursive: true });
 
 /* OMS_HOJE=2026-11-25 node src/build.mjs gera o site como nesse dia (para ver campanhas futuras) */
 const m = loadModel(process.env.OMS_HOJE ? new Date(process.env.OMS_HOJE + 'T12:00:00Z') : undefined);
+if (m.inicio.avaliacoes) m.inicio.avaliacoes = await withGoogle(m.inicio.avaliacoes, m);
 const write = (rel, data) => {
   const f = path.join(DIST, rel);
   fs.mkdirSync(path.dirname(f), { recursive: true });

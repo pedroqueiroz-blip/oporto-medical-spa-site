@@ -196,11 +196,25 @@ collections:
         label: Avaliações
         file: content/inicio/avaliacoes.json
         preview_path: /
-        description: 'Título da zona das avaliações do Google. As avaliações em si vêm do Google.'
+        description: 'Zona das avaliações do Google. Com a chave do Google ligada (GOOGLE_PLACES_KEY) a nota, o número e as avaliações vêm sozinhos do Google a cada atualização do site e estes campos ficam como reserva. Sem ela, copie a nota, o número e as avaliações tal como aparecem no perfil Google do spa; sem nota não aparece a pontuação, sem avaliações não aparecem cartões.'
         fields:
           - { name: etiqueta, label: Etiqueta, widget: string }
           - { name: titulo, label: Título, widget: string }
           - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+          - { name: nota_google, label: 'Nota no Google (ex.: 4,8)', widget: string, required: false }
+          - { name: total_avaliacoes, label: Número de avaliações no Google, widget: number, value_type: int, required: false }
+          - { name: perfil_google, label: Link do perfil Google (botão), widget: string, required: false, hint: 'No Google Maps: Partilhar > Copiar link. Vazio = pesquisa pelo nome.' }
+          - name: lista
+            label: Avaliações mostradas
+            label_singular: Avaliação
+            widget: list
+            required: false
+            summary: '{{fields.nome}} · {{fields.data}}'
+            fields:
+              - { name: nome, label: Nome como aparece no Google, widget: string }
+              - { name: data, label: 'Data (ex.: setembro 2026)', widget: string, required: false }
+              - { name: estrelas, label: Estrelas, widget: number, value_type: int, min: 1, max: 5, required: false }
+              - { name: texto, label: Texto da avaliação (sem alterar), widget: text }
           - { name: botao, label: Texto do botão, widget: string, required: false }
           - { name: nota, label: Nota por baixo, widget: text, required: false }
       - name: perguntas
