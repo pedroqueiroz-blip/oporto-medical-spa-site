@@ -722,7 +722,7 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .bk-group.is-open button.bk-group__t { border-color: var(--flame); }
 .bk-group.is-open button.bk-group__t::after { transform: rotate(-135deg) translateY(-3px); }
 /* Indicação da área (a mesma de «Cuidar de si»), só no computador */
-.bk-group__d { text-transform: none; letter-spacing: .02em; font-size: 14px; color: var(--oat); margin-left: -4px; }
+.bk-group__d { text-transform: none; letter-spacing: .02em; font-size: 14px; color: var(--oat); }
 @media (max-width: 640px) { .bk-group__d { display: none; } }
 .bk-group__n { display: inline; font-size: 11px; letter-spacing: .1em; color: var(--oat); }
 .bk-group:not(.is-open) .bk-options { display: none; }
