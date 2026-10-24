@@ -86,6 +86,7 @@ nunca no repositório. Depois de as criar, é preciso publicar de novo (*Deploys
 | `CODIGO_VIP` | Opcional: outro código VIP |
 | `BACKOFFICE_PASSWORD`, `BACKOFFICE_GITHUB_TOKEN` | Entrada no backoffice (/admin) com palavra-passe (ver README) |
 | `BUILD_HOOK_URL` | Reconstrução diária do site, para as campanhas mudarem nas datas (ver README) |
+| `GOOGLE_PLACES_KEY` | Avaliações do Google (nota, número e as mais recentes) em cada build, pela Places API (New). Sem ela ficam as do backoffice |
 | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | Agenda (fase seguinte) |
 
 Na euPago, no canal: *Receber notificação para um URL* → `https://www.oportomedicalspa.com/api/eupago-notificacao`.

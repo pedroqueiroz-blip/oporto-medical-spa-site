@@ -263,7 +263,7 @@ export function home(m) {
       </div>
       ${(A.lista || []).length ? `<div class="reviews__grid">
         ${A.lista.map((r) => `<figure class="review review--real">
-          <figcaption><b>${esc(r.nome)}</b><span class="review__meta">${r.estrelas ? esc(r.estrelas) + '/5 · ' : ''}${r.data ? esc(r.data) + ' · ' : ''}Google</span></figcaption>
+          <figcaption><b>${r.perfil ? '<a href="' + esc(r.perfil) + '" rel="noopener nofollow" target="_blank">' + esc(r.nome) + '</a>' : esc(r.nome)}</b><span class="review__meta">${r.estrelas ? esc(r.estrelas) + '/5 · ' : ''}${r.data ? esc(r.data) + ' · ' : ''}Google</span></figcaption>
           <blockquote>${esc(r.texto)}</blockquote>
         </figure>`).join('\n        ')}
       </div>` : ''}

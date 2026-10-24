@@ -196,7 +196,7 @@ collections:
         label: Avaliações
         file: content/inicio/avaliacoes.json
         preview_path: /
-        description: 'Zona das avaliações do Google. Copie a nota, o número e as avaliações tal como aparecem no perfil Google do spa; sem nota não aparece a pontuação, sem avaliações não aparecem cartões.'
+        description: 'Zona das avaliações do Google. Com a chave do Google ligada (GOOGLE_PLACES_KEY) a nota, o número e as avaliações vêm sozinhos do Google a cada atualização do site e estes campos ficam como reserva. Sem ela, copie a nota, o número e as avaliações tal como aparecem no perfil Google do spa; sem nota não aparece a pontuação, sem avaliações não aparecem cartões.'
         fields:
           - { name: etiqueta, label: Etiqueta, widget: string }
           - { name: titulo, label: Título, widget: string }
