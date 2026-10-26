@@ -57,12 +57,28 @@
     while (out.length < n) { d = new Date(d.getTime() + 864e5); if (d.getDay() !== 0) out.push(d); }
     return out;
   }
-  // Disponibilidade simulada, estável para o mesmo dia e terapeuta.
-  function isTaken(day, hour, therapistId) {
+  function isoDay(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+  // Horas livres da agenda do Zoho CRM, por tratamento (/api/disponibilidade). Sem Zoho ligado, a resposta
+  // é { fonte: 'simulada' } e fica a disponibilidade simulada, estável para o mesmo dia e terapeuta.
+  var AGENDA = {};
+  function loadAgenda(treatment, days, done) {
+    if (AGENDA[treatment] || !window.fetch || !window.OMS_PAGAR) return;
+    AGENDA[treatment] = { loading: true };
+    var span = Math.round((days[days.length - 1] - days[0]) / 864e5) + 1;
+    fetch('/api/disponibilidade?tratamento=' + encodeURIComponent(treatment) + '&de=' + isoDay(days[0]) + '&dias=' + span)
+      .then(function (r) { return r.ok ? r.json() : { fonte: 'simulada' }; })
+      .catch(function () { return { fonte: 'simulada' }; })
+      .then(function (j) { AGENDA[treatment] = j; done(treatment); });
+  }
+  function isTaken(day, hour, therapistId, treatment) {
+    var a = AGENDA[treatment];
+    if (a && a.loading) return true;
+    if (a && a.fonte === 'zoho') return ((a.livres[therapistId] || {})[isoDay(day)] || []).indexOf(hour) < 0;
     return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && hour > '13:00');
   }
   function freeFor(day, hour, treatment) {
-    return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id); });
+    return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id, treatment); });
   }
 
   // NIF português: 9 dígitos com o dígito de controlo certo.
@@ -133,7 +149,14 @@
 
     function slotFree(day, h) {
       if (s.therapist === 'any') return freeFor(day, h, s.treatment).length > 0;
-      return !isTaken(day, h, s.therapist);
+      return !isTaken(day, h, s.therapist, s.treatment);
+    }
+
+    function agendaNote() {
+      var a = AGENDA[s.treatment];
+      if (a && a.loading) return 'A ver as horas livres…';
+      if (a && a.fonte === 'zoho') return 'Horas livres neste momento. Encerra ao domingo.';
+      return 'Horários ilustrativos. Encerra ao domingo.';
     }
 
     function panelTime() {
@@ -147,7 +170,7 @@
       html += '</div><div class="bk-slots">' + HOURS.map(function (h) {
         var free = slotFree(s.day, h);
         return '<button type="button" class="bk-slot" data-hour="' + h + '" aria-pressed="' + (s.hour === h) + '"' + (free ? '' : ' disabled') + '>' + h + '</button>';
-      }).join('') + '</div><p class="bk-note">Horários ilustrativos. Encerra ao domingo.</p></div>';
+      }).join('') + '</div><p class="bk-note">' + agendaNote() + '</p></div>';
       return html;
     }
 
@@ -199,6 +222,7 @@
         nav = '<div class="bk-actions"><button type="button" class="btn btn--ghost" data-go="2">Voltar</button><span></span></div>';
       }
       root.innerHTML = '<div class="bk">' + (s.done ? '' : stepsBar()) + body + nav + '</div>';
+      if (s.treatment) loadAgenda(s.treatment, days, function (t) { if (s.treatment === t && !s.done && s.step === 2) render(); });
     }
 
     root.addEventListener('click', function (e) {
@@ -232,9 +256,9 @@
       // Pagamento (public/pagar.js): código, meio de pagamento e confirmação no servidor
       if (window.OMS_PAGAR) {
         var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist(), d = s.day;
-        var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+        var iso = isoDay(d);
         var voucher = root.querySelector('#bk-voucher');
-        OMS_PAGAR.verificar(root, { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', data: iso, hora: s.hour,
+        OMS_PAGAR.verificar(root, { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
           marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif }, { voltar: render, codigo: !!(voucher && voucher.checked) });
         return;
       }

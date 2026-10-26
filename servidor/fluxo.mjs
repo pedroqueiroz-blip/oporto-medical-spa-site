@@ -5,6 +5,7 @@ import { gastarCodigo, criarVoucher } from "./codigos.mjs";
 import { validadeVoucher } from "./datas.mjs";
 import { emitirFatura } from "./moloni.mjs";
 import * as M from "./email.mjs";
+import { marcarNoCRM } from "./agenda.mjs";
 
 const METODOS = ["mb_way", "multibanco", "card"];
 
@@ -78,6 +79,9 @@ export async function concluir(p, por) {
   }
   await gravar(p);
   if (p.total > 0) await emitirFatura(p, { guardar: gravar });
+  // Marcação na agenda do Zoho CRM; uma falha não trava o resto e vai no aviso à equipa.
+  await marcarNoCRM(p).catch((e) => { console.error("Zoho CRM", p.numero, e.message); p.zoho = { ...(p.zoho || {}), erro: e.message }; });
+  await gravar(p);
   await registarEmail(p, "cliente", () => (p.tipo === "voucher" ? M.emailVoucher(p) : M.emailMarcacao(p)));
   await registarEmail(p, "interno", () => M.emailInterno(p));
 }

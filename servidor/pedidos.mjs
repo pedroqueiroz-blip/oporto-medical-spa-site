@@ -113,7 +113,7 @@ export async function criar(corpo) {
 // O que o browser pode ver de um pedido (na página de pagamento).
 export const publico = (p) => ({
   numero: p.numero, tipo: p.tipo, estado: p.estado, total: p.total, tratamento: p.tratamento.nome,
-  marcacao: p.marcacao || null,
+  marcacao: p.marcacao ? { data: p.marcacao.data, hora: p.marcacao.hora, terapeuta: p.marcacao.terapeuta } : null,
   metodo: p.pagamento?.metodo || null,
   multibanco: p.pagamento?.multibanco || null,
   telemovel: p.pagamento?.telemovel ? p.pagamento.telemovel.replace(/^(\d{3})\d{3}/, "$1 ***") : null,

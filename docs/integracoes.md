@@ -15,7 +15,7 @@ euPago ── notificação ──> /api/eupago-notificacao
        ├─ Moloni ON             fatura-recibo na série SPA, fechada e enviada ao cliente
        ├─ email ao cliente      confirmação da marcação, ou o voucher com o código
        ├─ email à equipa        aviso de cada marcação ou voucher (EMAIL_RESERVAS ou o email do site)
-       └─ Zoho (fase seguinte)  cria a marcação na agenda
+       └─ Zoho CRM              ficha do cliente (NIF/email) e evento na agenda da terapeuta
 Newsletter (Netlify Forms) ──> submission-created: código de 10% por email
 ```
 
@@ -87,7 +87,10 @@ nunca no repositório. Depois de as criar, é preciso publicar de novo (*Deploys
 | `BACKOFFICE_PASSWORD`, `BACKOFFICE_GITHUB_TOKEN` | Entrada no backoffice (/admin) com palavra-passe (ver README) |
 | `BUILD_HOOK_URL` | Reconstrução diária do site, para as campanhas mudarem nas datas (ver README) |
 | `GOOGLE_PLACES_KEY` | Avaliações do Google (nota, número e as mais recentes) em cada build, pela Places API (New). Sem ela ficam as do backoffice |
-| `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | Agenda (fase seguinte) |
+| `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET` | Ligação ao Zoho CRM (agenda e clientes). Depois de publicar, abrir `/api/zoho/ligar` (ver «Agenda») |
+| `ZOHO_CAMPO_NIF` | Opcional: nome API do campo do NIF nos Contactos do CRM (por omissão `NIF`) |
+| `ZOHO_MODULO_AGENDA` | Opcional: módulo da agenda no CRM (por omissão `Events`, as Reuniões) |
+| `ZOHO_REFRESH_TOKEN` | Opcional: chave de renovação gerada à mão, em vez da ligação por `/api/zoho/ligar` |
 
 Na euPago, no canal: *Receber notificação para um URL* → `https://www.oportomedicalspa.com/api/eupago-notificacao`.
 
@@ -112,8 +115,30 @@ Os códigos guardam-se só como resumo (SHA-256) no Netlify Blobs (`verificacoes
 (testes e pré-visualizações) o código aparece no ecrã, para se poder experimentar: em produção a Resend tem de estar ativa.
 Os vouchers não pedem verificação.
 
-## Agenda
+## Agenda (Zoho CRM, conta zoho.eu)
 
-A disponibilidade em `public/prototype.js` ainda é simulada: as marcações chegam por email à equipa.
-Quando a agenda Zoho entrar, as horas livres passam a vir de `/api/disponibilidade` e cada pedido pago cria a marcação no Zoho.
-O **código** de cada tratamento no backoffice (`oil`, `fisio`, ...) é a chave comum para o serviço na agenda.
+Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
+
+- **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
+  uma hora está livre quando ela não tem nenhum evento no CRM que se sobreponha à duração do tratamento
+  (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo e ao sábado à tarde, e nunca a menos de 1 hora.
+- **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
+  do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
+- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
+- **Depois de pago** (ou a 0 €): o cliente procura-se nos Contactos pelo **NIF** e, se não houver, pelo **email**
+  (uma ficha sem NIF recebe-o); sem ficha, cria-se uma. O email de uma ficha existente nunca muda: uma diferença fica como nota
+  no evento e no aviso à equipa. Cria-se o evento na agenda da terapeuta, ligado à ficha, com o n.º do pedido, valor, email, telemóvel e NIF.
+- Uma falha no CRM não trava o pagamento: o aviso à equipa diz «Não ficou na agenda… Marcar à mão».
+
+Sem `ZOHO_CLIENT_ID`/`ZOHO_CLIENT_SECRET`, ou antes de ligar, `/api/disponibilidade` responde `{ fonte: "simulada" }`, a agenda
+do site fica simulada e as marcações chegam só por email.
+
+### Ligar (uma vez)
+
+1. Em [api-console.zoho.eu](https://api-console.zoho.eu): *Add Client → Server-based Applications*. Redirect URIs: `https://<domínio>/api/zoho/retorno`
+   para cada endereço onde se vai ligar (o domínio do site e, para testar, o da pré-visualização).
+2. Pôr `ZOHO_CLIENT_ID` e `ZOHO_CLIENT_SECRET` no Netlify e publicar de novo.
+3. Abrir `https://<domínio>/api/zoho/ligar`, escrever a palavra-passe do backoffice (`BACKOFFICE_PASSWORD`) e aceitar no Zoho.
+   A chave de renovação fica no Netlify Blobs (`zoho`). Permissões pedidas: `ZohoCRM.modules.ALL, ZohoCRM.users.READ, ZohoCRM.coql.READ, ZohoCRM.settings.fields.READ`.
+
+O **código** de cada tratamento no backoffice (`oil`, `fisio`, ...) vai no título do evento pelo nome do tratamento.
