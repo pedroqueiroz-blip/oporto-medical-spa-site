@@ -139,6 +139,10 @@ do site fica simulada e as marcações chegam só por email.
    para cada endereço onde se vai ligar (o domínio do site e, para testar, o da pré-visualização).
 2. Pôr `ZOHO_CLIENT_ID` e `ZOHO_CLIENT_SECRET` no Netlify e publicar de novo.
 3. Abrir `https://<domínio>/api/zoho/ligar`, escrever a palavra-passe do backoffice (`BACKOFFICE_PASSWORD`) e aceitar no Zoho.
-   A chave de renovação fica no Netlify Blobs (`zoho`). Permissões pedidas: `ZohoCRM.modules.ALL, ZohoCRM.users.READ, ZohoCRM.coql.READ, ZohoCRM.settings.fields.READ`.
+   A chave de renovação fica no Netlify Blobs (`zoho`). Permissões pedidas: `ZohoCRM.modules.ALL, ZohoCRM.users.READ, ZohoCRM.coql.READ, ZohoCRM.settings.modules.READ, ZohoCRM.settings.fields.READ`.
+
+4. Abrir `https://<domínio>/api/zoho/verificar` (mesma palavra-passe): confere pela API de metadados os módulos, o campo do NIF
+   nos Contactos, os campos da agenda, a leitura dos eventos e o utilizador do CRM de cada pessoa da equipa. Se o campo do NIF
+   tiver outro nome e houver um só candidato (NIF, contribuinte, fiscal…), o site passa a usá-lo; senão, indica-se em `ZOHO_CAMPO_NIF`.
 
 O **código** de cada tratamento no backoffice (`oil`, `fisio`, ...) vai no título do evento pelo nome do tratamento.

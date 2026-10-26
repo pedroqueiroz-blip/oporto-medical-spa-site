@@ -66,10 +66,14 @@ function zoho(req, body, j, res, out) {
   const cam = u.pathname.replace("/zoho/api/crm/v6", "");
   if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
   if (cam === "/users") return out({ users: Z.users });
+  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }] });
+  if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
+    ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
+    : ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" })) });
   if (cam === "/coql") return out({ data: Z.eventos, info: { more_records: false } });
   if (cam === "/Contacts/search") {
-    const nif = u.searchParams.get("criteria")?.match(/NIF:equals:(\d+)/)?.[1], email = u.searchParams.get("email");
-    const r = Z.contactos.filter((c) => (nif && c.NIF === nif) || (email && c.Email === email));
+    const [, campo, nif] = u.searchParams.get("criteria")?.match(/\((\w+):equals:(\d+)\)/) || [], email = u.searchParams.get("email");
+    const r = Z.contactos.filter((c) => (nif && c[campo] === nif) || (email && c.Email === email));
     if (!r.length) { res.statusCode = 204; return res.end(); }
     return out({ data: r });
   }
@@ -284,6 +288,11 @@ try {
   pg = await pagina(`/api/zoho/retorno?code=bom&state=${aut.searchParams.get("state")}`);
   ok(pg.status === 400, "o mesmo state não serve duas vezes");
 
+  pg = await pagina("/api/zoho/verificar", form("errada"));
+  ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Módulo da agenda (Events)") && pg.txt.includes("✓ Terapeuta: Luísa Pinto") && pg.txt.includes("✗ Terapeuta:"), "verificação pelos metadados: encontra o campo do NIF, a agenda e quem falta ligar");
+
   // Dia útil daqui a 3+ dias; a Luísa (ligada ao utilizador u1 pelo nome) tem um evento às 10:00
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
   const D = dia.toISOString().slice(0, 10);
@@ -302,7 +311,7 @@ try {
   ok(r.status === 200 && r.j.marcacao.terapeuta === "Luísa Pinto" && !("zohoDono" in r.j.marcacao), "«Sem preferência» fica com quem está livre no CRM");
   await notificar(r.j);
   const evz = Z.eventos.at(-1);
-  ok(Z.criados.length === 1 && Z.criados[0].NIF === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF");
+  ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");
   ok(evz.Owner.id === "u1" && evz.Who_Id.id === Z.criados[0].id && evz.Start_DateTime === instanteLisboa(D, "11:00").iso && evz.End_DateTime === instanteLisboa(D, "11:00", tz.duracao).iso && evz.Description.includes(r.j.numero), "marcação paga entra na agenda da Luísa, ligada à ficha");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("ficha de cliente nova")), "aviso à equipa diz que ficou na agenda");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
@@ -313,7 +322,7 @@ try {
   Z.contactos.push({ id: "c-antigo", Last_Name: "Antiga", Email: "antiga@exemplo.pt" });
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "16:00", qualquer: true, nome: "Rita Antiga", email: "antiga@exemplo.pt", telefone: "914000000", nif: "506651940", metodo: "mb_way" });
   await notificar(r.j);
-  ok(Z.criados.length === 1 && Z.contactos.find((c) => c.id === "c-antigo").NIF === "506651940" && Z.eventos.at(-1).Who_Id.id === "c-antigo", "ficha sem NIF encontrada pelo email recebe o NIF");
+  ok(Z.criados.length === 1 && Z.contactos.find((c) => c.id === "c-antigo").Contribuinte === "506651940" && Z.eventos.at(-1).Who_Id.id === "c-antigo", "ficha sem NIF encontrada pelo email recebe o NIF");
   Z.falhaEvento = true;
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "17:00", qualquer: true, ...zc, metodo: "mb_way" });
   await notificar(r.j);

@@ -4,7 +4,8 @@ import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/ped
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
 import { pedirCodigo, confirmarCodigo, ErroVerificacao } from "../../servidor/verificacao.mjs";
 import { disponibilidade, confirmarHora, ErroAgenda } from "../../servidor/agenda.mjs";
-import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao } from "../../servidor/zoho.mjs";
+import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
+import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
 export const config = { path: "/api/*" };
@@ -51,6 +52,19 @@ export default async (req) => {
       return pagina(`<h1>Ligar ao Zoho CRM</h1><p class="nota">${e.ligado ? `Ligado${e.em ? ` desde ${new Date(e.em).toLocaleDateString("pt-PT")}` : ""}. Só precisa de ligar de novo se mudar de conta.` : "A agenda online fica ligada à agenda e às fichas de clientes do Zoho CRM."}</p>
 <form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" autocomplete="current-password" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">${e.ligado ? "Ligar de novo" : "Ligar"}</button></form>`, m === "POST" ? 401 : 200);
     }
+    // Verificação da ligação pela API de metadados do CRM (protegida pela palavra-passe do backoffice).
+    if (rota === "/zoho/verificar") {
+      const ok = m === "POST" && senhaCerta(new URLSearchParams(await req.text()).get("senha") || "");
+      if (!ok) {
+        if (m === "POST") await pausa(1500);
+        return pagina(`<h1>Verificar o Zoho CRM</h1><p class="nota">Confere módulos, campo do NIF, agenda e equipa no CRM.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Verificar</button></form>`, m === "POST" ? 401 : 200);
+      }
+      if (!(await estadoLigacao()).ligado) return pagina(`<h1>Zoho CRM por ligar</h1><p><a href="/api/zoho/ligar" style="color:inherit">Ligar primeiro</a>.</p>`);
+      const linhas = await verificarCRM(catalogo.equipa || []);
+      const e = (x) => String(x).replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      return pagina(`<h1>Verificação do Zoho CRM</h1><div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}</div>`);
+    }
+
     if (rota === "/zoho/retorno" && m === "GET") {
       if (url.searchParams.get("error")) return pagina(`<h1>Ligação cancelada</h1><p>O Zoho não autorizou (${url.searchParams.get("error").replace(/[<>&"]/g, "")}). Pode voltar a <a href="/api/zoho/ligar" style="color:inherit">tentar</a>.</p>`, 400);
       try {
