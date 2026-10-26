@@ -5,7 +5,7 @@
   "seccoes": [
     {
       "titulo": "Quem somos",
-      "texto": "[[denominação social]], NIPC [[número]], com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nContactos: {telefone} · {email}."
+      "texto": "CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nContactos: {telefone} · {email}."
     },
     {
       "titulo": "Os tratamentos",
@@ -21,7 +21,7 @@
     },
     {
       "titulo": "Alterações e cancelamentos",
-      "texto": "- Pode alterar ou cancelar a marcação sem custos até 24 horas antes, por telefone, WhatsApp ou email. Escolhe uma nova data ou recebe o reembolso do valor pago, no prazo de 14 dias, pelo meio de pagamento que usou.\n- Com menos de 24 horas de antecedência, ou se faltar, a sessão considera-se realizada: o valor não é devolvido nem passa para outra marcação.\n- Uma marcação feita com voucher segue as mesmas regras: cancelada com menos de 24 horas, ou em caso de falta, o voucher considera-se usado.\n- Se formos nós a cancelar, por exemplo por doença da terapeuta, propomos nova data ou devolvemos o valor pago, à sua escolha."
+      "texto": "- Pode alterar ou cancelar a marcação sem custos até 24 horas antes, por telefone, WhatsApp ou email. Escolhe uma nova data ou recebe o reembolso do valor pago, no prazo de 14 dias, pelo meio de pagamento que usou.\n- Com menos de 24 horas de antecedência, ou se faltar, a sessão pode ser considerada feita, sem devolução do valor, ou poderá ser descontado o valor correspondente a 50% do tratamento.\n- Uma marcação feita com voucher segue as mesmas regras: cancelada com menos de 24 horas, ou em caso de falta, o voucher pode ser considerado usado.\n- Se formos nós a cancelar, por exemplo por doença da terapeuta, propomos nova data ou devolvemos o valor pago, à sua escolha."
     },
     {
       "titulo": "Direito de livre resolução",
@@ -53,7 +53,7 @@
     },
     {
       "titulo": "Modelo para desistir de um voucher",
-      "texto": "Preencha e envie para {email} (ou por correio para {morada}) apenas se quiser desistir da compra de um voucher, dentro de 14 dias.\n\n- Para: [[denominação social]], NIPC [[número]], {morada}, {email}\n- Pela presente comunico que desisto do contrato de compra do seguinte voucher:\n- Código do voucher e data da compra:\n- Nome:\n- Morada:\n- Data e assinatura (só se enviar em papel):"
+      "texto": "Preencha e envie para {email} (ou por correio para {morada}) apenas se quiser desistir da compra de um voucher, dentro de 14 dias.\n\n- Para: CNP, Lda., NIPC 506651940, {morada}, {email}\n- Pela presente comunico que desisto do contrato de compra do seguinte voucher:\n- Código do voucher e data da compra:\n- Nome:\n- Morada:\n- Data e assinatura (só se enviar em papel):"
     }
   ]
 }

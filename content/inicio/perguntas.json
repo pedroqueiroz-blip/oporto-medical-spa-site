@@ -11,7 +11,7 @@
     },
     {
       "pergunta": "Qual a política de cancelamento?",
-      "resposta": "Se não comparecer à sessão agendada ou não avisar com 24 horas de antecedência, a sessão será descontada do seu pacote, ou seja, o valor correspondente à sessão será considerado gasto e não lhe será devolvido nem utilizado em outra sessão. Após esse prazo ou em caso de falta, será cobrado 50% do valor do tratamento.",
+      "resposta": "Se não comparecer à sessão agendada ou não avisar com 24 horas de antecedência, a sessão pode ser considerada feita ou poderá ser descontado o valor correspondente a 50% do tratamento. Com mais de 24 horas de antecedência, pode mudar ou cancelar a marcação sem custos.",
       "automatica": "",
       "acrescento": ""
     },
@@ -72,7 +72,7 @@
     },
     {
       "pergunta": "Quais são os termos e condições do voucher?",
-      "resposta": "**Devolução e troca:** o valor do voucher adquirido não poderá ser devolvido, e o Oporto Medical Spa não está obrigado a efetuar a troca do serviço oferecido. **Validade:** o voucher é válido por um ano (12 meses) após a aquisição. Perde a validade quando o agendamento do respetivo serviço não for realizado dentro do prazo indicado no voucher, ou quando, depois de efetuada a reserva, o cancelamento não for feito com mais de 24 horas de antecedência. Caso o prazo tenha expirado, o voucher poderá ser reativado mediante o pagamento de 12,00 €, sendo neste caso a validade estendida por 6 meses.",
+      "resposta": "**Desistência e troca:** pode desistir da compra nos 14 dias seguintes, desde que o voucher não tenha sido usado, e devolvemos o valor pago. Depois desse prazo, o valor não é devolvido, e a troca por outro tratamento só é possível com o acordo do Oporto Medical Spa. **Validade:** o voucher é válido por um ano (12 meses) após a aquisição. Perde a validade quando o agendamento do respetivo serviço não for realizado dentro do prazo indicado no voucher, ou quando, depois de efetuada a reserva, o cancelamento não for feito com mais de 24 horas de antecedência. Caso o prazo tenha expirado, o voucher poderá ser reativado mediante o pagamento de 12,00 €, sendo neste caso a validade estendida por 6 meses.",
       "automatica": "",
       "acrescento": ""
     },
