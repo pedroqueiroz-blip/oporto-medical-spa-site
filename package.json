@@ -13,6 +13,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@netlify/blobs": "^11.1.4"
+    "@netlify/blobs": "^11.1.4",
+    "yaml": "^2.6.1"
   }
 }

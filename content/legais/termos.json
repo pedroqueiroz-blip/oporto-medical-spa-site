@@ -5,55 +5,111 @@
   "seccoes": [
     {
       "titulo": "Quem somos",
-      "texto": "CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nContactos: {telefone} · {email}."
+      "texto": "CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nContactos: {telefone} · {email}.",
+      "en": {
+        "titulo": "Who we are",
+        "texto": "CNP, Lda., tax no. (NIPC) 506651940, with registered office at {morada}, which operates Oporto Medical Spa, a unit registered with the Portuguese Health Regulatory Authority (Entidade Reguladora da Saúde) under no. E138084.\n\nContacts: {telefone} · {email}."
+      }
     },
     {
       "titulo": "Os tratamentos",
-      "texto": "Os tratamentos são feitos por fisioterapeutas e terapeutas especializadas. Cada sessão começa com uma avaliação. Se houver uma contraindicação, a fisioterapeuta pode adaptar o tratamento ou não o fazer, explicando-lhe porquê. Nesse caso, propomos outro tratamento ou devolvemos o valor pago.\n\nAs fotografias e descrições do site são ilustrativas. Os resultados dependem de cada pessoa e não são garantidos."
+      "texto": "Os tratamentos são feitos por fisioterapeutas e terapeutas especializadas. Cada sessão começa com uma avaliação. Se houver uma contraindicação, a fisioterapeuta pode adaptar o tratamento ou não o fazer, explicando-lhe porquê. Nesse caso, propomos outro tratamento ou devolvemos o valor pago.\n\nAs fotografias e descrições do site são ilustrativas. Os resultados dependem de cada pessoa e não são garantidos.",
+      "en": {
+        "titulo": "The treatments",
+        "texto": "Treatments are carried out by physiotherapists and specialist therapists. Every session begins with an assessment. If there is a contraindication, the physiotherapist may adapt the treatment or decide not to carry it out, explaining why. In that case, we will offer you another treatment or refund the amount paid.\n\nThe photographs and descriptions on the website are for illustration. Results vary from person to person and are not guaranteed."
+      }
     },
     {
       "titulo": "Preços e pagamento",
-      "texto": "- Os preços estão em euros e incluem todos os impostos. Os tratamentos estão isentos de IVA, nos termos do artigo 9.º do Código do IVA, e a fatura indica o motivo da isenção.\n- Paga-se no site por MB WAY, referência Multibanco ou cartão, através da euPago, entidade de pagamentos autorizada pelo Banco de Portugal.\n- O preço é o que aparece no momento da compra. Os preços de campanha só valem nas datas da campanha e enquanto houver vouchers disponíveis.\n- A marcação ou o voucher só ficam confirmados quando o pagamento é recebido. Uma referência Multibanco não paga no prazo indicado anula o pedido e liberta a hora.\n- Depois do pagamento, recebe por email a confirmação e a fatura-recibo."
+      "texto": "- Os preços estão em euros e incluem todos os impostos. Os tratamentos estão isentos de IVA, nos termos do artigo 9.º do Código do IVA, e a fatura indica o motivo da isenção.\n- Paga-se no site por MB WAY, referência Multibanco ou cartão, através da euPago, entidade de pagamentos autorizada pelo Banco de Portugal.\n- O preço é o que aparece no momento da compra. Os preços de campanha só valem nas datas da campanha e enquanto houver vouchers disponíveis.\n- A marcação ou o voucher só ficam confirmados quando o pagamento é recebido. Uma referência Multibanco não paga no prazo indicado anula o pedido e liberta a hora.\n- Depois do pagamento, recebe por email a confirmação e a fatura-recibo.",
+      "en": {
+        "titulo": "Prices and payment",
+        "texto": "- Prices are in euros and include all taxes. Treatments are exempt from VAT under Article 9 of the Portuguese VAT Code, and the invoice states the reason for the exemption.\n- Payment on the website is by MB WAY, Multibanco reference or card, through euPago, a payment institution authorised by the Bank of Portugal.\n- The price is the one shown at the time of purchase. Offer prices are only valid on the dates of the offer and while vouchers remain available.\n- A booking or voucher is only confirmed once payment is received. A Multibanco reference not paid within the stated time cancels the request and releases the time slot.\n- After payment, you will receive the confirmation and the invoice-receipt by email."
+      }
     },
     {
       "titulo": "Marcações",
-      "texto": "- Confirmamos o seu email com um código antes do pagamento. A marcação fica no nome e no NIF indicados.\n- Chegue 10 a 15 minutos antes. Um atraso pode encurtar o tratamento, para não prejudicar o cliente seguinte, sem redução do preço.\n- Informe a equipa, antes do tratamento, de gravidez, doenças, medicação, alergias, lesões ou cirurgias recentes. Não respondemos por consequências de informações de saúde omitidas ou incorretas.\n- Os objetos pessoais ficam à sua guarda. Aconselhamos que não traga objetos de valor."
+      "texto": "- Confirmamos o seu email com um código antes do pagamento. A marcação fica no nome e no NIF indicados.\n- Chegue 10 a 15 minutos antes. Um atraso pode encurtar o tratamento, para não prejudicar o cliente seguinte, sem redução do preço.\n- Informe a equipa, antes do tratamento, de gravidez, doenças, medicação, alergias, lesões ou cirurgias recentes. Não respondemos por consequências de informações de saúde omitidas ou incorretas.\n- Os objetos pessoais ficam à sua guarda. Aconselhamos que não traga objetos de valor.",
+      "en": {
+        "titulo": "Bookings",
+        "texto": "- We confirm your email with a code before payment. The booking is made in the name and tax number (NIF) you provide.\n- Please arrive 10 to 15 minutes early. If you are late, your treatment may be shortened so as not to delay the next client, with no reduction in price.\n- Before your treatment, please tell the team about any pregnancy, illness, medication, allergies, injuries or recent surgery. We are not responsible for consequences arising from health information that is withheld or incorrect.\n- You are responsible for your personal belongings. We advise you not to bring valuables."
+      }
     },
     {
       "titulo": "Alterações e cancelamentos",
-      "texto": "- Pode alterar ou cancelar a marcação sem custos até 24 horas antes, por telefone, WhatsApp ou email. Escolhe uma nova data ou recebe o reembolso do valor pago, no prazo de 14 dias, pelo meio de pagamento que usou.\n- Com menos de 24 horas de antecedência, ou se faltar, a sessão pode ser considerada feita, sem devolução do valor, ou poderá ser descontado o valor correspondente a 50% do tratamento.\n- Uma marcação feita com voucher segue as mesmas regras: cancelada com menos de 24 horas, ou em caso de falta, o voucher pode ser considerado usado.\n- Se formos nós a cancelar, por exemplo por doença da terapeuta, propomos nova data ou devolvemos o valor pago, à sua escolha."
+      "texto": "- Pode alterar ou cancelar a marcação sem custos até 24 horas antes, por telefone, WhatsApp ou email. Escolhe uma nova data ou recebe o reembolso do valor pago, no prazo de 14 dias, pelo meio de pagamento que usou.\n- Com menos de 24 horas de antecedência, ou se faltar, a sessão pode ser considerada feita, sem devolução do valor, ou poderá ser descontado o valor correspondente a 50% do tratamento.\n- Uma marcação feita com voucher segue as mesmas regras: cancelada com menos de 24 horas, ou em caso de falta, o voucher pode ser considerado usado.\n- Se formos nós a cancelar, por exemplo por doença da terapeuta, propomos nova data ou devolvemos o valor pago, à sua escolha.",
+      "en": {
+        "titulo": "Changes and cancellations",
+        "texto": "- You can change or cancel your booking free of charge up to 24 hours beforehand, by phone, WhatsApp or email. You can choose a new date or receive a refund of the amount paid within 14 days, using the payment method you used.\n- With less than 24 hours’ notice, or if you do not attend, the session may be considered as taken, with no refund, or 50% of the treatment price may be charged.\n- A booking made with a voucher follows the same rules: if it is cancelled with less than 24 hours’ notice, or if you do not attend, the voucher may be considered used.\n- If we have to cancel, for example because the therapist is ill, we will offer you a new date or refund the amount paid, as you prefer."
+      }
     },
     {
       "titulo": "Direito de livre resolução",
-      "texto": "Os tratamentos de fisioterapia são cuidados de saúde e estão fora do regime dos contratos celebrados à distância (Decreto-Lei n.º 24/2014, artigo 2.º, n.º 2). As restantes marcações são serviços de lazer com data marcada e não têm direito de livre resolução (artigo 17.º, n.º 1, do mesmo decreto-lei). Valem as regras de cancelamento acima.\n\nNos **vouchers**, tem 14 dias a contar da compra para desistir, sem indicar o motivo, desde que o voucher não tenha sido usado. Basta escrever para {email} com o código do voucher, ou usar o modelo no fim desta página. Devolvemos o valor pago em 14 dias, pelo meio de pagamento que usou, e o voucher fica anulado."
+      "texto": "Os tratamentos de fisioterapia são cuidados de saúde e estão fora do regime dos contratos celebrados à distância (Decreto-Lei n.º 24/2014, artigo 2.º, n.º 2). As restantes marcações são serviços de lazer com data marcada e não têm direito de livre resolução (artigo 17.º, n.º 1, do mesmo decreto-lei). Valem as regras de cancelamento acima.\n\nNos **vouchers**, tem 14 dias a contar da compra para desistir, sem indicar o motivo, desde que o voucher não tenha sido usado. Basta escrever para {email} com o código do voucher, ou usar o modelo no fim desta página. Devolvemos o valor pago em 14 dias, pelo meio de pagamento que usou, e o voucher fica anulado.",
+      "en": {
+        "titulo": "Right of withdrawal",
+        "texto": "Physiotherapy treatments are health care and fall outside the rules on distance contracts (Portuguese Decree-Law no. 24/2014, Article 2(2)). Other bookings are leisure services for a specific date and do not carry a right of withdrawal (Article 17(1) of the same Decree-Law). The cancellation rules above apply.\n\nFor **vouchers**, you have 14 days from purchase to withdraw, without giving a reason, as long as the voucher has not been used. Simply write to {email} with the voucher code, or use the form at the end of this page. We will refund the amount paid within 14 days, using the payment method you used, and the voucher will be cancelled."
+      }
     },
     {
       "titulo": "Vouchers",
-      "texto": "- Cada voucher corresponde a um tratamento e é digital. O código é enviado só por email a quem compra.\n- Quem tiver o código pode usá-lo. Guarde-o como guardaria dinheiro: não respondemos por códigos partilhados, perdidos ou usados por outra pessoa.\n- É válido até ao último dia do mês, 12 meses depois da compra. A validade está no voucher e no email.\n- Serve para uma marcação, uma só vez. Não é convertível em dinheiro e não dá troco. A troca por outro tratamento deverá ser solicitada no Spa, pagando a diferença, se houver.\n- Depois de expirado, pode ser reativado uma vez por 12,00 €, com mais 6 meses de validade.\n- Pode oferecê-lo a outra pessoa. Quem o usa aceita estes termos.\n- Os vouchers de campanha só se vendem nas datas da campanha e até ao limite de unidades, e não acumulam com outros descontos."
+      "texto": "- Cada voucher corresponde a um tratamento e é digital. O código é enviado só por email a quem compra.\n- Quem tiver o código pode usá-lo. Guarde-o como guardaria dinheiro: não respondemos por códigos partilhados, perdidos ou usados por outra pessoa.\n- É válido até ao último dia do mês, 12 meses depois da compra. A validade está no voucher e no email.\n- Serve para uma marcação, uma só vez. Não é convertível em dinheiro e não dá troco. A troca por outro tratamento deverá ser solicitada no Spa, pagando a diferença, se houver.\n- Depois de expirado, pode ser reativado uma vez por 12,00 €, com mais 6 meses de validade.\n- Pode oferecê-lo a outra pessoa. Quem o usa aceita estes termos.\n- Os vouchers de campanha só se vendem nas datas da campanha e até ao limite de unidades, e não acumulam com outros descontos.",
+      "en": {
+        "titulo": "Vouchers",
+        "texto": "- Each voucher is for one treatment and is digital. The code is sent by email to the buyer only.\n- Whoever has the code can use it. Keep it as you would keep cash: we are not responsible for codes that are shared, lost or used by someone else.\n- It is valid until the last day of the month, 12 months after purchase. The expiry date is shown on the voucher and in the email.\n- It can be used for one booking, once. It cannot be exchanged for cash and no change is given. Exchanges for another treatment must be requested at the spa, paying any difference.\n- Once expired, it can be reactivated once for €12.00, with a further 6 months’ validity.\n- You can give it to someone else. Whoever uses it accepts these terms.\n- Offer vouchers are only sold on the dates of the offer and up to the unit limit, and cannot be combined with other discounts."
+      }
     },
     {
       "titulo": "Códigos de desconto",
-      "texto": "- O código de 10% da newsletter vale uma vez por email, numa marcação ou num voucher, e não acumula com outros códigos nem com preços de campanha.\n- Outros códigos promocionais têm as condições indicadas quando são atribuídos.\n- Podemos anular um código usado de forma abusiva ou fraudulenta."
+      "texto": "- O código de 10% da newsletter vale uma vez por email, numa marcação ou num voucher, e não acumula com outros códigos nem com preços de campanha.\n- Outros códigos promocionais têm as condições indicadas quando são atribuídos.\n- Podemos anular um código usado de forma abusiva ou fraudulenta.",
+      "en": {
+        "titulo": "Discount codes",
+        "texto": "- The 10% newsletter code can be used once per email address, on one booking or one voucher, and cannot be combined with other codes or offer prices.\n- Other promotional codes carry the conditions stated when they are issued.\n- We may cancel a code that is used abusively or fraudulently."
+      }
     },
     {
       "titulo": "Responsabilidade",
-      "texto": "Prestamos os tratamentos com a diligência e as regras técnicas da profissão. Não respondemos por danos causados por informações de saúde omitidas ou incorretas, por não seguir as indicações da equipa, por casos de força maior ou por falhas de serviços de terceiros (pagamentos, email, internet) alheias ao nosso controlo.\n\nNada nestes termos exclui ou limita a nossa responsabilidade nos casos em que a lei não o permite, nomeadamente por dolo ou culpa grave."
+      "texto": "Prestamos os tratamentos com a diligência e as regras técnicas da profissão. Não respondemos por danos causados por informações de saúde omitidas ou incorretas, por não seguir as indicações da equipa, por casos de força maior ou por falhas de serviços de terceiros (pagamentos, email, internet) alheias ao nosso controlo.\n\nNada nestes termos exclui ou limita a nossa responsabilidade nos casos em que a lei não o permite, nomeadamente por dolo ou culpa grave.",
+      "en": {
+        "titulo": "Liability",
+        "texto": "We provide treatments with due care and in line with the technical standards of the profession. We are not liable for damage caused by health information that is withheld or incorrect, by not following the team’s advice, by force majeure or by failures of third-party services (payments, email, internet) beyond our control.\n\nNothing in these terms excludes or limits our liability where the law does not allow it, in particular for wilful misconduct or gross negligence."
+      }
     },
     {
       "titulo": "Propriedade intelectual",
-      "texto": "Os textos, fotografias, logótipos e marcas do site, incluindo «A Melhor Massagem do Mundo by Oporto Medical SPA» (marca registada no INPI com o n.º 480541), pertencem ao Oporto Medical Spa ou a quem autorizou o seu uso, e não podem ser copiados sem autorização."
+      "texto": "Os textos, fotografias, logótipos e marcas do site, incluindo «A Melhor Massagem do Mundo by Oporto Medical SPA» (marca registada no INPI com o n.º 480541), pertencem ao Oporto Medical Spa ou a quem autorizou o seu uso, e não podem ser copiados sem autorização.",
+      "en": {
+        "titulo": "Intellectual property",
+        "texto": "The texts, photographs, logos and trademarks on the website, including “A Melhor Massagem do Mundo by Oporto Medical SPA” (trademark registered with INPI under no. 480541), belong to Oporto Medical Spa or to those who have authorised their use, and may not be copied without permission."
+      }
     },
     {
       "titulo": "Reclamações e litígios",
-      "texto": "Pode reclamar no Livro de Reclamações, no spa ou em formato eletrónico em [www.livroreclamacoes.pt](https://www.livroreclamacoes.pt). Sobre cuidados de saúde, pode também reclamar junto da Entidade Reguladora da Saúde, em [www.ers.pt](https://www.ers.pt).\n\nEm caso de litígio de consumo, pode recorrer a uma entidade de resolução alternativa de litígios, como o Centro de Informação de Consumo e Arbitragem do Porto ([www.cicap.pt](https://www.cicap.pt)). Mais informação no Portal do Consumidor, [www.consumidor.gov.pt](https://www.consumidor.gov.pt)."
+      "texto": "Pode reclamar no Livro de Reclamações, no spa ou em formato eletrónico em [www.livroreclamacoes.pt](https://www.livroreclamacoes.pt). Sobre cuidados de saúde, pode também reclamar junto da Entidade Reguladora da Saúde, em [www.ers.pt](https://www.ers.pt).\n\nEm caso de litígio de consumo, pode recorrer a uma entidade de resolução alternativa de litígios, como o Centro de Informação de Consumo e Arbitragem do Porto ([www.cicap.pt](https://www.cicap.pt)). Mais informação no Portal do Consumidor, [www.consumidor.gov.pt](https://www.consumidor.gov.pt).",
+      "en": {
+        "titulo": "Complaints and disputes",
+        "texto": "You can make a complaint in the Complaints Book (Livro de Reclamações), at the spa or online at [www.livroreclamacoes.pt](https://www.livroreclamacoes.pt). For health care, you can also complain to the Health Regulatory Authority at [www.ers.pt](https://www.ers.pt).\n\nIn the event of a consumer dispute, you may use an alternative dispute resolution body, such as the Porto Consumer Information and Arbitration Centre ([www.cicap.pt](https://www.cicap.pt)). More information on the Consumer Portal, [www.consumidor.gov.pt](https://www.consumidor.gov.pt)."
+      }
     },
     {
       "titulo": "Lei aplicável e alterações",
-      "texto": "Estes termos regem-se pela lei portuguesa, sem prejuízo das normas de proteção do consumidor que lhe sejam mais favoráveis. Podemos alterá-los: aplica-se a versão em vigor na data da sua marcação ou compra."
+      "texto": "Estes termos regem-se pela lei portuguesa, sem prejuízo das normas de proteção do consumidor que lhe sejam mais favoráveis. Podemos alterá-los: aplica-se a versão em vigor na data da sua marcação ou compra.",
+      "en": {
+        "titulo": "Applicable law and changes",
+        "texto": "These terms are governed by Portuguese law, without prejudice to any consumer protection rules that are more favourable to you. We may change them: the version in force on the date of your booking or purchase applies."
+      }
     },
     {
       "titulo": "Modelo para desistir de um voucher",
-      "texto": "Preencha e envie para {email} (ou por correio para {morada}) apenas se quiser desistir da compra de um voucher, dentro de 14 dias.\n\n- Para: CNP, Lda., NIPC 506651940, {morada}, {email}\n- Pela presente comunico que desisto do contrato de compra do seguinte voucher:\n- Código do voucher e data da compra:\n- Nome:\n- Morada:\n- Data e assinatura (só se enviar em papel):"
+      "texto": "Preencha e envie para {email} (ou por correio para {morada}) apenas se quiser desistir da compra de um voucher, dentro de 14 dias.\n\n- Para: CNP, Lda., NIPC 506651940, {morada}, {email}\n- Pela presente comunico que desisto do contrato de compra do seguinte voucher:\n- Código do voucher e data da compra:\n- Nome:\n- Morada:\n- Data e assinatura (só se enviar em papel):",
+      "en": {
+        "titulo": "Form to withdraw from a voucher purchase",
+        "texto": "Complete and send this form to {email} (or by post to {morada}) only if you wish to withdraw from a voucher purchase, within 14 days.\n\n- To: CNP, Lda., tax no. (NIPC) 506651940, {morada}, {email}\n- I hereby give notice that I withdraw from the contract for the purchase of the following voucher:\n- Voucher code and date of purchase:\n- Name:\n- Address:\n- Date and signature (only if sent on paper):"
+      }
     }
-  ]
+  ],
+  "en": {
+    "titulo": "Terms and Conditions",
+    "introducao": "These terms apply to bookings and voucher purchases on the Oporto Medical Spa website. By booking or buying, you confirm that you have read and accept them. Please also read our [Privacy Policy](/en/privacy/). This English version is a translation provided for convenience. If there is any difference, the Portuguese version prevails."
+  }
 }

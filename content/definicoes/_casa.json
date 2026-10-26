@@ -28,5 +28,24 @@
     "Spa Industry Association"
   ],
   "registo_ers": "E138084",
-  "frase_rodape": "Um compromisso pelos resultados terapêuticos."
+  "frase_rodape": "Um compromisso pelos resultados terapêuticos.",
+  "en": {
+    "descricao_negocio": "Medical spa in Porto offering relaxation massages, physiotherapy, manual lymphatic drainage and clinical Pilates, by physiotherapists and specialist therapists.",
+    "comodidades": [
+      "Bathrobe, towels and slippers",
+      "Tea ritual on arrival",
+      "One-to-one care in a private room"
+    ],
+    "conhecimentos": [
+      "Relaxation massage",
+      "Aromatherapy",
+      "Physiotherapy",
+      "Postural re-education",
+      "Dermato-functional physiotherapy",
+      "Manual lymphatic drainage",
+      "Clinical Pilates",
+      "Phytotherapy"
+    ],
+    "frase_rodape": "A commitment to therapeutic results."
+  }
 }

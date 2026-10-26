@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 65,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Anti-Ageing Facial",
+    "nome_completo": "Anti-Ageing Facial",
+    "texto": "Restructuring care that softens the appearance of wrinkles and improves skin firmness and texture.",
+    "indicado_para": "Wrinkles, expression lines, loss of firmness",
+    "como_e": "Cleansing, restructuring treatment and face mask",
+    "tipo_servico": "Facial treatment",
+    "descricao_seo": "Restructuring care that softens the appearance of wrinkles and improves skin firmness and texture."
+  }
 }

@@ -28,6 +28,18 @@ Nos textos pode usar `*itálico*`, `**negrito**`, `[ligação](https://...)` e `
 (aparece marcado no site e fica fora dos dados para o Google). `{telefone}`, `{email}`,
 `{morada}`, `{horario}`, `{preco:fisio}` e `{duracao:fisio}` são substituídos pelos valores atuais.
 
+### Versão inglesa (`/en/`)
+
+Cada ficha do backoffice (e cada item das listas) tem um bloco fechado **English (EN)** com os mesmos campos de texto.
+O que estiver preenchido aparece nas páginas em inglês; o que ficar vazio aparece em português. Esses blocos
+acrescentam-se sozinhos no build (`src/admin-en.mjs` gera `dist/admin/config.yml` a partir de `public/admin/config.yml`).
+Os textos fixos do site estão em `src/ingles.mjs`; as frases automáticas (preços, morada, horário) têm versão inglesa
+em `src/modelo.mjs`. As páginas inglesas têm endereço próprio (campo «Endereço da página» no bloco EN).
+
+Em «Contactos e horário › Google, redes e lançamento», **Versão inglesa no site** liga o botão EN e põe as páginas
+`/en/` no Google (com `hreflang`). Desligado, as páginas existem mas ficam fora do Google; nas pré-visualizações
+do Netlify o botão EN funciona sempre.
+
 ### SEO e GEO automáticos
 
 O build (`src/build.mjs`) gera tudo a partir do conteúdo, por isso nada disto se edita à mão:

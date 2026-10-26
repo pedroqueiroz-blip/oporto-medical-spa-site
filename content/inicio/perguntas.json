@@ -7,105 +7,178 @@
       "pergunta": "Como posso fazer uma reserva no Oporto Medical Spa?",
       "resposta": "Pode efetuar o agendamento do seu tratamento através do nosso website (reserva online), email ({email}) ou através de um dos nossos contactos de telefone.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "How can I book at Oporto Medical Spa?",
+        "resposta": "You can book your treatment on our website (online booking), by email ({email}) or by calling one of our phone numbers."
+      }
     },
     {
       "pergunta": "Qual a política de cancelamento?",
       "resposta": "Se não comparecer à sessão agendada ou não avisar com 24 horas de antecedência, a sessão pode ser considerada feita ou poderá ser descontado o valor correspondente a 50% do tratamento. Com mais de 24 horas de antecedência, pode mudar ou cancelar a marcação sem custos.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "What is the cancellation policy?",
+        "resposta": "If you do not attend your appointment or do not give 24 hours’ notice, the session may be considered as taken, or 50% of the treatment price may be charged. With more than 24 hours’ notice, you can change or cancel your booking free of charge."
+      }
     },
     {
       "pergunta": "A que horas devo chegar ao SPA?",
       "resposta": "Aconselhamos a chegada com 10 minutos de antecedência, para garantir uma experiência tranquila.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "What time should I arrive at the spa?",
+        "resposta": "We recommend arriving 10 minutes early, so that your experience can begin calmly."
+      }
     },
     {
       "pergunta": "Que roupa devo usar para um tratamento no SPA?",
       "resposta": "Use roupa confortável. Disponibilizamos roupão, toalha, chinelos e cueca descartável.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "What should I wear for a spa treatment?",
+        "resposta": "Wear comfortable clothes. We provide a bathrobe, towel, slippers and disposable underwear."
+      }
     },
     {
       "pergunta": "O Oporto Medical Spa recebe crianças?",
       "resposta": "Sim. Atendemos crianças a partir dos 5 anos de idade, com autorização dos pais. Um dos pais pode acompanhar o tratamento.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Does Oporto Medical Spa welcome children?",
+        "resposta": "Yes. We treat children from 5 years of age, with their parents’ consent. A parent may stay with the child during the treatment."
+      }
     },
     {
       "pergunta": "O que significa «Medical SPA»?",
       "resposta": "Somos um SPA médico com foco em resultados terapêuticos. Trabalhamos exclusivamente com fisioterapeutas certificados, promovendo saúde, reabilitação e qualidade de vida.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "What does “Medical Spa” mean?",
+        "resposta": "We are a medical spa focused on therapeutic results. We work exclusively with certified physiotherapists, promoting health, rehabilitation and quality of life."
+      }
     },
     {
       "pergunta": "Posso usar o telemóvel durante a visita?",
       "resposta": "Para preservar a tranquilidade e o ambiente harmonioso do Oporto Medical Spa, solicitamos que não utilize telemóveis, dispositivos eletrónicos ou equipamentos de áudio durante a sua permanência no espaço. Agradecemos a sua compreensão e colaboração no respeito pelo bem-estar e relaxamento de todos os nossos clientes.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Can I use my phone during my visit?",
+        "resposta": "To preserve the calm and harmonious atmosphere of Oporto Medical Spa, we kindly ask you not to use mobile phones, electronic devices or audio equipment while you are with us. Thank you for your understanding and for respecting the well-being and relaxation of all our clients."
+      }
     },
     {
       "pergunta": "Preciso de prescrição médica para fazer fisioterapia?",
       "pergunta_seo": "Preciso de prescrição médica para fazer fisioterapia no Porto?",
       "resposta": "Não. A fisioterapia pode ser iniciada sem prescrição médica. Para reembolso através de seguros de saúde, é necessário apresentar prescrição médica anterior ao início dos tratamentos.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Do I need a doctor’s referral for physiotherapy?",
+        "pergunta_seo": "Do I need a doctor’s referral for physiotherapy in Porto?",
+        "resposta": "No. Physiotherapy can begin without a medical prescription. To claim reimbursement from health insurance, you need a medical prescription issued before the treatments begin."
+      }
     },
     {
       "pergunta": "Como posso pedir reembolso dos tratamentos de fisioterapia?",
       "resposta": "Geralmente precisa dos seguintes documentos: prescrição médica, fatura e relatório do fisioterapeuta. Confirme os requisitos com a sua seguradora ou subsistema de saúde.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "How can I claim reimbursement for physiotherapy?",
+        "resposta": "You will usually need the following documents: a medical prescription, the invoice and a report from the physiotherapist. Please check the requirements with your insurer or health scheme."
+      }
     },
     {
       "pergunta": "Quais são os métodos de pagamento disponíveis?",
       "resposta": "Aceitamos MB WAY, Multibanco, VISA/Mastercard e transferência bancária.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Which payment methods do you accept?",
+        "resposta": "We accept MB WAY, Multibanco, VISA/Mastercard and bank transfer."
+      }
     },
     {
       "pergunta": "Posso oferecer um voucher presente do Oporto Medical Spa?",
       "resposta": "Sim. Pode adquirir um voucher digital (recebido por email) ou físico (levantado no Spa ou enviado para a morada desejada).",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Can I give an Oporto Medical Spa gift voucher?",
+        "resposta": "Yes. You can buy a digital voucher (sent by email) or a physical one (collected at the spa or sent to the address of your choice)."
+      }
     },
     {
       "pergunta": "Quais são os termos e condições do voucher?",
       "resposta": "**Desistência e troca:** pode desistir da compra nos 14 dias seguintes, desde que o voucher não tenha sido usado, e devolvemos o valor pago. Depois desse prazo, o valor não é devolvido. A troca por outro tratamento deverá ser solicitada no Spa. **Validade:** o voucher é válido por um ano (12 meses) após a aquisição. Perde a validade quando o agendamento do respetivo serviço não for realizado dentro do prazo indicado no voucher, ou quando, depois de efetuada a reserva, o cancelamento não for feito com mais de 24 horas de antecedência. Caso o prazo tenha expirado, o voucher poderá ser reativado mediante o pagamento de 12,00 €, sendo neste caso a validade estendida por 6 meses.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "What are the voucher terms and conditions?",
+        "resposta": "**Cancellation and exchange:** you can cancel your purchase within 14 days, as long as the voucher has not been used, and we will refund the amount paid. After that period, the amount is not refunded. Exchanges for another treatment must be requested at the spa. **Validity:** the voucher is valid for one year (12 months) from the date of purchase. It expires if the corresponding treatment is not booked within the period shown on the voucher, or if, once booked, the appointment is not cancelled more than 24 hours in advance. If the voucher has expired, it can be reactivated for €12.00, in which case its validity is extended by 6 months."
+      }
     },
     {
       "pergunta": "Onde fica o Oporto Medical Spa?",
       "resposta": "",
       "automatica": "morada",
-      "acrescento": "Fica praticamente em frente ao Pingo Doce Ramalde – João de Brito, a menos de 1 minuto a pé, e a 2 a 3 minutos da paragem de autocarro S. João de Brito."
+      "acrescento": "Fica praticamente em frente ao Pingo Doce Ramalde – João de Brito, a menos de 1 minuto a pé, e a 2 a 3 minutos da paragem de autocarro S. João de Brito.",
+      "en": {
+        "pergunta": "Where is Oporto Medical Spa?",
+        "acrescento": "It is almost opposite the Pingo Doce Ramalde – João de Brito supermarket, less than a minute’s walk away, and 2 to 3 minutes from the S. João de Brito bus stop."
+      }
     },
     {
       "pergunta": "Quanto custa uma massagem no Oporto Medical Spa?",
       "resposta": "",
       "automatica": "precos_relaxar",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "How much does a massage cost at Oporto Medical Spa?"
+      }
     },
     {
       "pergunta": "Quanto custa uma sessão de fisioterapia?",
       "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?",
       "resposta": "",
       "automatica": "precos_fisio",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "How much does a physiotherapy session cost?",
+        "pergunta_seo": "How much does a physiotherapy session cost in Porto, at Oporto Medical Spa?"
+      }
     },
     {
       "pergunta": "Há estacionamento?",
       "resposta": "Sim. O Pingo Doce mesmo ao lado tem parque de estacionamento para clientes, e há lugares na via pública ao longo da Rua São João de Brito e nas ruas vizinhas, como a Rua das Andresas.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Is there parking?",
+        "resposta": "Yes. The Pingo Doce supermarket right next door has a car park for customers, and there is street parking along Rua São João de Brito and the nearby streets, such as Rua das Andresas."
+      }
     },
     {
       "pergunta": "Falam inglês e espanhol?",
       "resposta": "Falamos português e inglês.",
       "automatica": "",
-      "acrescento": ""
+      "acrescento": "",
+      "en": {
+        "pergunta": "Do you speak English and Spanish?",
+        "resposta": "We speak Portuguese and English."
+      }
     }
-  ]
+  ],
+  "en": {
+    "etiqueta": "Frequently asked questions",
+    "titulo": "Before you come.",
+    "texto": "Book here, by phone on {telefone} or by email at {email}. We recommend booking two days in advance."
+  }
 }

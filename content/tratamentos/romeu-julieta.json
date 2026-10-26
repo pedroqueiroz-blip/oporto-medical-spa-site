@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 129,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Romeo and Juliet Ritual",
+    "nome_completo": "Romeo and Juliet Ritual (Him: Ayurvedic / Her: Geothermal)",
+    "texto": "Two different massage experiences to share special moments as a couple.",
+    "indicado_para": "Relaxing together, closeness and well-being",
+    "como_e": "Ayurvedic and Geothermal massages",
+    "tipo_servico": "Spa ritual for two",
+    "descricao_seo": "Two different massage experiences to share special moments as a couple."
+  }
 }

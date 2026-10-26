@@ -14,5 +14,14 @@
   "duracao": 90,
   "preco": 60,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Post-Surgery Rehabilitation Programme",
+    "nome_completo": "Post-Surgery Rehabilitation Programme",
+    "texto": "A personalised recovery plan to help your body regain mobility, function and confidence after surgery. Each stage is adjusted to your progress, respecting healing times and clinical guidance.",
+    "indicado_para": "Recovering mobility and function after surgery",
+    "como_e": "Rehabilitation plan adapted to the surgery and your progress",
+    "tipo_servico": "Physiotherapy",
+    "descricao_seo": "A personalised recovery plan to help your body regain mobility, function and confidence after surgery. Each stage is adjusted to your progress, respecting healing times and clinical guidance."
+  }
 }

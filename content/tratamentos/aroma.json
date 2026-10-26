@@ -14,5 +14,15 @@
   "duracao": 60,
   "preco": 65,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Aromatherapy",
+    "nome_completo": "Aromatherapy Massage",
+    "texto": "Essential oils and gentle movements to release tension and restore serenity.",
+    "indicado_para": "Stress, tiredness, relaxation",
+    "como_e": "Gentle massage with essential oils",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "Essential oils and gentle movements to release tension and restore serenity.",
+    "pressao": "Light"
+  }
 }

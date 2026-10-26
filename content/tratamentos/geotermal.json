@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 70,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Geothermal",
+    "nome_completo": "Geothermal Massage",
+    "texto": "Hot stones and relaxing movements to ease tension and restore tranquillity.",
+    "indicado_para": "Muscle tension, relief and deep relaxation",
+    "como_e": "Heated volcanic stones and essential oils",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "Hot stones and relaxing movements to ease tension and restore tranquillity."
+  }
 }

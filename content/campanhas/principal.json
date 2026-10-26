@@ -22,5 +22,16 @@
   "selo_texto": "Marca registada no INPI",
   "titulo": "A Melhor Massagem",
   "preco_antigo": 88,
-  "imagem_alt": "Massagem facial realizada com movimentos suaves e técnicas manuais, promovendo o relaxamento, o bem-estar e o cuidado da pele."
+  "imagem_alt": "Massagem facial realizada com movimentos suaves e técnicas manuais, promovendo o relaxamento, o bem-estar e o cuidado da pele.",
+  "en": {
+    "etiqueta": "Highlight of the month. An exclusive experience.",
+    "texto": "Oporto Medical Spa’s signature massage, created exclusively by our team and registered as a trademark, is a unique experience available only at our spa. Its name means “The Best Massage in the World”.",
+    "inclui": [
+      "==What it includes: a sensory experience inspired by Eastern rituals==",
+      "Best-seller · our clients’ favourite"
+    ],
+    "selo_texto": "Trademark registered with INPI",
+    "tipo_servico": "Signature massage",
+    "imagem_alt": "Facial massage with gentle movements and manual techniques, for relaxation, well-being and skin care"
+  }
 }

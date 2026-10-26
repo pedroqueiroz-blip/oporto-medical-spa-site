@@ -3,5 +3,12 @@
   "titulo": "Ofereça",
   "titulo_destaque": "uma pausa.",
   "texto": "Ofereça saúde, relaxamento e bem-estar. Escolha a massagem ou o ritual ideal e surpreenda com um voucher digital, disponível no momento da compra.",
-  "nota": "Recebeu um voucher? Use o código no último passo da reserva."
+  "nota": "Recebeu um voucher? Use o código no último passo da reserva.",
+  "en": {
+    "etiqueta": "Gift vouchers",
+    "titulo": "Give",
+    "titulo_destaque": "a pause.",
+    "texto": "Give the gift of health, relaxation and well-being. Choose the ideal massage or ritual and surprise someone with a digital voucher, available as soon as you buy it.",
+    "nota": "Received a voucher? Enter the code in the last step of your booking."
+  }
 }

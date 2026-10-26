@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 60,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Body-Contouring Treatment",
+    "nome_completo": "Manual Body-Contouring Treatment",
+    "texto": "A vigorous massage that stimulates circulation and improves the appearance of the skin and cellulite.",
+    "indicado_para": "Cellulite, body contours and skin texture",
+    "como_e": "Firm, quick and targeted movements",
+    "tipo_servico": "Body treatment",
+    "descricao_seo": "A vigorous massage that stimulates circulation and improves the appearance of the skin and cellulite."
+  }
 }

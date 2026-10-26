@@ -14,5 +14,14 @@
   "duracao": 90,
   "preco": 60,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Postnatal Rehabilitation Programme",
+    "nome_completo": "Postnatal Rehabilitation Programme",
+    "texto": "Dedicated support for your body’s recovery after pregnancy and childbirth, respecting each stage of the process. Tailored exercises and techniques to rebuild strength, stability and confidence in your body.",
+    "indicado_para": "Postnatal recovery, pelvic floor strengthening and core stability",
+    "como_e": "Individual treatment plan to help your body recover after pregnancy",
+    "tipo_servico": "Physiotherapy",
+    "descricao_seo": "Dedicated support for your body’s recovery after pregnancy and childbirth, respecting each stage of the process. Tailored exercises and techniques to rebuild strength, stability and confidence in your body."
+  }
 }

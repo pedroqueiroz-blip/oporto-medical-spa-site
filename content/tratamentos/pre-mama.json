@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 70,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Pregnancy",
+    "nome_completo": "Pregnancy Massage",
+    "texto": "A massage designed for pregnant women to relax, relieve discomfort and bring well-being during pregnancy.",
+    "indicado_para": "Pregnancy, tired legs, muscle tension",
+    "como_e": "Gentle massage adapted to pregnancy",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "A massage designed for pregnant women to relax, relieve discomfort and bring well-being during pregnancy."
+  }
 }

@@ -35,5 +35,16 @@
     "pos-cirurgico",
     "pos-parto",
     "postura"
-  ]
+  ],
+  "en": {
+    "funcao": "Physiotherapist and osteopath",
+    "foco": "Physiotherapy. Osteopathy. Clinical and Equipment Pilates.",
+    "bio": "Physiotherapy focused on movement, balance and quality of life.",
+    "credencial": "OF licence no. [[6137]]",
+    "conhece": [
+      "Physiotherapy",
+      "Clinical Pilates",
+      "Osteopathy"
+    ]
+  }
 }

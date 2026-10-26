@@ -30,5 +30,15 @@
     "modela-360",
     "modelador",
     "pos-cirurgico"
-  ]
+  ],
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy. Clinical Pilates.",
+    "bio": "Personalised care, focused on restoring mobility and well-being.",
+    "credencial": "OF licence no. [[12171]]",
+    "conhece": [
+      "A Melhor Massagem do Mundo",
+      "Aromatherapy"
+    ]
+  }
 }

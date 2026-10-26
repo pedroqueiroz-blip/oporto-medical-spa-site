@@ -26,5 +26,18 @@
   "tratamento": "world",
   "duracao": 75,
   "preco": 65,
-  "preco_antigo": 88
+  "preco_antigo": 88,
+  "en": {
+    "etiqueta": "Christmas offer",
+    "titulo": "This Christmas, give",
+    "titulo_destaque": "moments of care",
+    "botao": "Discover the Christmas vouchers",
+    "condicoes": [
+      "Vouchers on sale in November and December 2026.",
+      "Cannot be combined with other offers or discounts."
+    ],
+    "texto": "**A Melhor Massagem do Mundo®, The Best Massage in the World.** An exclusive ritual combining massage techniques for a unique relaxation experience.",
+    "imagem_alt": "Hot stone massage on the back, beside a lotus flower and a candle",
+    "tipo_servico": "Signature massage"
+  }
 }

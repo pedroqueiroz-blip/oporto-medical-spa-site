@@ -1,5 +1,9 @@
 {
   "titulo": "Massagem de Relaxamento no Porto · Oporto Medical Spa",
   "descricao": "",
-  "titulo_partilha": "Massagem de relaxamento no Porto · Oporto Medical Spa"
+  "titulo_partilha": "Massagem de relaxamento no Porto · Oporto Medical Spa",
+  "en": {
+    "titulo": "Relaxation Massage in Porto · Oporto Medical Spa",
+    "titulo_partilha": "Relaxation massage in Porto · Oporto Medical Spa"
+  }
 }

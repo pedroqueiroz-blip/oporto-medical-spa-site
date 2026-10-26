@@ -5,51 +5,103 @@
   "seccoes": [
     {
       "titulo": "Quem é o responsável",
-      "texto": "O responsável pelo tratamento dos seus dados é CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nPara qualquer questão sobre os seus dados, escreva para {email} ou ligue para {telefone}."
+      "texto": "O responsável pelo tratamento dos seus dados é CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nPara qualquer questão sobre os seus dados, escreva para {email} ou ligue para {telefone}.",
+      "en": {
+        "titulo": "Who is responsible",
+        "texto": "The controller of your data is CNP, Lda., tax no. (NIPC) 506651940, with registered office at {morada}, which operates Oporto Medical Spa, a unit registered with the Portuguese Health Regulatory Authority (Entidade Reguladora da Saúde) under no. E138084.\n\nFor any question about your data, write to {email} or call {telefone}."
+      }
     },
     {
       "titulo": "Que dados recolhemos",
-      "texto": "- **Marcações:** nome, email, telefone, NIF, tratamento, terapeuta, dia e hora.\n- **Confirmação do email:** um código de seis dígitos, enviado para o seu email antes do pagamento.\n- **Vouchers:** os dados de quem compra, o nome de quem recebe, o nome de quem oferece, a mensagem e o código do voucher.\n- **Pagamentos:** o meio de pagamento, o número de telemóvel MB WAY, a referência e o estado do pagamento. Os dados do cartão são escritos diretamente na página da euPago e nunca chegam ao Oporto Medical Spa.\n- **Newsletter:** o email e o registo do seu consentimento.\n- **Contactos:** o que nos enviar por email, telefone ou WhatsApp.\n- **No spa:** os dados de saúde necessários à avaliação e ao tratamento (queixas, historial, medicação, contraindicações), registados pela fisioterapeuta no seu processo. O site não pede dados de saúde.\n- **Dados técnicos:** o endereço IP e os dados de ligação que os servidores registam por segurança."
+      "texto": "- **Marcações:** nome, email, telefone, NIF, tratamento, terapeuta, dia e hora.\n- **Confirmação do email:** um código de seis dígitos, enviado para o seu email antes do pagamento.\n- **Vouchers:** os dados de quem compra, o nome de quem recebe, o nome de quem oferece, a mensagem e o código do voucher.\n- **Pagamentos:** o meio de pagamento, o número de telemóvel MB WAY, a referência e o estado do pagamento. Os dados do cartão são escritos diretamente na página da euPago e nunca chegam ao Oporto Medical Spa.\n- **Newsletter:** o email e o registo do seu consentimento.\n- **Contactos:** o que nos enviar por email, telefone ou WhatsApp.\n- **No spa:** os dados de saúde necessários à avaliação e ao tratamento (queixas, historial, medicação, contraindicações), registados pela fisioterapeuta no seu processo. O site não pede dados de saúde.\n- **Dados técnicos:** o endereço IP e os dados de ligação que os servidores registam por segurança.",
+      "en": {
+        "titulo": "What data we collect",
+        "texto": "- **Bookings:** name, email, phone, tax number (NIF), treatment, therapist, date and time.\n- **Email confirmation:** a six-digit code sent to your email before payment.\n- **Vouchers:** the buyer’s details, the recipient’s name, the giver’s name, the message and the voucher code.\n- **Payments:** the payment method, the MB WAY mobile number, the reference and the payment status. Card details are entered directly on the euPago page and never reach Oporto Medical Spa.\n- **Newsletter:** your email and a record of your consent.\n- **Contacts:** whatever you send us by email, phone or WhatsApp.\n- **At the spa:** the health data needed for assessment and treatment (complaints, history, medication, contraindications), recorded by the physiotherapist in your file. The website does not ask for health data.\n- **Technical data:** the IP address and connection data that servers record for security."
+      }
     },
     {
       "titulo": "Para que usamos os dados",
-      "texto": "- **Gerir marcações e vouchers**, confirmá-los por email e contactá-lo sobre a marcação: execução do contrato (artigo 6.º, n.º 1, alínea b) do RGPD).\n- **Emitir faturas** e cumprir obrigações fiscais e legais: obrigação legal (alínea c)).\n- **Avaliar e tratar a sua saúde** e manter o processo clínico: prestação de cuidados de saúde por profissionais sujeitos a sigilo (artigo 9.º, n.º 2, alínea h) e n.º 3 do RGPD).\n- **Enviar a newsletter** e o código de boas-vindas: o seu consentimento (alínea a)), que pode retirar a qualquer momento.\n- **Confirmar o email, prevenir fraude**, proteger o site e defender os nossos direitos em caso de litígio: interesse legítimo (alínea f)).\n\nNão vendemos os seus dados, não os usamos para publicidade de terceiros nem tomamos decisões automatizadas sobre si."
+      "texto": "- **Gerir marcações e vouchers**, confirmá-los por email e contactá-lo sobre a marcação: execução do contrato (artigo 6.º, n.º 1, alínea b) do RGPD).\n- **Emitir faturas** e cumprir obrigações fiscais e legais: obrigação legal (alínea c)).\n- **Avaliar e tratar a sua saúde** e manter o processo clínico: prestação de cuidados de saúde por profissionais sujeitos a sigilo (artigo 9.º, n.º 2, alínea h) e n.º 3 do RGPD).\n- **Enviar a newsletter** e o código de boas-vindas: o seu consentimento (alínea a)), que pode retirar a qualquer momento.\n- **Confirmar o email, prevenir fraude**, proteger o site e defender os nossos direitos em caso de litígio: interesse legítimo (alínea f)).\n\nNão vendemos os seus dados, não os usamos para publicidade de terceiros nem tomamos decisões automatizadas sobre si.",
+      "en": {
+        "titulo": "What we use the data for",
+        "texto": "- **Managing bookings and vouchers**, confirming them by email and contacting you about your booking: performance of a contract (Article 6(1)(b) GDPR).\n- **Issuing invoices** and meeting tax and legal obligations: legal obligation (point (c)).\n- **Assessing and treating your health** and keeping your clinical record: provision of health care by professionals bound by confidentiality (Article 9(2)(h) and 9(3) GDPR).\n- **Sending the newsletter** and the welcome code: your consent (point (a)), which you can withdraw at any time.\n- **Confirming your email, preventing fraud**, protecting the website and defending our rights in the event of a dispute: legitimate interest (point (f)).\n\nWe do not sell your data, we do not use it for third-party advertising and we do not make automated decisions about you."
+      }
     },
     {
       "titulo": "Com quem partilhamos",
-      "texto": "Só com prestadores que tratam os dados por nossa conta, com contrato e garantias de proteção, e apenas no necessário:\n\n- **euPago** (Portugal): pagamentos por MB WAY, Multibanco e cartão.\n- **Moloni ON** (Portugal): faturação. As faturas são comunicadas à Autoridade Tributária.\n- **Zoho** (centro de dados na União Europeia): ficha de cliente e agenda das marcações.\n- **Resend** (Estados Unidos): envio dos emails de confirmação, vouchers e códigos.\n- **Netlify** (Estados Unidos): alojamento do site, formulários e registo dos pedidos.\n- **Google** (Estados Unidos): tipos de letra do site (Google Fonts), que recebem o endereço IP de quem visita.\n\nComunicamos também dados às autoridades quando a lei o exige e, a seu pedido, à sua seguradora ou subsistema de saúde."
+      "texto": "Só com prestadores que tratam os dados por nossa conta, com contrato e garantias de proteção, e apenas no necessário:\n\n- **euPago** (Portugal): pagamentos por MB WAY, Multibanco e cartão.\n- **Moloni ON** (Portugal): faturação. As faturas são comunicadas à Autoridade Tributária.\n- **Zoho** (centro de dados na União Europeia): ficha de cliente e agenda das marcações.\n- **Resend** (Estados Unidos): envio dos emails de confirmação, vouchers e códigos.\n- **Netlify** (Estados Unidos): alojamento do site, formulários e registo dos pedidos.\n- **Google** (Estados Unidos): tipos de letra do site (Google Fonts), que recebem o endereço IP de quem visita.\n\nComunicamos também dados às autoridades quando a lei o exige e, a seu pedido, à sua seguradora ou subsistema de saúde.",
+      "en": {
+        "titulo": "Who we share it with",
+        "texto": "Only with providers who process data on our behalf, under contract and with data protection safeguards, and only as far as necessary:\n\n- **euPago** (Portugal): MB WAY, Multibanco and card payments.\n- **Moloni ON** (Portugal): invoicing. Invoices are reported to the Portuguese Tax Authority.\n- **Zoho** (data centre in the European Union): client records and the booking calendar.\n- **Resend** (United States): sending confirmation, voucher and code emails.\n- **Netlify** (United States): website hosting, forms and request logs.\n- **Google** (United States): the website’s fonts (Google Fonts), which receive visitors’ IP addresses.\n\nWe also share data with the authorities when the law requires it and, at your request, with your insurer or health scheme."
+      }
     },
     {
       "titulo": "Transferências para fora da União Europeia",
-      "texto": "Alguns prestadores estão nos Estados Unidos. Essas transferências fazem-se ao abrigo do Quadro de Privacidade de Dados UE-EUA, quando o prestador está certificado, ou das cláusulas contratuais-tipo aprovadas pela Comissão Europeia."
+      "texto": "Alguns prestadores estão nos Estados Unidos. Essas transferências fazem-se ao abrigo do Quadro de Privacidade de Dados UE-EUA, quando o prestador está certificado, ou das cláusulas contratuais-tipo aprovadas pela Comissão Europeia.",
+      "en": {
+        "titulo": "Transfers outside the European Union",
+        "texto": "Some providers are based in the United States. These transfers take place under the EU-U.S. Data Privacy Framework, where the provider is certified, or under the standard contractual clauses approved by the European Commission."
+      }
     },
     {
       "titulo": "Durante quanto tempo guardamos os dados",
-      "texto": "- **Faturas e documentos contabilísticos:** 10 anos, como exige a lei fiscal.\n- **Processo clínico:** pelo prazo que a lei exige para os registos de saúde.\n- **Ficha de cliente e histórico de marcações:** enquanto for cliente e até 5 anos depois da última marcação, para responder a pedidos e reclamações.\n- **Vouchers:** até ao fim da validade e, depois, pelo prazo das faturas.\n- **Newsletter:** até cancelar a subscrição.\n- **Códigos de confirmação do email:** 10 minutos.\n- **Registos técnicos:** pelo período curto necessário à segurança do site."
+      "texto": "- **Faturas e documentos contabilísticos:** 10 anos, como exige a lei fiscal.\n- **Processo clínico:** pelo prazo que a lei exige para os registos de saúde.\n- **Ficha de cliente e histórico de marcações:** enquanto for cliente e até 5 anos depois da última marcação, para responder a pedidos e reclamações.\n- **Vouchers:** até ao fim da validade e, depois, pelo prazo das faturas.\n- **Newsletter:** até cancelar a subscrição.\n- **Códigos de confirmação do email:** 10 minutos.\n- **Registos técnicos:** pelo período curto necessário à segurança do site.",
+      "en": {
+        "titulo": "How long we keep the data",
+        "texto": "- **Invoices and accounting documents:** 10 years, as required by tax law.\n- **Clinical records:** for the period required by law for health records.\n- **Client record and booking history:** while you are a client and for up to 5 years after your last booking, to deal with requests and complaints.\n- **Vouchers:** until they expire and then for the same period as invoices.\n- **Newsletter:** until you unsubscribe.\n- **Email confirmation codes:** 10 minutes.\n- **Technical logs:** for the short period needed for website security."
+      }
     },
     {
       "titulo": "Os seus direitos",
-      "texto": "Pode pedir acesso, retificação, apagamento, limitação ou portabilidade dos seus dados, opor-se ao tratamento baseado em interesse legítimo e retirar o consentimento a qualquer momento, sem afetar o tratamento já feito. Basta escrever para {email}. Respondemos no prazo de um mês e podemos pedir-lhe que confirme a sua identidade.\n\nAlguns dados não podem ser apagados enquanto a lei nos obrigar a guardá-los, como as faturas e o processo clínico.\n\nPode também apresentar reclamação à Comissão Nacional de Proteção de Dados, em [www.cnpd.pt](https://www.cnpd.pt)."
+      "texto": "Pode pedir acesso, retificação, apagamento, limitação ou portabilidade dos seus dados, opor-se ao tratamento baseado em interesse legítimo e retirar o consentimento a qualquer momento, sem afetar o tratamento já feito. Basta escrever para {email}. Respondemos no prazo de um mês e podemos pedir-lhe que confirme a sua identidade.\n\nAlguns dados não podem ser apagados enquanto a lei nos obrigar a guardá-los, como as faturas e o processo clínico.\n\nPode também apresentar reclamação à Comissão Nacional de Proteção de Dados, em [www.cnpd.pt](https://www.cnpd.pt).",
+      "en": {
+        "titulo": "Your rights",
+        "texto": "You can request access to, rectification, erasure, restriction or portability of your data, object to processing based on legitimate interest and withdraw your consent at any time, without affecting processing already carried out. Simply write to {email}. We reply within one month and may ask you to confirm your identity.\n\nSome data cannot be erased while the law requires us to keep it, such as invoices and clinical records.\n\nYou can also lodge a complaint with the Portuguese Data Protection Authority (Comissão Nacional de Proteção de Dados) at [www.cnpd.pt](https://www.cnpd.pt)."
+      }
     },
     {
       "titulo": "Newsletter",
-      "texto": "Só enviamos a newsletter a quem a subscreve e marca a caixa de consentimento. Pode cancelar a subscrição a qualquer momento, pela ligação em cada email ou escrevendo para {email}."
+      "texto": "Só enviamos a newsletter a quem a subscreve e marca a caixa de consentimento. Pode cancelar a subscrição a qualquer momento, pela ligação em cada email ou escrevendo para {email}.",
+      "en": {
+        "titulo": "Newsletter",
+        "texto": "We only send the newsletter to people who subscribe and tick the consent box. You can unsubscribe at any time using the link in every email or by writing to {email}."
+      }
     },
     {
       "titulo": "Cookies",
-      "texto": "Este site não usa cookies de publicidade, de análise de visitas nem ferramentas de seguimento. Usa apenas o armazenamento técnico estritamente necessário ao backoffice da equipa.\n\nAs ligações para o Google Maps, Waze, WhatsApp e Instagram só o levam a esses serviços se carregar nelas, e aí aplicam-se as políticas de privacidade deles."
+      "texto": "Este site não usa cookies de publicidade, de análise de visitas nem ferramentas de seguimento. Usa apenas o armazenamento técnico estritamente necessário ao backoffice da equipa.\n\nAs ligações para o Google Maps, Waze, WhatsApp e Instagram só o levam a esses serviços se carregar nelas, e aí aplicam-se as políticas de privacidade deles.",
+      "en": {
+        "titulo": "Cookies",
+        "texto": "This website does not use advertising cookies, visitor analytics or tracking tools. It only uses the technical storage strictly necessary for the team’s back office.\n\nLinks to Google Maps, Waze, WhatsApp and Instagram only take you to those services if you click them, and their own privacy policies then apply."
+      }
     },
     {
       "titulo": "Segurança",
-      "texto": "Os dados viajam sempre cifrados (HTTPS). O acesso ao backoffice e às contas dos prestadores é protegido por palavra-passe e limitado à equipa. Toda a equipa clínica está sujeita a sigilo profissional."
+      "texto": "Os dados viajam sempre cifrados (HTTPS). O acesso ao backoffice e às contas dos prestadores é protegido por palavra-passe e limitado à equipa. Toda a equipa clínica está sujeita a sigilo profissional.",
+      "en": {
+        "titulo": "Security",
+        "texto": "Data always travels encrypted (HTTPS). Access to the back office and to our providers’ accounts is password-protected and restricted to the team. The entire clinical team is bound by professional confidentiality."
+      }
     },
     {
       "titulo": "Menores",
-      "texto": "As marcações e compras no site destinam-se a maiores de 18 anos. A marcação de um menor deve ser feita pelos pais ou pelo representante legal, e o menor deve vir acompanhado."
+      "texto": "As marcações e compras no site destinam-se a maiores de 18 anos. A marcação de um menor deve ser feita pelos pais ou pelo representante legal, e o menor deve vir acompanhado.",
+      "en": {
+        "titulo": "Minors",
+        "texto": "Bookings and purchases on the website are intended for people aged 18 or over. Bookings for a minor must be made by a parent or legal guardian, and the minor must be accompanied."
+      }
     },
     {
       "titulo": "Alterações a esta política",
-      "texto": "Podemos atualizar esta política. A versão em vigor está sempre nesta página, com a data da última atualização."
+      "texto": "Podemos atualizar esta política. A versão em vigor está sempre nesta página, com a data da última atualização.",
+      "en": {
+        "titulo": "Changes to this policy",
+        "texto": "We may update this policy. The current version is always on this page, with the date of the last update."
+      }
     }
-  ]
+  ],
+  "en": {
+    "titulo": "Privacy Policy",
+    "introducao": "This policy explains what personal data Oporto Medical Spa collects on the website and at the spa, what we use it for, how long we keep it and how you can exercise your rights, under the General Data Protection Regulation (GDPR) and Portuguese Law no. 58/2019. This English version is a translation provided for convenience. If there is any difference, the Portuguese version prevails."
+  }
 }

@@ -21,25 +21,56 @@
         "pergunta_seo": "Quanto custa uma sessão de Pilates clínico no Porto, no Oporto Medical Spa?",
         "resposta": "",
         "automatica": "precos_area",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "How much does a clinical Pilates session cost in Porto?",
+          "pergunta_seo": "How much does a clinical Pilates session cost in Porto, at Oporto Medical Spa?"
+        }
       },
       {
         "pergunta": "Qual a diferença entre Pilates Clínico e Pilates com Aparelhos?",
         "resposta": "O Pilates Clínico é uma sessão individual com fisioterapeuta, para postura, flexibilidade e equilíbrio. O Pilates com Aparelhos usa os aparelhos de Pilates para fortalecer o corpo, melhorar a postura e aumentar a mobilidade. A Reeducação Postural junta técnicas específicas para a postura, a flexibilidade, a respiração e o equilíbrio muscular.",
         "automatica": "",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "What is the difference between Clinical Pilates and Equipment Pilates?",
+          "resposta": "Clinical Pilates is a one-to-one session with a physiotherapist for posture, flexibility and balance. Equipment Pilates uses Pilates apparatus to strengthen the body, improve posture and increase mobility. Postural Re-education combines specific techniques for posture, flexibility, breathing and muscle balance."
+        }
       },
       {
         "pergunta": "Onde fica o Oporto Medical Spa?",
         "resposta": "",
         "automatica": "morada",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "Where is Oporto Medical Spa?"
+        }
       }
-    ]
+    ],
+    "en": {
+      "etiqueta": "Questions about Pilates",
+      "titulo": "Before you book."
+    }
   },
   "seo": {
     "titulo": "Pilates Clínico e com Aparelhos no Porto · Oporto Medical Spa",
     "descricao": "",
-    "titulo_partilha": "Pilates clínico no Porto · Oporto Medical Spa"
+    "titulo_partilha": "Pilates clínico no Porto · Oporto Medical Spa",
+    "en": {
+      "titulo": "Clinical and Equipment Pilates in Porto · Oporto Medical Spa",
+      "titulo_partilha": "Clinical Pilates in Porto · Oporto Medical Spa"
+    }
+  },
+  "en": {
+    "endereco": "clinical-pilates-porto",
+    "nome_menu": "Clinical Pilates in Porto",
+    "etiqueta": "Clinical Pilates · Porto",
+    "titulo": "Quiet strength,",
+    "titulo_destaque": "posture from the inside out.",
+    "resumo_tipo": "clinical Pilates and postural re-education",
+    "texto": "One-to-one sessions guided by a physiotherapist, on the mat or with equipment. Every exercise has a reason, and the pace is always set by your body.",
+    "tabela_titulo": "Which session",
+    "tabela_destaque": "to choose?",
+    "nota": "Do you have pain that needs to be assessed first? See [physiotherapy](/en/physiotherapy-porto/)."
   }
 }

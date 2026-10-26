@@ -16,12 +16,18 @@ export function homeDescription(m) {
   const own = m.inicio.seo.descricao;
   if (own) return clip(own);
   const r = m.relaxRange;
+  const camp = m.campaign && m.campaign.titulo ? ' ' + [m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ') + '.' : '';
+  if (m.en) {
+    const others = [...new Set(m.treatments.filter((t) => t.grupo !== 'Relaxar').map((t) => t.tipo_servico).filter(Boolean))];
+    const offer = (r ? ['relaxation massages from ' + eur(r.min)] : []).concat(others);
+    const d = 'Medical spa in ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '') + '.' + (offer.length ? ' ' + m.list(offer).replace(/^./, (c) => c.toUpperCase()) + '.' : '');
+    return fit([d + camp + ' Book online.', d + camp, d + ' Book online.', d]);
+  }
   const lower = (x) => /^Pilates/.test(x) ? x : x.charAt(0).toLowerCase() + x.slice(1);
   const others = [...new Set(m.treatments.filter((t) => t.grupo !== 'Relaxar').map((t) => lower(t.tipo_servico)))];
   const offer = (r ? ['massagens de relaxamento desde ' + eur(r.min)] : []).concat(others);
   let d = 'Medical spa no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '') + '.' +
     (offer.length ? ' ' + listPT(offer).replace(/^./, (c) => c.toUpperCase()) + '.' : '');
-  const camp = m.campaign && m.campaign.titulo ? ' ' + [m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ') + '.' : '';
   return fit([d + camp + ' Reserve online.', d + camp, d + ' Reserve online.', d]);
 }
 
@@ -34,33 +40,42 @@ export function massagesDescription(m) {
   const own = m.massagens.seo.descricao;
   if (own) return clip(own);
   const relax = m.inGroup('Relaxar');
-  const d = 'Massagens de relaxamento no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
+  const d = (m.en ? 'Relaxation massages in ' : 'Massagens de relaxamento no ') + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
   const list = relax.map((t) => t.nome + ' ' + eur(t.preco)).join(', ');
-  return fit([d + ': ' + list + '. Reserve online.', d + ': ' + list + '.', d + '. Reserve online.']);
+  const book = m.en ? ' Book online.' : ' Reserve online.';
+  return fit([d + ': ' + list + '.' + book, d + ': ' + list + '.', d + '.' + book]);
 }
 
 export function areaDescription(m, P) {
   const own = P.seo && P.seo.descricao;
   if (own) return clip(own);
   const list = m.inGroup(P.grupo);
-  const d = (P.resumo_tipo ? P.resumo_tipo.charAt(0).toUpperCase() + P.resumo_tipo.slice(1) : P.grupo) + ' no ' + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
+  const d = (P.resumo_tipo ? P.resumo_tipo.charAt(0).toUpperCase() + P.resumo_tipo.slice(1) : m.groupName(P.grupo)) + (m.en ? ' in ' : ' no ') + m.s.localidade + (m.s.zona ? ', ' + m.s.zona : '');
   const items = list.map((t) => t.nome + ' ' + eur(t.preco)).join(', ');
-  return fit([d + ': ' + items + '. Reserve online.', d + ': ' + items + '.', d + '. Reserve online.']);
+  const book = m.en ? ' Book online.' : ' Reserve online.';
+  return fit([d + ': ' + items + '.' + book, d + ': ' + items + '.', d + '.' + book]);
 }
 
+/* hreflang: com a versão inglesa pública (m.enPublic), cada página aponta para a sua par na outra língua */
 export function head(m, { title, description, path, ogTitle, ogDescription, ogImage, hreflang }) {
   const url = m.s.url + path;
   const img = abs(m, ogImage || m.s.imagem_partilha || '/img/massagem-pindas-760.webp');
+  const alt = m.altPath && m.altPath(path);
+  if (!hreflang && m.enPublic && alt) {
+    const pt = m.s.url + (m.en ? alt : path), en = m.s.url + (m.en ? path : alt);
+    hreflang = { 'pt-PT': pt, en, 'x-default': pt };
+  }
+  const indexar = m.s.indexar && (!m.en || m.enPublic);
   const tags = [
     '<meta charset="utf-8">',
-    m.s.indexar ? '<meta name="robots" content="index, follow, max-image-preview:large">' : '<meta name="robots" content="noindex, nofollow">',
+    indexar ? '<meta name="robots" content="index, follow, max-image-preview:large">' : '<meta name="robots" content="noindex, nofollow">',
     '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">',
     '<title>' + esc(title) + '</title>',
     '<meta name="description" content="' + esc(description) + '">',
     '<link rel="canonical" href="' + esc(url) + '">',
     ...Object.entries(hreflang || { 'pt-PT': url, 'x-default': url }).map(([l, u]) => '<link rel="alternate" hreflang="' + l + '" href="' + esc(u) + '">'),
     '<meta property="og:type" content="website">',
-    '<meta property="og:locale" content="pt_PT">',
+    '<meta property="og:locale" content="' + (m.en ? 'en_GB' : 'pt_PT') + '">',
     '<meta property="og:site_name" content="' + esc(m.s.nome) + '">',
     '<meta property="og:title" content="' + esc(ogTitle || title) + '">',
     '<meta property="og:description" content="' + esc(ogDescription || description) + '">',
@@ -87,7 +102,7 @@ function openingHours(m) {
 
 function offer(m, t) {
   const o = { '@type': 'Offer', itemOffered: { '@type': 'Service', name: t.nome_completo + (t.duracao ? ' (' + minutes(t.duracao) + ')' : ''), serviceType: t.tipo_servico } };
-  if (t.descricao_seo) o.itemOffered.description = t.descricao_seo + (t.duracao ? ' ' + t.duracao + ' minutos.' : '');
+  if (t.descricao_seo) o.itemOffered.description = t.descricao_seo + (t.duracao ? ' ' + t.duracao + (m.en ? ' minutes.' : ' minutos.') : '');
   if (t.preco) { o.price = price2(t.preco); o.priceCurrency = 'EUR'; }
   return o;
 }
@@ -95,7 +110,7 @@ function offer(m, t) {
 function campaignOffer(m, c = m.campaign) {
   if (!c) return null;
   const name = [c.titulo, c.titulo_destaque, c.assinatura].filter(Boolean).join(' ');
-  const o = { '@type': 'Offer', itemOffered: { '@type': 'Service', name, serviceType: c.tipo_servico || 'Massagem' } };
+  const o = { '@type': 'Offer', itemOffered: { '@type': 'Service', name, serviceType: c.tipo_servico || m.t('Massagem') } };
   const d = [m.text.plain(c.texto), c.selo && c.selo_texto ? c.selo_texto + (c.selo_numero ? ', ' + c.selo_numero : '') + '.' : ''].filter(Boolean).join(' ');
   if (d) o.itemOffered.description = d;
   if (c.preco) { o.price = price2(c.preco); o.priceCurrency = 'EUR'; }
@@ -132,16 +147,16 @@ export function business(m) {
   if (s.latitude && s.longitude) b.geo = { '@type': 'GeoCoordinates', latitude: Number(s.latitude), longitude: Number(s.longitude) };
   const same = (s.redes || []).map((r) => (typeof r === 'string' ? r : r.url)).filter((u) => /^https?:\/\//.test(u || ''));
   if (same.length) b.sameAs = same;
-  if (s.telemovel) b.contactPoint = [{ '@type': 'ContactPoint', telephone: telE164(s.telemovel), contactType: 'reservations', availableLanguage: ['pt'] }];
+  if (s.telemovel) b.contactPoint = [{ '@type': 'ContactPoint', telephone: telE164(s.telemovel), contactType: 'reservations', availableLanguage: m.enPublic ? ['pt', 'en'] : ['pt'] }];
   const offers = [...m.campaigns.map((c) => campaignOffer(m, c)), ...m.treatments.map((t) => offer(m, t))].filter(Boolean);
-  b.hasOfferCatalog = { '@type': 'OfferCatalog', name: 'Rituais e tratamentos', itemListElement: offers };
+  b.hasOfferCatalog = { '@type': 'OfferCatalog', name: m.t('Rituais e tratamentos'), itemListElement: offers };
   /* A equipa só entra nos dados estruturados quando os nomes estão confirmados */
   if (m.teamConfirmed) {
     b.employee = m.team.map((p) => {
       const o = { '@type': 'Person', name: p.nome, jobTitle: p.funcao };
       if (p.conhece && p.conhece.length) o.knowsAbout = p.conhece;
       if (p.foto) o.image = abs(m, p.foto);
-      if (p.cedula) o.hasCredential = { '@type': 'EducationalOccupationalCredential', credentialCategory: 'Cédula profissional', identifier: p.cedula, recognizedBy: { '@type': 'Organization', name: 'Ordem dos Fisioterapeutas' } };
+      if (p.cedula) o.hasCredential = { '@type': 'EducationalOccupationalCredential', credentialCategory: m.t('Cédula profissional'), identifier: p.cedula, recognizedBy: { '@type': 'Organization', name: 'Ordem dos Fisioterapeutas' } };
       return o;
     });
   }
@@ -157,8 +172,8 @@ function faqPage(id, items) {
 export function homeLD(m, faqItems) {
   const graph = [
     business(m),
-    { '@type': 'WebSite', '@id': m.s.url + '/#site', url: m.s.url + '/', name: m.s.nome, inLanguage: ['pt-PT'], publisher: { '@id': m.s.url + '/#spa' } },
-    faqPage(m.s.url + '/#faq', faqItems)
+    { '@type': 'WebSite', '@id': m.s.url + '/#site', url: m.s.url + '/', name: m.s.nome, inLanguage: m.enPublic ? ['pt-PT', 'en'] : ['pt-PT'], publisher: { '@id': m.s.url + '/#spa' } },
+    faqPage(m.s.url + m.href('/') + '#faq', faqItems)
   ].filter(Boolean);
   return ld(graph);
 }
@@ -170,16 +185,16 @@ export function massagesLD(m, faqItems, path) {
     {
       '@type': 'Service',
       '@id': url + '#servico',
-      name: 'Massagem de relaxamento no ' + m.s.localidade,
-      serviceType: 'Massagem de relaxamento',
-      description: 'Massagens manuais de relaxamento em sala privada, com ritual do chá à chegada: ' + listPT(relax.map((t) => t.nome)) + '.',
+      name: m.t('Massagem de relaxamento') + (m.en ? ' in ' : ' no ') + m.s.localidade,
+      serviceType: m.t('Massagem de relaxamento'),
+      description: m.t('Massagens manuais de relaxamento em sala privada, com ritual do chá à chegada:') + ' ' + m.list(relax.map((t) => t.nome)) + '.',
       provider: { '@id': m.s.url + '/#spa' },
       areaServed: (m.s.areas_servidas || []).slice(0, 3).map((a) => ({ '@type': /,/.test(a) ? 'Place' : 'City', name: a })),
       offers: relax.map((t) => ({ '@type': 'Offer', name: t.nome_completo + ' (' + minutes(t.duracao) + ')', price: price2(t.preco), priceCurrency: 'EUR' }))
     },
     { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Início', item: m.s.url + '/' },
-      { '@type': 'ListItem', position: 2, name: 'Massagens no ' + m.s.localidade, item: url }
+      { '@type': 'ListItem', position: 1, name: m.t('Início'), item: m.s.url + m.href('/') },
+      { '@type': 'ListItem', position: 2, name: m.pageFor('Relaxar').nome_menu, item: url }
     ] },
     faqPage(url + '#perguntas', faqItems)
   ].filter(Boolean);
@@ -194,14 +209,14 @@ export function areaLD(m, P, faqItems) {
       '@type': 'Service',
       '@id': url + '#servico',
       name: (P.nome_menu || P.titulo),
-      serviceType: P.resumo_tipo || P.grupo,
+      serviceType: P.resumo_tipo || m.groupName(P.grupo),
       description: m.text.plain(P.texto),
       provider: { '@id': m.s.url + '/#spa' },
       areaServed: (m.s.areas_servidas || []).slice(0, 3).map((a) => ({ '@type': /,/.test(a) ? 'Place' : 'City', name: a })),
       offers: list.map((t) => offer(m, t))
     },
     { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Início', item: m.s.url + '/' },
+      { '@type': 'ListItem', position: 1, name: m.t('Início'), item: m.s.url + m.href('/') },
       { '@type': 'ListItem', position: 2, name: P.nome_menu || P.titulo, item: url }
     ] },
     faqPage(url + '#perguntas', faqItems)

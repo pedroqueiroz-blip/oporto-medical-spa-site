@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 45,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Clinical Pilates",
+    "nome_completo": "Clinical Pilates",
+    "texto": "A one-to-one session with a physiotherapist, for posture, flexibility and balance.",
+    "indicado_para": "Posture, flexibility, strength and injury prevention",
+    "como_e": "One-to-one session guided by a physiotherapist",
+    "tipo_servico": "Clinical Pilates",
+    "descricao_seo": "A one-to-one session with a physiotherapist, for posture, flexibility and balance."
+  }
 }

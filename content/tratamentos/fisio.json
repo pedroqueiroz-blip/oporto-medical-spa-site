@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 45,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Physiotherapy",
+    "nome_completo": "Physiotherapy",
+    "texto": "Guided movement and specialist techniques to relieve pain, restore mobility and give you back confidence in your body. Personalised care, adapted to your needs and to the pace of your recovery.",
+    "indicado_para": "Pain, limited movement, functional recovery",
+    "como_e": "Assessment. Manual therapy and exercise",
+    "tipo_servico": "Physiotherapy",
+    "descricao_seo": "Guided movement and specialist techniques to relieve pain, restore mobility and give you back confidence in your body. Personalised care, adapted to your needs and to the pace of your recovery."
+  }
 }

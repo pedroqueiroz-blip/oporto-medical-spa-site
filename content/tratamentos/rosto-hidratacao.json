@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 50,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Deep Hydration Facial",
+    "nome_completo": "Deep Hydration Facial",
+    "texto": "Intensive hydration and antioxidant action for soft, radiant and revitalised skin.",
+    "indicado_para": "Dehydration, dull skin, lack of radiance",
+    "como_e": "Cleansing, antioxidant serum and hydrating mask",
+    "tipo_servico": "Facial treatment",
+    "descricao_seo": "Intensive hydration and antioxidant action for soft, radiant and revitalised skin."
+  }
 }

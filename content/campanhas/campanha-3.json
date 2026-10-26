@@ -17,5 +17,16 @@
   "selo_em_campanha": false,
   "titulo": "Massagem Manual",
   "preco_antigo": 74,
-  "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular."
+  "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular.",
+  "en": {
+    "etiqueta": "Offer of the month",
+    "titulo": "Ayurvedic Massage",
+    "titulo_destaque": "and Stretching",
+    "assinatura": "inspired by the Ayurvedic tradition",
+    "texto": "An Indian-inspired massage that combines flowing movements and gentle stretches to release tension, improve flexibility and restore the body’s balance.",
+    "inclui": [
+      "Gliding strokes with oil, gentle stretches and body traction."
+    ],
+    "imagem_alt": "A therapist gently stretching a woman’s neck by hand, improving mobility and relaxing the muscles"
+  }
 }

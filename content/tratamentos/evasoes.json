@@ -14,5 +14,14 @@
   "duracao": 90,
   "preco": 85,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Evasões Ritual",
+    "nome_completo": "Evasões Ritual (Geothermal Massage + Indian Head Therapy)",
+    "texto": "Hot stones and an Indian head massage for a deeply relaxing experience.",
+    "indicado_para": "Well-being and serenity. A gift to myself.",
+    "como_e": "Hot stones and head massage",
+    "tipo_servico": "Spa ritual",
+    "descricao_seo": "Hot stones and an Indian head massage for a deeply relaxing experience."
+  }
 }

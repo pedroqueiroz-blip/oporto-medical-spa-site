@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 70,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Oporto Sensations",
+    "nome_completo": "Oporto Sensations",
+    "texto": "Enveloping movements and a nourishing cream for a deep sensory relaxation experience.",
+    "indicado_para": "Stress, relaxation, sensory well-being",
+    "como_e": "Gentle movements with a nourishing cream",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "Enveloping movements and a nourishing cream for a deep sensory relaxation experience."
+  }
 }

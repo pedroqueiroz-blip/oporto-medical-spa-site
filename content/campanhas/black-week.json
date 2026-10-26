@@ -30,5 +30,24 @@
   "titulo": "Massagem Manual",
   "limite_vouchers": 25,
   "preco_antigo": 40,
-  "imagem_alt": "Massagem manual nas costas com óleo, à luz de uma vela"
+  "imagem_alt": "Massagem manual nas costas com óleo, à luz de uma vela",
+  "en": {
+    "etiqueta": "Black Week · 23 to 29 November",
+    "titulo": "Targeted",
+    "titulo_destaque": "Massage",
+    "assinatura": "Back & Neck Massage",
+    "texto": "A special opportunity to take a break, ease muscle tension and discover the care of Oporto Medical Spa.",
+    "imagem_alt": "Hands-on back massage with oil, by candlelight",
+    "inclui": [
+      "Therapeutic massage for the back, shoulders and neck"
+    ],
+    "tipo_servico": "Targeted massage",
+    "botao": "Get your Black Week voucher",
+    "condicoes": [
+      "Available to buy only from 23 to 29 November 2026.",
+      "Limited to the first 25 vouchers.",
+      "Voucher valid for 12 months from the date of purchase.",
+      "Cannot be combined with other current offers or discounts."
+    ]
+  }
 }

@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 70,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Manual Lymphatic Drainage",
+    "nome_completo": "Manual Lymphatic Drainage",
+    "texto": "A gentle massage that stimulates lymphatic circulation and helps reduce swelling and fluid retention.",
+    "indicado_para": "Heavy legs, fluid retention, after surgery",
+    "como_e": "Gentle, slow and rhythmic massage",
+    "tipo_servico": "Manual lymphatic drainage",
+    "descricao_seo": "A gentle massage that stimulates lymphatic circulation and helps reduce swelling and fluid retention."
+  }
 }

@@ -34,5 +34,15 @@
     "pos-cirurgico",
     "pos-parto",
     "postura"
-  ]
+  ],
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy. Clinical and Equipment Pilates.",
+    "bio": "An individual approach to relieving pain and improving how your body works.",
+    "credencial": "OF licence no. [[9428]]",
+    "conhece": [
+      "Physiotherapy",
+      "Clinical Pilates"
+    ]
+  }
 }

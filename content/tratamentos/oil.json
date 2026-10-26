@@ -14,5 +14,15 @@
   "duracao": 60,
   "preco": 74,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Oil & Candle",
+    "nome_completo": "Oil & Candle Massage",
+    "texto": "Deep relaxation with the warmth of a melted aromatic candle that nourishes and softens the skin.",
+    "indicado_para": "Relaxation, hydration, sensory experience",
+    "como_e": "Massage with a warm candle",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "Deep relaxation with the warmth of a melted aromatic candle that nourishes and softens the skin.",
+    "pressao": "Light to medium"
+  }
 }

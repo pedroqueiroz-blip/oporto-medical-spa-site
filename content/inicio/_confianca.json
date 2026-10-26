@@ -1,4 +1,8 @@
 {
   "confianca": "Membro da International Medical SPA Association e da Spa Industry Association. Pioneiro em Portugal no conceito de medical spa.",
-  "confianca_nota": "Medical Spa significa, antes de mais, o compromisso pelos resultados terapêuticos."
+  "confianca_nota": "Medical Spa significa, antes de mais, o compromisso pelos resultados terapêuticos.",
+  "en": {
+    "confianca": "Member of the International Medical SPA Association and the Spa Industry Association. A pioneer of the medical spa concept in Portugal.",
+    "confianca_nota": "Medical Spa means, above all, a commitment to therapeutic results."
+  }
 }

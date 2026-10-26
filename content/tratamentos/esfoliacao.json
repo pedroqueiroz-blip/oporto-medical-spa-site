@@ -14,5 +14,14 @@
   "duracao": 50,
   "preco": 49,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Body Scrub and Hydration",
+    "nome_completo": "Body Scrub and Hydration",
+    "texto": "A revitalising scrub and deep hydration for renewed, soft and velvety skin.",
+    "indicado_para": "Rough skin, uneven texture, lack of softness",
+    "como_e": "Body peel and nourishing hydration",
+    "tipo_servico": "Body treatment",
+    "descricao_seo": "A revitalising scrub and deep hydration for renewed, soft and velvety skin."
+  }
 }

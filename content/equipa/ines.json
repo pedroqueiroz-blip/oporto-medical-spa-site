@@ -28,5 +28,14 @@
     "localizada",
     "modela-360",
     "modelador"
-  ]
+  ],
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy",
+    "bio": "Specialist support for functional recovery and injury prevention.",
+    "credencial": "OF licence no. [[13403]]",
+    "conhece": [
+      "Physiotherapy"
+    ]
+  }
 }

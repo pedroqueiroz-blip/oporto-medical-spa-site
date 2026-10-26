@@ -26,5 +26,12 @@
     }
   ],
   "botao": "Ver todas no Google",
-  "nota": "As avaliações são publicadas por clientes no Google e mostradas por ordem de data, sem seleção. O Oporto Medical Spa não as edita."
+  "nota": "As avaliações são publicadas por clientes no Google e mostradas por ordem de data, sem seleção. O Oporto Medical Spa não as edita.",
+  "en": {
+    "etiqueta": "From our guests",
+    "titulo": "In the words",
+    "titulo_destaque": "of those who felt it.",
+    "botao": "See all on Google",
+    "nota": "Reviews are posted by clients on Google and shown by date, without selection. Oporto Medical Spa does not edit them. Reviews appear in the language in which they were written."
+  }
 }

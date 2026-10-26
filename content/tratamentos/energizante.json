@@ -14,5 +14,14 @@
   "duracao": 50,
   "preco": 50,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Energising",
+    "nome_completo": "Energising Massage",
+    "texto": "Vigorous strokes to stimulate the muscles and restore physical vitality.",
+    "indicado_para": "Muscle fatigue, vitality, recovery",
+    "como_e": "Vigorous, intense strokes",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "Vigorous strokes to stimulate the muscles and restore physical vitality."
+  }
 }

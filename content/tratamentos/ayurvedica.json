@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 74,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Ayurvedic & Stretching",
+    "nome_completo": "Ayurvedic Massage and Stretching",
+    "texto": "A deep massage with stretches to promote flexibility, balance and well-being.",
+    "indicado_para": "Stiffness, flexibility, balance",
+    "como_e": "Massage with stretches, gliding strokes and traction",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "A deep massage with stretches to promote flexibility, balance and well-being."
+  }
 }

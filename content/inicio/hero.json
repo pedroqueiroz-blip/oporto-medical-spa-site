@@ -7,5 +7,15 @@
   "botao": "Reservar o meu momento",
   "resumo": "O Oporto Medical Spa é um espaço exclusivo no Porto, onde a fisioterapia especializada e o relaxamento se unem para cuidar de si. Um ambiente sereno e acolhedor, com acompanhamento individualizado e tratamentos pensados para promover o seu bem-estar e equilíbrio.",
   "titulo": "Aqui o tempo",
-  "imagem_alt": "Terapeuta a massajar as costas de uma cliente com pindas de ervas aquecidas"
+  "imagem_alt": "Terapeuta a massajar as costas de uma cliente com pindas de ervas aquecidas",
+  "en": {
+    "etiqueta": "Medical spa in Porto · massage, physiotherapy and clinical Pilates",
+    "titulo": "Here, time",
+    "titulo_destaque": "slows down",
+    "resumo": "Oporto Medical Spa is an exclusive space in Porto where specialist physiotherapy and relaxation come together to take care of you. A calm, welcoming setting, with one-to-one attention and treatments designed to support your well-being and balance.",
+    "texto": "For anyone who wants to switch off from the city, recover from pain or simply enjoy pure well-being. Come and discover the art of taking care of yourself.",
+    "botao": "Book my moment",
+    "imagem_alt": "Therapist massaging a client’s back with warm herbal poultices",
+    "frase_spa": "from the Latin *sanus per aquam*, health through water"
+  }
 }
