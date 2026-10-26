@@ -1,20 +1,7 @@
 {
-  "ordem": 30,
-  "id": "geotermal",
-  "nome": "Geotermal",
-  "nome_completo": "Massagem Geotermal",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem de relaxamento",
   "texto": "Pedras quentes e movimentos relaxantes para aliviar tensões e restaurar a tranquilidade.",
-  "texto_massagens": "",
   "descricao_seo": "Pedras quentes e movimentos relaxantes para aliviar tensões e restaurar a tranquilidade.",
-  "indicado_para": "Tensão muscular, alívio e relaxamento profundo",
-  "como_e": "Pedras vulcânicas aquecidas e óleos essenciais",
-  "pressao": "",
-  "duracao": 60,
-  "preco": 70,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Geothermal",
     "nome_completo": "Geothermal Massage",
@@ -23,5 +10,18 @@
     "como_e": "Heated volcanic stones and essential oils",
     "tipo_servico": "Relaxation massage",
     "descricao_seo": "Hot stones and relaxing movements to ease tension and restore tranquillity."
-  }
+  },
+  "ordem": 30,
+  "nome_completo": "Massagem Geotermal",
+  "indicado_para": "Tensão muscular, alívio e relaxamento profundo",
+  "artigo": "a",
+  "preco": 70,
+  "duracao": 60,
+  "pressao": "A gosto",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem de relaxamento",
+  "visivel": true,
+  "como_e": "Pedras vulcânicas aquecidas e óleos essenciais",
+  "nome": "Geotermal",
+  "id": "geotermal"
 }
