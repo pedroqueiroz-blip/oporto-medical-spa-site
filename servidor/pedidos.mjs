@@ -100,9 +100,8 @@ export async function criar(corpo) {
     if (!/^\d{2}:\d{2}$/.test(hora)) throw new ErroCliente("Escolha a hora da marcação.");
     p.marcacao = { data, hora, terapeuta: limpar(corpo.terapeuta, 80) };
   } else {
-    // Só voucher digital, por agora: a caixa oferta (+6 €) ainda não tem artigo nem envio definidos.
-    if (corpo.formato === "caixa") throw new ErroCliente("A caixa oferta ainda não se compra online. Escolha o voucher digital, por email, ou fale connosco.");
-    p.voucher = { para: limpar(corpo.para, 60), de: limpar(corpo.de, 60), mensagem: limpar(corpo.mensagem, 200) };
+    // Entrega: digital (só o email) ou caixa oferta para levantar no spa, sem custo extra. O código segue sempre por email.
+    p.voucher = { para: limpar(corpo.para, 60), de: limpar(corpo.de, 60), mensagem: limpar(corpo.mensagem, 200), formato: corpo.formato === "caixa" ? "caixa" : "digital" };
   }
   return p;
 }
