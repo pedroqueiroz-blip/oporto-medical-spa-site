@@ -6,17 +6,33 @@ export const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname)
 export const PUBLIC = path.join(ROOT, 'public');
 
 const CONTENT = path.join(ROOT, 'content');
-const jsonFiles = (dir) => fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()
-  .map((f) => ({ key: f.slice(0, -5), data: JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')) }));
+const jsonFiles = (dir, lang) => fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort()
+  .map((f) => ({ key: f.slice(0, -5), data: localize(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')), lang) }));
 const byOrder = (a, b) => (Number(a.ordem) || 0) - (Number(b.ordem) || 0);
+
+/* Versão inglesa: cada ficha (e cada item das listas) pode ter um objeto «en» com os mesmos campos de texto,
+   escrito no backoffice em «English (EN)». Em inglês, o que estiver preenchido substitui o português;
+   o que ficar vazio mantém o português. Em português, o «en» é ignorado. */
+export function localize(data, lang) {
+  if (Array.isArray(data)) return data.map((x) => localize(x, lang));
+  if (!data || typeof data !== 'object') return data;
+  const { en, ...out } = data;
+  for (const k of Object.keys(out)) out[k] = localize(out[k], lang);
+  if (lang === 'en' && en && typeof en === 'object') {
+    for (const [k, v] of Object.entries(en)) {
+      if (typeof v === 'string' ? v.trim() : Array.isArray(v) ? v.some((x) => typeof x === 'string' && x.trim()) : false) out[k] = v;
+    }
+  }
+  return out;
+}
 
 /* Conteúdo do backoffice. Uma pasta (content/inicio/) junta-se num só objeto: cada ficheiro é uma
    secção com o nome do ficheiro (hero.json → hero); os que começam por _ juntam-se ao nível de cima. */
-export function readJSON(name) {
+export function readJSON(name, lang = 'pt') {
   const dir = path.join(CONTENT, name);
-  if (!fs.existsSync(dir)) return JSON.parse(fs.readFileSync(dir + '.json', 'utf8'));
+  if (!fs.existsSync(dir)) return localize(JSON.parse(fs.readFileSync(dir + '.json', 'utf8')), lang);
   const out = {};
-  for (const { key, data } of jsonFiles(dir)) {
+  for (const { key, data } of jsonFiles(dir, lang)) {
     if (key.startsWith('_')) Object.assign(out, data);
     else out[key] = data;
   }
@@ -24,14 +40,14 @@ export function readJSON(name) {
 }
 
 /* Lista com um ficheiro por item (content/tratamentos/oil.json), pela ordem do campo «ordem». */
-export function readList(name) {
-  return jsonFiles(path.join(CONTENT, name)).map((f) => ({ _id: f.key, ...f.data })).sort(byOrder);
+export function readList(name, lang = 'pt') {
+  return jsonFiles(path.join(CONTENT, name), lang).map((f) => ({ _id: f.key, ...f.data })).sort(byOrder);
 }
 
 /* Campanhas (content/campanhas/): a primeira em vigor pela ordem é a principal, as outras rodam por baixo.
    O selo dourado «Em campanha» vai para o tratamento da primeira campanha ligada que o tenha pedido. */
-export function readCampaigns(isLive) {
-  const all = readList('campanhas');
+export function readCampaigns(isLive, lang = 'pt') {
+  const all = readList('campanhas', lang);
   const [main = {}, ...extras] = [...all.filter(isLive), ...all.filter((c) => !isLive(c))];
   const badge = [main, ...extras].find((c) => c.selo_em_campanha && c.tratamento && isLive(c));
   return { ...main, extras, destaque_tratamento: badge ? badge.tratamento : null, destaque_preco: badge ? badge.preco : null };
@@ -87,9 +103,9 @@ export function hourShort(h) {
   return String(Number(hh)) + 'h' + (mm && mm !== '00' ? mm : '');
 }
 
-export function listPT(items) {
+export function listPT(items, and = 'e') {
   if (items.length <= 1) return items.join('');
-  return items.slice(0, -1).join(', ') + ' e ' + items[items.length - 1];
+  return items.slice(0, -1).join(', ') + ' ' + and + ' ' + items[items.length - 1];
 }
 
 /* Tamanho de imagens PNG, JPEG, GIF e WebP, lido do cabeçalho do ficheiro. */

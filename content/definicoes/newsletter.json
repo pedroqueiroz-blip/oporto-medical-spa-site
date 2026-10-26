@@ -6,5 +6,14 @@
   "oferta": "Novo cliente? Inscreva-se e receba 10% de desconto na primeira marcação.",
   "botao": "Subscrever",
   "consentimento": "Aceito receber a newsletter do Oporto Medical Spa.\nPosso cancelar a qualquer momento.",
-  "obrigado": "Obrigado. A próxima newsletter segue para o seu email."
+  "obrigado": "Obrigado. A próxima newsletter segue para o seu email.",
+  "en": {
+    "titulo": "News from your spa",
+    "titulo_destaque": ", once a month.",
+    "texto": "This month’s rituals, our offers and small tips for taking care of yourself, in your inbox. Never too much.",
+    "oferta": "New client? Sign up and get 10% off your first booking.",
+    "botao": "Subscribe",
+    "consentimento": "I agree to receive the Oporto Medical Spa newsletter.\nI can unsubscribe at any time.",
+    "obrigado": "Thank you. The next newsletter is on its way to your inbox."
+  }
 }

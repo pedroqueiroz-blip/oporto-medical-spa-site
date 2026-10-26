@@ -26,5 +26,18 @@
   "tratamento": "aroma",
   "duracao": 45,
   "preco": 45,
-  "preco_antigo": 65
+  "preco_antigo": 65,
+  "en": {
+    "etiqueta": "Christmas offer",
+    "titulo": "This Christmas, give",
+    "titulo_destaque": "moments of care",
+    "botao": "Discover the Christmas vouchers",
+    "condicoes": [
+      "Vouchers on sale in November and December 2026.",
+      "Cannot be combined with other offers or discounts."
+    ],
+    "texto": "**Aromatherapy Massage.** Essential oils and gentle movements to release tension and restore serenity.",
+    "imagem_alt": "Aromatic oil being poured onto a client’s back, by candlelight",
+    "tipo_servico": "Relaxation massage"
+  }
 }

@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 110,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Oporto Body & Mind Ritual",
+    "nome_completo": "Oporto Body & Mind Ritual (2 Aromatherapy Massages)",
+    "texto": "A perfect moment to share for two.",
+    "indicado_para": "Relaxing together, sharing and connection",
+    "como_e": "Two aromatherapy massages",
+    "tipo_servico": "Spa ritual for two",
+    "descricao_seo": "A perfect moment to share for two."
+  }
 }

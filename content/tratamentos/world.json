@@ -14,5 +14,14 @@
   "duracao": 75,
   "preco": 88,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "A Melhor Massagem do Mundo",
+    "nome_completo": "A Melhor Massagem do Mundo® (The Best Massage in the World)",
+    "texto": "An exclusive ritual combining massage techniques for a unique relaxation experience.",
+    "indicado_para": "An unforgettable sensory experience",
+    "como_e": "Exclusive ritual with combined techniques",
+    "tipo_servico": "Signature massage",
+    "descricao_seo": "An exclusive ritual combining massage techniques for a unique relaxation experience."
+  }
 }

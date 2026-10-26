@@ -12,7 +12,13 @@
       "botao": "Marcar ritual",
       "tratamento": "oil",
       "imagem": "/img/uploads/massagem-geotermal-pedras.jpg",
-      "imagem_alt": "Massagem com pedras quentes nas costas, junto a uma flor de lótus e uma vela"
+      "imagem_alt": "Massagem com pedras quentes nas costas, junto a uma flor de lótus e uma vela",
+      "en": {
+        "titulo": "Relax",
+        "texto": "Rituals of calm, delicate scents and a welcoming atmosphere. An hour that is yours alone.",
+        "botao": "Book a ritual",
+        "imagem_alt": "Hot stone massage on the back, beside a lotus flower and a candle"
+      }
     },
     {
       "titulo": "Recuperar",
@@ -20,7 +26,13 @@
       "botao": "Fisioterapia",
       "tratamento": "fisio",
       "imagem": "/img/uploads/massagem-pescoco-ombros-spa-porto.jpg",
-      "imagem_alt": "Terapeuta a massajar as costas de uma cliente"
+      "imagem_alt": "Terapeuta a massajar as costas de uma cliente",
+      "en": {
+        "titulo": "Recover",
+        "texto": "Relief from back pain, muscle knots and tension. Functional recovery.",
+        "botao": "Physiotherapy",
+        "imagem_alt": "Therapist massaging a client’s back"
+      }
     },
     {
       "titulo": "Fortalecer",
@@ -28,7 +40,13 @@
       "botao": "Pilates",
       "tratamento": "pilates",
       "imagem": "/img/uploads/pilates-clinico-bola-porto.jpg",
-      "imagem_alt": "Mulher a alongar-se numa bola de pilates"
+      "imagem_alt": "Mulher a alongar-se numa bola de pilates",
+      "en": {
+        "titulo": "Strengthen",
+        "texto": "Posture, flexibility and mobility. Strength and injury prevention.",
+        "botao": "Pilates",
+        "imagem_alt": "Woman doing a Pilates exercise on a small ball"
+      }
     },
     {
       "titulo": "Cuidar",
@@ -36,8 +54,22 @@
       "botao": "Ver tratamentos",
       "tratamento": "dren",
       "imagem": "/img/uploads/massagem-costas-toalha-spa-porto.jpg",
-      "imagem_alt": "pernas de uma mulher com celulite a serem massajadas"
+      "imagem_alt": "pernas de uma mulher com celulite a serem massajadas",
+      "en": {
+        "titulo": "Care",
+        "texto": "Fluid retention. Swelling. Cellulite. Skin firmness and tone.",
+        "botao": "See treatments",
+        "imagem_alt": "A woman’s legs being massaged to treat cellulite"
+      }
     }
   ],
-  "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
+  "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”",
+  "en": {
+    "etiqueta": "Take care of yourself",
+    "titulo": "A place to slow down",
+    "titulo_destaque": "and take care of yourself…",
+    "texto": "A refuge in the heart of the city, where you can slow down, leave your worries at the door and set aside some time for yourself.\nAt Oporto Medical Spa, we bring together the excellence of Western techniques and the tradition of ancient Eastern rituals to give you moments of relaxation, balance and well-being. From therapeutic care to relaxation rituals, every experience is designed to ease tension, restore mobility and take care of you.",
+    "imagem_alt": "The Oporto Medical Spa logo on the wall, between shadows of window blinds and warm light",
+    "citacao": "“Refined care, a commitment to results and a high therapeutic standard are what make us exclusive.”"
+  }
 }

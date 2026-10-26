@@ -14,5 +14,14 @@
   "duracao": 90,
   "preco": 60,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Postural Re-education",
+    "nome_completo": "Postural Re-education",
+    "texto": "Specific techniques to improve posture, flexibility, breathing and muscle balance.",
+    "indicado_para": "Postural imbalances, muscle tension and stiffness",
+    "como_e": "Clinical Pilates and manual therapy in one combined session",
+    "tipo_servico": "Physiotherapy",
+    "descricao_seo": "Specific techniques to improve posture, flexibility, breathing and muscle balance."
+  }
 }

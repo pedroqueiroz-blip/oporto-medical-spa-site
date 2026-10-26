@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 55,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Equipment Pilates",
+    "nome_completo": "Equipment Pilates",
+    "texto": "Pilates exercises on equipment to strengthen the body, improve posture and increase mobility.",
+    "indicado_para": "Muscle strength, posture and mobility",
+    "como_e": "Pilates exercises on equipment",
+    "tipo_servico": "Clinical Pilates",
+    "descricao_seo": "Pilates exercises on equipment to strengthen the body, improve posture and increase mobility."
+  }
 }

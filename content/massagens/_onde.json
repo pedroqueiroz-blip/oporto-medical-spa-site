@@ -1,5 +1,10 @@
 {
   "onde_titulo": "A dois passos",
   "onde_destaque": "da Boavista e da Foz.",
-  "onde_texto": "Fica praticamente em frente ao Pingo Doce Ramalde, na Rua São João de Brito. Pode estacionar no parque do Pingo Doce ou na rua, e a paragem de autocarro S. João de Brito (linhas 202, 208, 501 e 503) fica a 2 a 3 minutos a pé."
+  "onde_texto": "Fica praticamente em frente ao Pingo Doce Ramalde, na Rua São João de Brito. Pode estacionar no parque do Pingo Doce ou na rua, e a paragem de autocarro S. João de Brito (linhas 202, 208, 501 e 503) fica a 2 a 3 minutos a pé.",
+  "en": {
+    "onde_titulo": "Just a step away",
+    "onde_destaque": "from Boavista and Foz.",
+    "onde_texto": "We are almost opposite the Pingo Doce Ramalde supermarket, on Rua São João de Brito. You can park in the Pingo Doce car park or on the street, and the S. João de Brito bus stop (lines 202, 208, 501 and 503) is a 2 to 3-minute walk away."
+  }
 }

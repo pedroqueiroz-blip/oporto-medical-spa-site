@@ -13,5 +13,17 @@
   "titulo": "Permita-se ao luxo",
   "botao_comparar": "Conheça todos os rituais e tratamentos",
   "imagem_alt": "Mulher sentada em meditação, de costas, diante de uma janela redonda iluminada",
-  "escolher_destaque": "escolher?"
+  "escolher_destaque": "escolher?",
+  "en": {
+    "etiqueta": "Rituals and treatments",
+    "titulo": "Treat yourself to the luxury",
+    "titulo_destaque": "of taking care of yourself.",
+    "texto": "Three paths, one purpose: to take care of the whole of you. Every experience is tailored to you, in a welcoming setting where you will find time, attention and personal care.",
+    "imagem_alt": "Woman sitting in meditation, seen from behind, facing a round lit window",
+    "botao_todos": "Discover all",
+    "botao_comparar": "See all rituals and treatments",
+    "escolher_titulo": "Which treatment",
+    "escolher_destaque": "to choose?",
+    "escolher_texto": "Relax with our massages, regain mobility with physiotherapy and strengthen your body with clinical Pilates."
+  }
 }

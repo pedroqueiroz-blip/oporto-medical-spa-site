@@ -2,5 +2,11 @@
   "etiqueta": "Reservar Online",
   "titulo": "Reserve agora.",
   "titulo_destaque": "Cuide de si.",
-  "texto": "Prefere falar connosco? Ligue-nos ou contacte-nos por Whatsapp. Estamos aqui para ajudar."
+  "texto": "Prefere falar connosco? Ligue-nos ou contacte-nos por Whatsapp. Estamos aqui para ajudar.",
+  "en": {
+    "etiqueta": "Book online",
+    "titulo": "Book now.",
+    "titulo_destaque": "Take care of yourself.",
+    "texto": "Would you rather talk to us? Call us or message us on WhatsApp. We are here to help."
+  }
 }

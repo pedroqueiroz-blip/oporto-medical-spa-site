@@ -17,5 +17,15 @@
   "selo_em_campanha": true,
   "titulo": "Massagem Manual com",
   "preco_antigo": 65,
-  "imagem_alt": ""
+  "imagem_alt": "",
+  "en": {
+    "etiqueta": "Offer of the month",
+    "titulo": "Massage with",
+    "titulo_destaque": "Aromatherapy",
+    "assinatura": "Warm essential oils",
+    "texto": "A relaxing massage combining manual techniques and aromatherapy to release tension, reduce stress and bring a deep sense of well-being.",
+    "inclui": [
+      "Manual techniques, aromatherapy. Deep relaxation. Tension relief"
+    ]
+  }
 }

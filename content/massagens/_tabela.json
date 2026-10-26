@@ -2,5 +2,11 @@
   "citacao": "Terapêutica, reequilibradora ou simplesmente relaxante, a massagem é *uma fonte de prazer.* Num ambiente de total tranquilidade, deixe-se tratar com requinte e encontre um mundo só seu.",
   "escolher_titulo": "Que massagem",
   "escolher_destaque": "escolher?",
-  "nota_fisio": "Tem dor que não passa com uma massagem? Uma sessão de [fisioterapia](/fisioterapia-porto/) ({preco:fisio}, {duracao:fisio}) começa por avaliar a causa. [[a pressão de cada massagem deve ser confirmada pela equipa]]"
+  "nota_fisio": "Tem dor que não passa com uma massagem? Uma sessão de [fisioterapia](/fisioterapia-porto/) ({preco:fisio}, {duracao:fisio}) começa por avaliar a causa. [[a pressão de cada massagem deve ser confirmada pela equipa]]",
+  "en": {
+    "citacao": "Therapeutic, rebalancing or simply relaxing, massage is *a source of pleasure.* In complete tranquillity, let yourself be treated with refinement and find a world of your own.",
+    "escolher_titulo": "Which massage",
+    "escolher_destaque": "to choose?",
+    "nota_fisio": "Pain that a massage doesn’t ease? A [physiotherapy](/en/physiotherapy-porto/) session ({preco:fisio}, {duracao:fisio}) starts by assessing the cause. [[the pressure of each massage is to be confirmed by the team]]"
+  }
 }

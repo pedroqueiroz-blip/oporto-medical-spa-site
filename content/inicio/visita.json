@@ -8,19 +8,42 @@
   "passos": [
     {
       "titulo": "Chá ou infusão",
-      "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera."
+      "texto": "Chega 10 a 15 min antes. Roupão, toalhas e chinelos à sua espera.",
+      "en": {
+        "titulo": "Tea or infusion",
+        "texto": "Arrive 10 to 15 minutes early. A bathrobe, towels and slippers will be waiting for you."
+      }
     },
     {
       "titulo": "Escuta",
-      "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje."
+      "texto": "Uma conversa com a terapeuta sobre o que o corpo lhe pede hoje.",
+      "en": {
+        "titulo": "Listening",
+        "texto": "A conversation with your therapist about what your body needs today."
+      }
     },
     {
       "titulo": "O tratamento",
-      "texto": "Luz baixa, mãos especializadas e todo o tempo do mundo."
+      "texto": "Luz baixa, mãos especializadas e todo o tempo do mundo.",
+      "en": {
+        "titulo": "The treatment",
+        "texto": "Soft light, expert hands and all the time in the world."
+      }
     },
     {
       "titulo": "Repouso",
-      "texto": "Uns minutos só seus antes de voltar à cidade."
+      "texto": "Uns minutos só seus antes de voltar à cidade.",
+      "en": {
+        "titulo": "Rest",
+        "texto": "A few minutes just for you before returning to the city."
+      }
     }
-  ]
+  ],
+  "en": {
+    "etiqueta": "A Melhor Massagem do Mundo® · The Best Massage in the World",
+    "titulo": "Exclusive to",
+    "titulo_destaque": "Oporto Medical Spa.",
+    "texto": "Every detail has been designed to give you the finest sensory experience. If there were only one massage, this would be the most exclusive of all, from the first touch to the very last sigh.",
+    "imagem_alt": "A Melhor Massagem do Mundo® (The Best Massage in the World), an exclusive Oporto Medical Spa ritual"
+  }
 }

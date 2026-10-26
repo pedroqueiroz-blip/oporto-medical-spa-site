@@ -14,5 +14,14 @@
   "duracao": 90,
   "preco": 95,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Sensitive Ritual",
+    "nome_completo": "Sensitive Ritual (Aromatherapy Massage + Hydrating Facial)",
+    "texto": "A ritual combining an essential oil massage with a hydrating facial to nourish the skin and relax the senses.",
+    "indicado_para": "Relaxation, facial hydration, radiance",
+    "como_e": "Aromatherapy and hydrating facial",
+    "tipo_servico": "Spa ritual",
+    "descricao_seo": "A ritual combining an essential oil massage with a hydrating facial to nourish the skin and relax the senses."
+  }
 }

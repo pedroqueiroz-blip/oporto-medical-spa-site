@@ -14,7 +14,7 @@
   if (voucherEl && window.PMS) {
     var count = 0, sum = 0, cart = $('#cart');
     voucher = PMS.mountVoucher(voucherEl, { onBuy: function (v) {
-      count++; sum += v; cart.hidden = false; cart.textContent = 'Carrinho · ' + count + ' · ' + PMS.eur(sum);
+      count++; sum += v; cart.hidden = false; cart.textContent = (document.documentElement.lang === 'en' ? 'Cart · ' : 'Carrinho · ') + count + ' · ' + PMS.eur(sum);
     } });
   }
   document.addEventListener('click', function (e) {
@@ -65,7 +65,7 @@
       cur = (i + slides.length) % slides.length;
       slides.forEach(function (s, k) { s.classList.toggle('is-on', k === cur); s.setAttribute('aria-hidden', k === cur ? 'false' : 'true'); s.inert = k !== cur; });
       dots.forEach(function (d, k) { d.classList.toggle('is-on', k === cur); if (k === cur) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current'); });
-      if (count) count.textContent = (cur + 1) + ' de ' + slides.length;
+      if (count) count.textContent = (cur + 1) + ' ' + (count.getAttribute('data-of') || 'de') + ' ' + slides.length;
     }
     function start() { stop(); if (!still && !paused) timer = setInterval(function () { show(cur + 1); }, 3000); }
     function stop() { if (timer) clearInterval(timer); timer = null; }

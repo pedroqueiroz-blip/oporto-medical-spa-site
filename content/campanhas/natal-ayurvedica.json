@@ -26,5 +26,18 @@
   "tratamento": "ayurvedica",
   "duracao": 60,
   "preco": 49,
-  "preco_antigo": 74
+  "preco_antigo": 74,
+  "en": {
+    "etiqueta": "Christmas offer",
+    "titulo": "This Christmas, give",
+    "titulo_destaque": "moments of care",
+    "botao": "Discover the Christmas vouchers",
+    "condicoes": [
+      "Vouchers on sale in November and December 2026.",
+      "Cannot be combined with other offers or discounts."
+    ],
+    "texto": "**Ayurvedic Massage and Stretching.** A deep massage with stretches to promote flexibility, balance and well-being.",
+    "imagem_alt": "Therapist stretching a client’s neck during an Ayurvedic massage",
+    "tipo_servico": "Relaxation massage"
+  }
 }

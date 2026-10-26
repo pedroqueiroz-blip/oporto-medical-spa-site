@@ -13,5 +13,9 @@
   "tratamento": "",
   "duracao": null,
   "preco": null,
-  "selo_em_campanha": false
+  "selo_em_campanha": false,
+  "en": {
+    "etiqueta": "Offer of the month",
+    "titulo": "Fourth offer"
+  }
 }

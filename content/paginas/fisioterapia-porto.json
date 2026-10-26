@@ -21,38 +21,79 @@
         "pergunta_seo": "Quanto custa uma sessão de fisioterapia no Porto, no Oporto Medical Spa?",
         "resposta": "",
         "automatica": "precos_area",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "How much does a physiotherapy session cost in Porto?",
+          "pergunta_seo": "How much does a physiotherapy session cost in Porto, at Oporto Medical Spa?"
+        }
       },
       {
         "pergunta": "Como é a primeira sessão?",
         "resposta": "A fisioterapeuta começa por avaliar e indicar a melhor forma de cuidar da sua saúde. A terapêutica de reabilitação começa logo a seguir, na mesma sessão.",
         "automatica": "",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "What happens in the first session?",
+          "resposta": "Your physiotherapist starts by assessing you and recommending the best way to look after your health. Rehabilitation treatment begins straight afterwards, in the same session."
+        }
       },
       {
         "pergunta": "Preciso de prescrição médica para fazer fisioterapia?",
         "pergunta_seo": "Preciso de prescrição médica para fazer fisioterapia no Porto?",
         "resposta": "Não. A fisioterapia pode ser iniciada sem prescrição médica. Para reembolso através de seguros de saúde, é necessário apresentar prescrição médica anterior ao início dos tratamentos.",
         "automatica": "",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "Do I need a doctor’s referral for physiotherapy?",
+          "pergunta_seo": "Do I need a doctor’s referral for physiotherapy in Porto?",
+          "resposta": "No. Physiotherapy can begin without a medical prescription. To claim reimbursement from health insurance, you need a medical prescription issued before the treatments begin."
+        }
       },
       {
         "pergunta": "Como posso pedir reembolso dos tratamentos de fisioterapia?",
         "resposta": "Geralmente precisa dos seguintes documentos: prescrição médica, fatura e relatório do fisioterapeuta. Confirme os requisitos com a sua seguradora ou subsistema de saúde.",
         "automatica": "",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "How can I claim reimbursement for physiotherapy?",
+          "resposta": "You will usually need the following documents: a medical prescription, the invoice and a report from the physiotherapist. Please check the requirements with your insurer or health scheme."
+        }
       },
       {
         "pergunta": "Onde fica o Oporto Medical Spa?",
         "resposta": "",
         "automatica": "morada",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "Where is Oporto Medical Spa?"
+        }
       }
-    ]
+    ],
+    "en": {
+      "etiqueta": "Questions about physiotherapy",
+      "titulo": "Before you book."
+    }
   },
   "seo": {
     "titulo": "Fisioterapia e Osteopatia no Porto · Oporto Medical Spa",
     "descricao": "",
-    "titulo_partilha": "Fisioterapia no Porto · Oporto Medical Spa"
+    "titulo_partilha": "Fisioterapia no Porto · Oporto Medical Spa",
+    "en": {
+      "titulo": "Physiotherapy and Osteopathy in Porto · Oporto Medical Spa",
+      "titulo_partilha": "Physiotherapy in Porto · Oporto Medical Spa"
+    }
+  },
+  "en": {
+    "endereco": "physiotherapy-porto",
+    "nome_menu": "Physiotherapy in Porto",
+    "etiqueta": "Physiotherapy and osteopathy · Porto",
+    "titulo": "Treating the cause,",
+    "titulo_destaque": "not just the pain.",
+    "resumo_tipo": "physiotherapy and osteopathy",
+    "texto": "Every session begins with an assessment. Your physiotherapist listens to what your body is telling them, looks for the source of the discomfort and only then chooses the right hands-on techniques, exercises and pace for you.",
+    "citacao": "We are a medical spa: *health and well-being under one roof*, with the time and quiet that recovery needs.",
+    "tabela_titulo": "Which treatment",
+    "tabela_destaque": "to choose?",
+    "nota": "Would you rather start by relaxing? See our [relaxation massages](/en/massages-porto/)."
   }
 }

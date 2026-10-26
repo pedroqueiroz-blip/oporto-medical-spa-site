@@ -2,16 +2,25 @@
    preços, intervalos, horário, respostas automáticas e a campanha em vigor. */
 import { execFileSync } from 'node:child_process';
 import { readJSON, readList, readCampaigns, makeText, eur, minutes, telHref, hourShort, listPT, esc } from './lib.mjs';
+import { traducao } from './ingles.mjs';
 
 const GROUP_AREA = { Recuperar: 'Fisioterapia', Fortalecer: 'Pilates e postura', Cuidar: 'Corpo', Relaxar: 'Relaxamento' };
 
-export function loadModel(today = new Date()) {
-  const s = readJSON('definicoes');
-  const inicio = readJSON('inicio');
-  const massagens = readJSON('massagens');
-  const treatments = readList('tratamentos').filter((t) => t.visivel !== false);
+/* lang 'en' = versão inglesa: os textos com «en» preenchido no backoffice, as frases automáticas e os
+   textos fixos do site (src/ingles.mjs) em inglês, e as páginas por baixo de /en/. */
+export function loadModel(today = new Date(), lang = 'pt') {
+  const en = lang === 'en';
+  const t = traducao(lang);
+  const base = en ? '/en' : '';
+  const s = readJSON('definicoes', lang);
+  const inicio = readJSON('inicio', lang);
+  const massagens = readJSON('massagens', lang);
+  const treatments = readList('tratamentos', lang).filter((t) => t.visivel !== false);
   /* Retrato desligado no backoffice (mostrar_foto) = como se não houvesse foto: o cartão mostra só o texto */
-  const team = readList('equipa').map((p) => (p.mostrar_foto === false ? { ...p, foto: '' } : p));
+  const team = readList('equipa', lang).map((p) => (p.mostrar_foto === false ? { ...p, foto: '' } : p));
+  const list = (items) => listPT(items, en ? 'and' : 'e');
+  /* Nome das áreas no site (o valor guardado, «Relaxar»…, continua a ser a chave) */
+  const groupName = (g) => t(g);
 
   s.url = String(s.url || '').replace(/\/+$/, '');
   const byId = (id) => treatments.find((t) => t.id === id);
@@ -25,9 +34,14 @@ export function loadModel(today = new Date()) {
   }
 
   const h = s.horario || {};
-  const hoursShort = 'Seg a Sex ' + hourShort(h.semana_abre) + '–' + hourShort(h.semana_fecha) +
+  const hr = en ? (x) => String(x || '').replace(/^0/, '') : hourShort;
+  const hoursShort = en
+    ? 'Mon–Fri ' + hr(h.semana_abre) + '–' + hr(h.semana_fecha) + (h.sabado_aberto ? ' · Sat ' + hr(h.sabado_abre) + '–' + hr(h.sabado_fecha) : '')
+    : 'Seg a Sex ' + hourShort(h.semana_abre) + '–' + hourShort(h.semana_fecha) +
     (h.sabado_aberto ? ' · Sáb ' + hourShort(h.sabado_abre) + '–' + hourShort(h.sabado_fecha) : '');
-  const hoursLong = 'Abre de segunda a sexta das ' + hourShort(h.semana_abre) + ' às ' + hourShort(h.semana_fecha) +
+  const hoursLong = en
+    ? 'Open Monday to Friday from ' + hr(h.semana_abre) + ' to ' + hr(h.semana_fecha) + (h.sabado_aberto ? ' and on Saturdays from ' + hr(h.sabado_abre) + ' to ' + hr(h.sabado_fecha) : '') + '.'
+    : 'Abre de segunda a sexta das ' + hourShort(h.semana_abre) + ' às ' + hourShort(h.semana_fecha) +
     (h.sabado_aberto ? ' e ao sábado das ' + hourShort(h.sabado_abre) + ' às ' + hourShort(h.sabado_fecha) : '') + '.';
   const addressLine = s.rua + ', ' + s.codigo_postal + ' ' + s.localidade;
 
@@ -90,9 +104,47 @@ export function loadModel(today = new Date()) {
     }
     return '';
   }
+  /* As mesmas respostas automáticas, em inglês */
+  function autoEN(kind, grupo) {
+    const relax = inGroup('Relaxar');
+    const rec = inGroup('Recuperar'), fort = inGroup('Fortalecer');
+    switch (kind) {
+      case 'morada':
+        return 'At ' + addressLine + (s.zona ? ', in the west of the city, ' + s.zona : '') + '. ' + hoursLong;
+      case 'precos_relaxar': {
+        if (!relax.length) return '';
+        const sorted = [...relax].sort((a, b) => a.preco - b.preco);
+        const lo = sorted[0], hi = sorted[sorted.length - 1];
+        let out = 'Relaxation massages cost between ' + eur(lo.preco) + ' (' + lo.nome + ', ' + minutes(lo.duracao) + ') and ' +
+          eur(hi.preco) + ' (' + hi.nome + ', ' + minutes(hi.duracao) + ').';
+        const mid = sorted.slice(1, -1);
+        if (mid.length) out += ' ' + mid.map((t) => 'The ' + t.nome_completo + ' costs ' + eur(t.preco) + ' (' + minutes(t.duracao) + ')').join('. ') + '.';
+        return out;
+      }
+      case 'intervalo_relaxar': {
+        const p = range(relax, 'preco'), d = range(relax, 'duracao');
+        if (!p) return '';
+        return 'At ' + s.nome + ', ' + (p.min === p.max ? eur(p.min) : 'between ' + eur(p.min) + ' and ' + eur(p.max)) +
+          ', depending on the ritual and its length (' + (d.min === d.max ? minutes(d.min) : d.min + ' or ' + d.max + ' minutes') + ').';
+      }
+      case 'precos_area': {
+        const all = inGroup(grupo);
+        if (!all.length) return '';
+        return 'At ' + s.nome + ': ' + list(all.map((t) => t.nome_completo + ', ' + eur(t.preco) + ' (' + minutes(t.duracao) + ')')) + '.';
+      }
+      case 'precos_fisio': {
+        const all = rec.concat(fort);
+        if (!all.length) return '';
+        const [first, ...rest] = all;
+        return 'A ' + first.nome_completo + ' session costs ' + eur(first.preco) + ' and lasts ' + first.duracao + ' minutes.' +
+          (rest.length ? ' ' + cap(list(rest.map((t, i) => t.nome_completo + (i === 0 ? ' costs ' : ' ') + eur(t.preco) + ' (' + minutes(t.duracao) + ')'))) + '.' : '');
+      }
+    }
+    return '';
+  }
   function faq(list, grupo) {
     return (list || []).map((q) => {
-      const base = q.automatica ? auto(q.automatica, grupo) : q.resposta;
+      const base = q.automatica ? (en ? autoEN : auto)(q.automatica, grupo) : q.resposta;
       const full = [base, q.acrescento].filter(Boolean).join(' ');
       return { q: q.pergunta, qSeo: q.pergunta_seo || q.pergunta, html: text.inline(full), plain: text.plain(base) && !text.hasTbc(base) ? text.plain(base) : '' };
     }).filter((x) => x.html);
@@ -102,6 +154,18 @@ export function loadModel(today = new Date()) {
   function priceAnswer() {
     const relax = inGroup('Relaxar'), p = range(relax, 'preco'), d = range(relax, 'duracao');
     const parts = [];
+    if (en) {
+      if (p) parts.push('Relaxation massages cost ' + (p.min === p.max ? eur(p.min) : 'between ' + eur(p.min) + ' and ' + eur(p.max)) +
+        ' and last ' + (d.min === d.max ? d.min + ' minutes' : d.min + ' to ' + d.max + ' minutes') + '.');
+      const AREA_EN = { Recuperar: 'physiotherapy and osteopathy', Fortalecer: 'Pilates and postural re-education', Cuidar: 'body' };
+      const bitsEN = groups.filter((g) => g !== 'Relaxar').map((g) => {
+        const pr = range(inGroup(g), 'preco');
+        return pr ? (AREA_EN[g] || t(g).toLowerCase()) + ' treatments cost ' + (pr.min === pr.max ? eur(pr.min) : 'between ' + eur(pr.min) + ' and ' + eur(pr.max)) + ' per session' : '';
+      }).filter(Boolean);
+      if (bitsEN.length) parts.push(cap(list(bitsEN)) + '.');
+      parts.push('All can be booked online, choosing your therapist and time.');
+      return parts.join(' ');
+    }
     if (p) parts.push('As massagens de relaxamento custam ' + (p.min === p.max ? eur(p.min) : 'entre ' + eur(p.min) + ' e ' + eur(p.max)) +
       ' e duram ' + (d.min === d.max ? d.min + ' minutos' : d.min + ' a ' + d.max + ' minutos') + '.');
     const bits = [];
@@ -119,7 +183,7 @@ export function loadModel(today = new Date()) {
      o site reconstrói-se todos os dias de madrugada para as campanhas entrarem e saírem sozinhas) */
   const day = today.toLocaleDateString('sv-SE', { timeZone: 'Europe/Lisbon' });
   const live = (c) => c && c.ativa && (!c.inicio || c.inicio.slice(0, 10) <= day) && (!c.fim || c.fim.slice(0, 10) >= day);
-  const camp = readCampaigns(live);
+  const camp = readCampaigns(live, lang);
   const campaignOn = camp.ativa && (!camp.inicio || camp.inicio.slice(0, 10) <= day) && (!camp.fim || camp.fim.slice(0, 10) >= day);
   const campTreatment = camp.tratamento ? byId(camp.tratamento) : null;
 
@@ -147,15 +211,16 @@ export function loadModel(today = new Date()) {
   const changed = lastChange();
 
   /* Páginas por área (fisioterapia, Pilates, drenagem…); a área Relaxar tem a página de massagens */
-  const areaPages = readList('paginas').filter((p) => p.endereco && p.grupo && inGroup(p.grupo).length)
-    .map((p) => ({ ...p, path: '/' + p.endereco.replace(/^\/+|\/+$/g, '') + '/' }));
-  const pageFor = (g) => g === 'Relaxar' ? { path: '/massagens-porto/', nome_menu: 'Massagens no ' + s.localidade } : areaPages.find((p) => p.grupo === g) || null;
+  const areaPages = readList('paginas', lang).filter((p) => p.endereco && p.grupo && inGroup(p.grupo).length)
+    .map((p) => ({ ...p, path: base + '/' + p.endereco.replace(/^\/+|\/+$/g, '') + '/' }));
+  const pageFor = (g) => g === 'Relaxar' ? { path: en ? '/en/massages-porto/' : '/massagens-porto/', nome_menu: (en ? 'Massages in ' : 'Massagens no ') + s.localidade } : areaPages.find((p) => p.grupo === g) || null;
 
   const relaxRange = range(inGroup('Relaxar'), 'preco');
   const allRange = range(treatments, 'preco');
   const teamConfirmed = team.length > 0 && team.every((p) => p.confirmado);
 
   return {
+    lang, en, t, base, href: (p) => base + p, groupName, list,
     s, day, changed, areaPages, pageFor, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };

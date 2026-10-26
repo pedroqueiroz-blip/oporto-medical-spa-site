@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 90,
   "visivel": true,
-  "artigo": "o"
+  "artigo": "o",
+  "en": {
+    "nome": "Modela 360 Protocol",
+    "nome_completo": "Modela 360º Protocol",
+    "texto": "An exclusive protocol combining acoustic wave therapy and body-contouring massage to improve the appearance of cellulite and define your silhouette.",
+    "indicado_para": "Cellulite, tissue quality and silhouette",
+    "como_e": "Acoustic waves and anti-cellulite massage",
+    "tipo_servico": "Body treatment",
+    "descricao_seo": "An exclusive protocol combining acoustic wave therapy and body-contouring massage to improve the appearance of cellulite and define your silhouette."
+  }
 }

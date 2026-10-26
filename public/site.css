@@ -333,6 +333,7 @@ body { margin: 0; }
 .person { display: flex; flex-direction: column; gap: 6px; }
 .person__ph { position: relative; aspect-ratio: 4 / 5; border-radius: 200px 200px 0 0; margin-bottom: 16px; display: grid; place-items: end center; padding-bottom: 18px; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; color: rgba(232, 220, 200, .6); }
 .person__role { margin: 0; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--flame); }
+:lang(en) .person__role { letter-spacing: .2em; hyphens: auto; }
 .person h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 28px; }
 .person p { margin: 0; font-size: 14px; color: var(--oat); }
 .person .cred { font-size: 12px; }

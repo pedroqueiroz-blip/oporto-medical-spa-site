@@ -14,5 +14,14 @@
   "duracao": 60,
   "preco": 45,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Osteopathy",
+    "nome_completo": "Osteopathy",
+    "texto": "Gentle, precise manual techniques that aim to improve mobility, relieve tension and restore the body’s balance. A holistic approach that respects your body and its individual needs.",
+    "indicado_para": "Muscle tension, discomfort and reduced mobility",
+    "como_e": "Individual manual techniques to improve mobility and body balance",
+    "tipo_servico": "Osteopathy",
+    "descricao_seo": "Gentle, precise manual techniques that aim to improve mobility, relieve tension and restore the body’s balance. A holistic approach that respects your body and its individual needs."
+  }
 }

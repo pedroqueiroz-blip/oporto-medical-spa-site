@@ -21,25 +21,56 @@
         "pergunta_seo": "Quanto custa uma drenagem linfática manual no Porto, no Oporto Medical Spa?",
         "resposta": "",
         "automatica": "precos_area",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "How much does lymphatic drainage cost in Porto?",
+          "pergunta_seo": "How much does manual lymphatic drainage cost in Porto, at Oporto Medical Spa?"
+        }
       },
       {
         "pergunta": "Para quem é a drenagem linfática manual?",
         "resposta": "É uma massagem suave que estimula a circulação linfática e ajuda a reduzir o inchaço e a retenção de líquidos. Está indicada para pernas pesadas, retenção de líquidos e recuperação pós-operatória.",
         "automatica": "",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "Who is manual lymphatic drainage for?",
+          "resposta": "It is a gentle massage that stimulates lymphatic circulation and helps reduce swelling and fluid retention. It is recommended for heavy legs, fluid retention and recovery after surgery."
+        }
       },
       {
         "pergunta": "Onde fica o Oporto Medical Spa?",
         "resposta": "",
         "automatica": "morada",
-        "acrescento": ""
+        "acrescento": "",
+        "en": {
+          "pergunta": "Where is Oporto Medical Spa?"
+        }
       }
-    ]
+    ],
+    "en": {
+      "etiqueta": "Questions about lymphatic drainage",
+      "titulo": "Before you book."
+    }
   },
   "seo": {
     "titulo": "Drenagem Linfática Manual no Porto · Oporto Medical Spa",
     "descricao": "",
-    "titulo_partilha": "Drenagem linfática no Porto · Oporto Medical Spa"
+    "titulo_partilha": "Drenagem linfática no Porto · Oporto Medical Spa",
+    "en": {
+      "titulo": "Manual Lymphatic Drainage in Porto · Oporto Medical Spa",
+      "titulo_partilha": "Lymphatic drainage in Porto · Oporto Medical Spa"
+    }
+  },
+  "en": {
+    "endereco": "lymphatic-drainage-porto",
+    "nome_menu": "Lymphatic drainage in Porto",
+    "etiqueta": "Lymphatic drainage and body · Porto",
+    "titulo": "Lightness",
+    "titulo_destaque": "you can feel.",
+    "resumo_tipo": "manual lymphatic drainage and body",
+    "texto": "From the slow, rhythmic touch of lymphatic drainage to the firm movements of the body-contouring treatment, every protocol is performed by hand, in a private room, at your body’s pace.",
+    "tabela_titulo": "Which treatment",
+    "tabela_destaque": "to choose?",
+    "nota": "Looking for a moment just to relax? See our [relaxation massages](/en/massages-porto/)."
   }
 }

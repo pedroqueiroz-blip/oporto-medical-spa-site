@@ -4,5 +4,13 @@
   "titulo_destaque": "só sua.",
   "texto": "Cada massagem é realizada manualmente, por terapeutas especializadas que personalizam cada experiência de acordo com as necessidades do seu corpo, num cuidado exclusivo pensado para si.\n",
   "botao": "Reservar massagem",
-  "botao_oferecer": "Oferecer uma massagem"
+  "botao_oferecer": "Oferecer uma massagem",
+  "en": {
+    "etiqueta": "Relaxation massage · Porto",
+    "titulo": "An hour",
+    "titulo_destaque": "all your own.",
+    "texto": "Every massage is performed by hand by specialist therapists, who tailor each experience to what your body needs, in exclusive care designed just for you.",
+    "botao": "Book a massage",
+    "botao_oferecer": "Give a massage"
+  }
 }

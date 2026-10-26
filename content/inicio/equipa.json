@@ -2,5 +2,11 @@
   "etiqueta": "Quem cuida de si",
   "titulo": "Mãos que escutam,",
   "titulo_destaque": "mãos que cuidam.",
-  "texto": "Fisioterapeutas com cédula profissional especializadas na arte de bem receber, na arte de bem cuidar. Escolha a profissional da sua preferência."
+  "texto": "Fisioterapeutas com cédula profissional especializadas na arte de bem receber, na arte de bem cuidar. Escolha a profissional da sua preferência.",
+  "en": {
+    "etiqueta": "Who takes care of you",
+    "titulo": "Hands that listen,",
+    "titulo_destaque": "hands that care.",
+    "texto": "Licensed physiotherapists who have mastered the art of welcoming and the art of caring. Choose the therapist you prefer."
+  }
 }

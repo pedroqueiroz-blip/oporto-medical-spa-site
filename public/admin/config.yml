@@ -485,6 +485,7 @@ collections:
           - { name: redes, label: "Perfis (Google Business, Instagram, Facebook)", widget: list, required: false, field: { name: url, label: Endereço, widget: string }, hint: 'Ligam o site aos perfis oficiais no Google.' }
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: indexar, label: Site visível no Google, widget: boolean, required: false, default: false, hint: 'Deixe desligado até ao lançamento. Pode guardar e publicar alterações com isto desligado: o site atualiza-se na mesma e continua escondido do Google.' }
+          - { name: ingles, label: Versão inglesa no site (botão EN), widget: boolean, required: false, default: false, hint: 'Liga o botão EN no topo e põe as páginas /en/ no Google. Deixe desligado até os textos em inglês estarem revistos; nas pré-visualizações o botão EN funciona sempre. Os textos em inglês escrevem-se no bloco «English (EN)» de cada ficha.' }
 
   - name: legais
     label: Privacidade e termos

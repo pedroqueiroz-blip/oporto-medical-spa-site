@@ -12,5 +12,8 @@
   "pais": "PT",
   "zona": "entre a Boavista e a Foz",
   "latitude": "",
-  "longitude": ""
+  "longitude": "",
+  "en": {
+    "zona": "between Boavista and Foz"
+  }
 }

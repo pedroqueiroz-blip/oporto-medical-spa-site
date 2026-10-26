@@ -14,5 +14,14 @@
   "duracao": 30,
   "preco": 35,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Indian Head Therapy",
+    "nome_completo": "Indian Head Therapy",
+    "texto": "An Indian scalp massage to relieve tension and stress and promote mental calm.",
+    "indicado_para": "Headaches, mental fatigue",
+    "como_e": "Gentle touch and pressure",
+    "tipo_servico": "Relaxation massage",
+    "descricao_seo": "An Indian scalp massage to relieve tension and stress and promote mental calm."
+  }
 }

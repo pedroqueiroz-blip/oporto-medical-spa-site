@@ -14,5 +14,14 @@
   "duracao": 45,
   "preco": 40,
   "visivel": true,
-  "artigo": "a"
+  "artigo": "a",
+  "en": {
+    "nome": "Targeted",
+    "nome_completo": "Targeted Massage",
+    "texto": "Relief from muscle tension in the back, neck and shoulders through specific techniques.",
+    "indicado_para": "Tension in the back, neck and shoulders",
+    "como_e": "Specific techniques on the area of tension",
+    "tipo_servico": "Targeted massage",
+    "descricao_seo": "Relief from muscle tension in the back, neck and shoulders through specific techniques."
+  }
 }
