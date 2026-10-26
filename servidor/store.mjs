@@ -57,4 +57,5 @@ export async function store(name) {
 export const STORES = {
   pedidos: "pedidos",   // marcações e vouchers comprados
   codigos: "codigos",   // vouchers emitidos e códigos de 10% da newsletter
+  verificacoes: "verificacoes", // códigos de verificação do email antes da marcação
 };

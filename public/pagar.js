@@ -1,6 +1,7 @@
 /* Oporto Medical Spa: passo de pagamento das marcações e dos vouchers.
    OMS_PAGAR.abrir(root, pedido, { voltar }) mostra o resumo, o código (VIP, 10% da newsletter ou voucher),
    o NIF e o meio de pagamento (MB WAY, Multibanco, cartão). O valor é sempre calculado no servidor (/api).
+   Nas marcações, OMS_PAGAR.verificar(root, pedido, opts) confirma antes o email com um código de 6 dígitos.
    Na página /pagamento/ (regresso do cartão), OMS_PAGAR.estado(root, numero, token) mostra como ficou. */
 (function () {
   'use strict';
@@ -68,7 +69,7 @@
 
   function abrir(root, pedido, opts) {
     opts = opts || {};
-    var st = { codigo: pedido.codigo || '', conta: null, metodo: 'mb_way', telemovel: pedido.telefone || '', nif: '', nome: pedido.nome || '', email: pedido.email || '', telefone: pedido.telefone || '', aEnviar: false };
+    var st = { codigo: pedido.codigo || '', conta: null, metodo: 'mb_way', telemovel: pedido.telefone || '', nif: pedido.nif || '', nome: pedido.nome || '', email: pedido.email || '', telefone: pedido.telefone || '', aEnviar: false };
     var pedeDados = !(pedido.nome && pedido.email);
 
     function total() { return st.conta ? st.conta.total : null; }
@@ -93,7 +94,7 @@
             return '<button type="button" data-metodo="' + m[0] + '" aria-pressed="' + (st.metodo === m[0]) + '">' + m[1] + '</button>';
           }).join('') + '</div></div>' +
           (st.metodo === 'mb_way' ? '<label class="field"><span>Telemóvel MB WAY</span><input id="pg-tel" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(st.telemovel) + '"></label>' : '') +
-          '<label class="field"><span>NIF na fatura (opcional)</span><input id="pg-nif" inputmode="numeric" maxlength="9" value="' + esc(st.nif) + '"></label>') +
+          (pedido.tipo === 'marcacao' ? '' : '<label class="field"><span>NIF na fatura (opcional)</span><input id="pg-nif" inputmode="numeric" maxlength="9" value="' + esc(st.nif) + '"></label>')) +
         '<p class="bk-note pg-aceito">Ao ' + (gratis ? 'confirmar' : 'pagar') + ', aceita os <a href="/termos/" target="_blank" rel="noopener">Termos e Condições</a> e a <a href="/privacidade/" target="_blank" rel="noopener">Política de Privacidade</a>.</p>' +
         '<p class="bk-error" role="alert"' + (erro ? '' : ' hidden') + '>' + esc(erro || '') + '</p>' +
         '<button type="submit" class="btn btn--primary"' + (t == null || st.aEnviar ? ' disabled' : '') + '>' +
@@ -150,6 +151,54 @@
     calcular(st.codigo.trim(), opts.codigo);
   }
 
+  /* Marcações: o email confirma-se com um código de 6 dígitos antes de pagar. Depois segue para abrir(). */
+  function verificar(root, pedido, opts) {
+    opts = opts || {};
+    var st = { codigo: '', enviado: false, teste: '', aEnviar: false };
+
+    function render(erro) {
+      root.innerHTML = '<div class="bk-panel bk-panel--confirm pg"><div class="bk-summary">' +
+        '<p class="bk-summary__eyebrow">Confirmar o email</p>' +
+        '<p class="bk-summary__title">' + esc(pedido.email) + '</p>' +
+        '<p class="bk-note">' + (st.enviado ? 'Enviámos um código de 6 dígitos para este email. Veja também a pasta de spam.' : 'A enviar o código…') + '</p>' +
+        (st.teste ? '<p class="bk-note">Pré-visualização sem envio de emails: o código é <b>' + esc(st.teste) + '</b>.</p>' : '') + '</div>' +
+        '<form class="bk-form" novalidate>' +
+        '<label class="field"><span>Código do email</span><input id="vf-codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value="' + esc(st.codigo) + '"></label>' +
+        '<p class="bk-error" role="alert"' + (erro ? '' : ' hidden') + '>' + esc(erro || '') + '</p>' +
+        '<button type="submit" class="btn btn--primary"' + (st.aEnviar || !st.enviado ? ' disabled' : '') + '>' + (st.aEnviar ? 'Um momento…' : 'Confirmar') + '</button>' +
+        '<button type="button" class="btn btn--ghost" data-reenviar>Enviar outro código</button>' +
+        (opts.voltar ? '<button type="button" class="btn btn--ghost" data-voltar>Voltar</button>' : '') +
+        '</form></div>';
+      var i = root.querySelector('#vf-codigo'); if (i && st.enviado && !erro) i.focus();
+    }
+    function enviar() {
+      return api('/verificacao', { email: pedido.email })
+        .then(function (r) { st.enviado = true; st.teste = r.codigoTeste || ''; render(); })
+        .catch(function (e) { st.enviado = true; render(e.message); });
+    }
+
+    var h = root._pg = {};
+    h.input = function (e) { if (e.target.id === 'vf-codigo') st.codigo = e.target.value.replace(/\D/g, ''); };
+    h.click = function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.hasAttribute('data-reenviar')) enviar();
+      else if (b.hasAttribute('data-voltar')) opts.voltar();
+    };
+    h.submit = function (e) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      if (st.codigo.length !== 6) return render('Escreva os 6 dígitos do código.');
+      st.aEnviar = true; render();
+      api('/verificacao/confirmar', { email: pedido.email, codigo: st.codigo }).then(function (r) {
+        var p = {}; for (var k in pedido) p[k] = pedido[k];
+        p.verificacao = r.verificacao;
+        abrir(root, p, opts);
+      }).catch(function (err) { st.aEnviar = false; render(err.message); });
+    };
+    ligar(root);
+    render();
+    enviar();
+  }
+
   /* Página /pagamento/: regresso do pagamento com cartão. */
   function estado(root, numero, token, falhou) {
     api('/pedido?n=' + encodeURIComponent(numero) + '&t=' + encodeURIComponent(token)).then(function (p) {
@@ -163,7 +212,7 @@
     }).catch(function (e) { root.innerHTML = '<div class="bk-panel"><p class="bk-note">' + esc(e.message) + '</p></div>'; });
   }
 
-  window.OMS_PAGAR = { abrir: abrir, estado: estado };
+  window.OMS_PAGAR = { abrir: abrir, verificar: verificar, estado: estado };
 
   var pg = document.getElementById('pagamento-estado');
   if (pg) {

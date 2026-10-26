@@ -2,6 +2,7 @@
 // e a notificação de pagamento da euPago. A fatura (Moloni ON) e os emails seguem do servidor.
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
+import { pedirCodigo, confirmarCodigo, ErroVerificacao } from "../../servidor/verificacao.mjs";
 
 export const config = { path: "/api/*" };
 
@@ -25,6 +26,17 @@ export default async (req) => {
       if (c.codigo) await pausa(300);
       const r = await calcular({ tipo: c.tipo, tratamento: c.tratamento, codigo: c.codigo, campanha: c.campanha });
       return json({ precoBase: r.precoBase, desconto: r.desconto, total: r.total, codigo: r.codigo && { tipo: r.codigo.tipo, texto: r.codigo.texto } });
+    }
+
+    // Verificação do email antes da marcação: envia o código e, depois, confirma-o.
+    if (rota === "/verificacao" && m === "POST") {
+      const c = await corpo(req);
+      return json(await pedirCodigo(c.email));
+    }
+    if (rota === "/verificacao/confirmar" && m === "POST") {
+      const c = await corpo(req);
+      await pausa(300);
+      return json(await confirmarCodigo(c.email, c.codigo));
     }
 
     // Cria o pedido e o pagamento. Com total 0 (VIP ou voucher) fica logo confirmado.
@@ -54,7 +66,7 @@ export default async (req) => {
 
     return json({ erro: "Não encontrado." }, 404);
   } catch (e) {
-    if (e instanceof ErroCliente) return json({ erro: e.message }, 400);
+    if (e instanceof ErroCliente || e instanceof ErroVerificacao) return json({ erro: e.message }, 400);
     console.error("API", rota, e);
     return json({ erro: e.message || "Ocorreu um erro. Tente de novo dentro de momentos." }, 502);
   }
