@@ -2,13 +2,13 @@
   "etiqueta": "Cuidar de si",
   "titulo": "Um espaço para abrandar ",
   "titulo_destaque": "e cuidar de si...",
-  "texto": "Um refúgio no coração da cidade, onde pode abrandar o ritmo, deixar as preocupações à porta e dedicar um tempo a si.\n\nNo Oporto Medical Spa, juntamos o melhor das técnicas ocidentais à sabedoria dos antigos rituais orientais, para lhe proporcionar momentos de relaxamento, equilíbrio e bem-estar. Seja para aliviar dores de costas, libertar tensões, recuperar a mobilidade ou simplesmente desligar da rotina, temos diferentes abordagens para cuidar de si.\n\nAtravés das massagens, do Pilates Clínico e da Osteopatia, ajudamo-lo a sentir-se melhor, a cuidar do seu corpo e a melhorar a sua qualidade de vida. Porque acreditamos que cuidar da saúde também pode ser um momento de prazer, tranquilidade e reencontro consigo.",
+  "texto": "Um refúgio no coração da cidade, onde pode abrandar o ritmo, deixar as preocupações à porta e dedicar um tempo a si.\nNo Oporto Medical Spa, harmonizamos a excelência das técnicas ocidentais com a tradição dos antigos rituais orientais, para lhe proporcionar momentos de relaxamento, equilíbrio e bem-estar. Dos cuidados terapêuticos aos rituais de relaxamento, cada experiência é pensada para aliviar tensões, recuperar a mobilidade e cuidar de si.",
   "imagem": "/img/uploads/oporto-medical-spa-sombras.jpg",
   "imagem_alt": "Logótipo do Oporto Medical Spa na parede, entre sombras de persiana e luz quente",
   "pilares": [
     {
       "titulo": "Relaxar",
-      "texto": "Rituais de tranquilidade, luz baixa e silêncio. Uma hora só sua.",
+      "texto": "Rituais de tranquilidade, aromas delicados e ambiente acolhedor. Uma hora só sua.",
       "botao": "Marcar ritual",
       "tratamento": "oil",
       "imagem": "/img/uploads/massagem-geotermal-pedras.jpg",
@@ -16,7 +16,7 @@
     },
     {
       "titulo": "Recuperar",
-      "texto": "Dores de costas, contraturas, corrigir postura, reforço muscular.",
+      "texto": "Alívio da dor costas, contraturas, tensão muscular, recuperação funcional.",
       "botao": "Fisioterapia",
       "tratamento": "fisio",
       "imagem": "/img/uploads/lady-having-stress-relieving-massage-in-spa-salon.jpg",
@@ -24,19 +24,19 @@
     },
     {
       "titulo": "Fortalecer",
-      "texto": "Postura, flexibilidade, força e prevenção de lesões.",
+      "texto": "Postura, flexibilidade e mobilidade. Força e prevenção de lesões.",
       "botao": "Pilates",
       "tratamento": "pilates",
       "imagem": "/img/uploads/istock_000015192886medium-copy_edit.jpg",
-      "imagem_alt": "Mulher a alongar-se no chão, diante de uma janela redonda"
+      "imagem_alt": "Mulher a alongar-se numa bola de pilates"
     },
     {
       "titulo": "Cuidar",
-      "texto": "Retenção líquidos, edema, celulite.",
+      "texto": "Retenção líquidos. Edema. Celulite. Firmeza e tonicidade da pele.",
       "botao": "Ver tratamentos",
       "tratamento": "dren",
       "imagem": "/img/uploads/massage.jpg",
-      "imagem_alt": "Cintura de uma mulher com a pele molhada, depois de um tratamento de corpo"
+      "imagem_alt": "pernas de uma mulher com celulite a serem massajadas"
     }
   ],
   "citacao": "“O requinte nos cuidados, o compromisso com os resultados e o elevado nível terapêutico definem a nossa exclusividade.”"
