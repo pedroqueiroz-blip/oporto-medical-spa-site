@@ -6,9 +6,19 @@
   "foto": "",
   "bio": "Cuidado personalizado, focado na recuperação da mobilidade e do bem-estar.",
   "cedula": "",
-  "credencial": "Cédula OF n,º [[12171]]",
+  "credencial": "Cédula OF n,º ==12171==",
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy. Clinical Pilates.",
+    "bio": "Personalised care, focused on restoring mobility and well-being.",
+    "credencial": "OF licence no. ==12171==",
+    "conhece": [
+      "A Melhor Massagem do Mundo",
+      "Aromatherapy"
+    ]
+  },
   "ordem": 40,
-  "confirmado": false,
+  "confirmado": true,
   "funcao": "Fisioterapeuta",
   "foco": "Fisioterapia. Pilates Clinico.",
   "nome": "Beatriz Tavares",
@@ -30,15 +40,5 @@
     "modela-360",
     "modelador",
     "pos-cirurgico"
-  ],
-  "en": {
-    "funcao": "Physiotherapist",
-    "foco": "Physiotherapy. Clinical Pilates.",
-    "bio": "Personalised care, focused on restoring mobility and well-being.",
-    "credencial": "OF licence no. [[12171]]",
-    "conhece": [
-      "A Melhor Massagem do Mundo",
-      "Aromatherapy"
-    ]
-  }
+  ]
 }
