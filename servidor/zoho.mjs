@@ -183,6 +183,9 @@ export async function verificarCRM(equipa = []) {
     const campos = (await crm("GET", `/settings/fields?module=${agenda}`))?.fields || [];
     const faltam = ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].filter((n) => !campos.some((f) => f.api_name === n));
     add(!faltam.length, `Módulo da agenda (${agenda})`, faltam.length ? `Faltam os campos ${faltam.join(", ")}.` : "Título, início, fim, responsável e contacto disponíveis.");
+    // Campos próprios da agenda (onde pode estar a terapeuta de cada marcação)
+    const proprios = campos.filter((f) => f.custom_field || ["picklist", "multiselectpicklist", "lookup", "userlookup", "ownerlookup"].includes(f.data_type));
+    if (proprios.length) add(true, `Campos da agenda que podem indicar a terapeuta`, proprios.map((f) => `«${f.field_label}» (${f.api_name}, ${f.data_type}${f.pick_list_values?.length ? `: ${f.pick_list_values.map((v) => v.display_value).join(" / ")}` : ""}${f.lookup?.module?.api_name ? ` → ${f.lookup.module.api_name}` : ""})`).join("; "));
   } catch (e) { add(false, `Módulo da agenda (${agenda})`, e.message); }
 
   // Eventos dos próximos 14 dias (confirma a leitura por COQL)
@@ -190,7 +193,10 @@ export async function verificarCRM(equipa = []) {
     const agora = new Date(), ate = new Date(agora.getTime() + 14 * 864e5);
     const iso = (d) => d.toISOString().replace(/\.\d{3}Z$/, "+00:00");
     const evs = await eventos(iso(agora), iso(ate));
-    add(true, "Leitura da agenda", `${evs.length} eventos nos próximos 14 dias.`);
+    const donos = {};
+    for (const e of evs) donos[e.dono] = (donos[e.dono] || 0) + 1;
+    const us = await utilizadores().catch(() => []);
+    add(true, "Leitura da agenda", `${evs.length} eventos nos próximos 14 dias. Por responsável: ${Object.entries(donos).map(([id, n]) => `${us.find((u) => u.id === id)?.nome || id}: ${n}`).join(", ") || "nenhum"}.`);
   } catch (e) { add(false, "Leitura da agenda", e.message); }
 
   // Equipa do site ↔ utilizadores do CRM
