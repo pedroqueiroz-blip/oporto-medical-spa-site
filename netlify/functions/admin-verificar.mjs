@@ -142,7 +142,8 @@ async function moloni() {
 
 async function eupago(origem) {
   const res = conv(await verificarEupago().catch((e) => [{ texto: "euPago", ok: false, detalhe: e.message }]));
-  if (env("EUPAGO_API_KEY")) res.push(item("URL de notificação a pôr no canal euPago", "aviso", `${origem}/api/eupago-notificacao`));
+  // O endereço principal do site (URL, definido pelo Netlify), e não o da pré-visualização: os pedidos são os mesmos.
+  if (env("EUPAGO_API_KEY")) res.push(item("URL de notificação a pôr no canal euPago", "aviso", `${(env("URL") || origem).replace(/\/$/, "")}/api/eupago-notificacao`));
   return res;
 }
 
