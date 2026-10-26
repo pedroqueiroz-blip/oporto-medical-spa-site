@@ -1,17 +1,20 @@
 {
-  "ordem": 30,
+  "tratamento": "ayurvedica",
   "ativa": true,
+  "texto": "[[Uma massagem inspirada indiana, que combina movimentos fluidos e alongamentos suaves para aliviar tensões, melhorar a flexibilidade e promover o equilíbrio corporal.]]",
+  "inclui": [
+    "Deslizamentos com óleo, alongamentos suaves e trações corporais."
+  ],
   "inicio": "",
+  "titulo_destaque": "Ayurvédica e Alongamento",
+  "ordem": 30,
   "fim": "",
+  "preco": 49,
+  "duracao": 60,
+  "imagem": "/img/uploads/massagem-ayurvedica.jpg",
   "etiqueta": "Campanha do mês",
-  "titulo": "Terceira campanha",
-  "titulo_destaque": "a confirmar",
-  "texto": "[[Texto da terceira campanha a enviar.]]",
-  "imagem": "",
-  "imagem_alt": "",
-  "inclui": [],
-  "tratamento": "dren",
-  "duracao": null,
-  "preco": null,
-  "selo_em_campanha": false
+  "selo_em_campanha": false,
+  "titulo": "Massagem Manual",
+  "preco_antigo": 74,
+  "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular."
 }
