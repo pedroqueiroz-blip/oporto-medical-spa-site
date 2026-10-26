@@ -65,6 +65,7 @@ ${p.voucher.mensagem ? `<p style="font-style:italic;margin:0 0 12px">“${esc(p.
 ${p.voucher.para || p.voucher.de ? `<p style="font-size:13px;color:#B5A288;margin:0 0 14px">${p.voucher.para ? `Para ${esc(p.voucher.para)}` : ""}${p.voucher.para && p.voucher.de ? " · " : ""}${p.voucher.de ? `De ${esc(p.voucher.de)}` : ""}</p>` : ""}
 <p style="font-size:26px;letter-spacing:.12em;margin:0;color:#D9A86C"><b>${esc(p.voucher.codigo)}</b></p>
 <p style="font-size:13px;margin:12px 0 0">Válido até ${esc(dataPT(p.voucher.validade))}</p></div>
+${p.voucher.formato === "caixa" ? `<p><b>Caixa oferta:</b> preparamos a caixa com este voucher, sem custo extra. Pode levantá-la no spa${spa.morada ? `, em ${esc(spa.morada)}` : ""}, no horário de funcionamento. Indique o n.º do pedido, ${esc(p.numero)}.</p>` : ""}
 <p>Para marcar, escolha ${esc(p.tratamento.nome)} em <a href="${esc(site())}/#reservar">${esc(site().replace(/^https?:\/\//, ""))}</a>, escreva o código no passo de confirmação e a marcação fica sem custos. Também pode marcar pelo ${esc(spa.telefone)}.</p>
 <p style="font-size:13px;color:#7a6650">Válido para uma marcação. A fatura-recibo segue num email à parte.</p>`),
 });
@@ -90,6 +91,7 @@ export const emailInterno = (p, problema) => enviar({
     p.marcacao?.terapeuta && ["Terapeuta", esc(p.marcacao.terapeuta)],
     p.voucher?.codigo && ["Voucher", `${esc(p.voucher.codigo)} · válido até ${esc(dataPT(p.voucher.validade))}`],
     p.voucher?.para && ["Para", esc(p.voucher.para)],
+    p.voucher && ["Entrega", p.voucher.formato === "caixa" ? "Caixa oferta, levanta no SPA (preparar a caixa)" : "Digital, por email"],
     ["Cliente", `${esc(p.cliente.nome)} · ${esc(p.cliente.email)} · ${esc(p.cliente.telefone)}${p.cliente.nif ? ` · NIF ${esc(p.cliente.nif)}` : ""}`],
     ["Valor", valorPago(p)], p.fatura?.numero && ["Fatura", esc(p.fatura.numero)], p.moloni?.erro && ["Moloni", esc(p.moloni.erro)],
   ])}`),
