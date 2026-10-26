@@ -90,9 +90,27 @@
   [class*="-StyledAuthenticationPage"] [class*="-CustomLogoIcon"] { border: 0 !important; }
   [class*="-LoginButton"] { background: var(--linen) !important; color: var(--night) !important; border-radius: 999px !important; padding: 0 30px !important; letter-spacing: .14em; text-transform: uppercase; font-size: 12px !important; }
   [class*="-StyledAuthenticationPage"] a { color: var(--oat) !important; }
+
+  /* Pedido de palavra-passe, antes do Decap */
+  .entrar { position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 0; background: var(--night); }
+  .entrar[hidden] { display: none; }
+  .entrar img { width: 150px; margin-bottom: 26px; }
+  .entrar input { box-sizing: border-box; width: min(320px, calc(100vw - 32px)); padding: 12px 14px; border: 1px solid rgba(232, 220, 200, .3); border-radius: 4px; background: transparent; color: var(--linen); font: 15px var(--body); }
+  .entrar .erro { min-height: 20px; margin: 10px 0 0; color: #E0A58C; font-size: 13px; }
+  .entrar button { margin-top: 6px; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 0; border-radius: 999px; background: var(--linen); color: var(--night); font: 600 12px var(--body); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+  .entrar button:disabled { opacity: .6; }
+  .verificar { position: fixed; left: 16px; bottom: 14px; z-index: 50; padding: 6px 14px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 0 var(--line); color: var(--muted) !important; font-size: 12px; text-decoration: none; }
+  .verificar:hover { color: var(--night) !important; }
 </style>
 </head>
 <body>
+<form id="entrar" class="entrar" hidden>
+  <img src="/logo-beige.svg" alt="Oporto Medical Spa">
+  <input type="password" name="senha" placeholder="Palavra-passe" autocomplete="current-password" required>
+  <p class="erro" aria-live="polite"></p>
+  <button type="submit">Entrar</button>
+</form>
+<a class="verificar" href="/admin-verificar" target="_blank" rel="noopener">Verificar ligações</a>
 <script>window.CMS_MANUAL_INIT = true;</script>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>
@@ -235,9 +253,47 @@
   });
   CMS.registerPreviewTemplate('equipa', PessoaPreview);
 
-  /* Entrada com a palavra-passe da equipa (netlify/functions/admin-entrar.mjs), no próprio site.
-     Sem a palavra-passe definida no Netlify, essa página encaminha para a entrada com conta GitHub. */
-  CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'admin-entrar' } } });
+  /* Entrada com a palavra-passe da equipa (netlify/functions/admin-entrar.mjs), logo nesta página, sem o botão do GitHub.
+     A chave devolvida fica onde o Decap guarda a sessão (decap-cms-user). Sem a palavra-passe definida no Netlify,
+     aparece a entrada do Decap com conta GitHub, como antes. */
+  (function () {
+    var CHAVE = 'decap-cms-user';
+    var iniciar = function () {
+      CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'admin-entrar' } } });
+      // Ao sair (ou se a chave deixar de valer), o Decap mostra a sua página de entrada: volta-se ao pedido de palavra-passe.
+      new MutationObserver(function () {
+        if (document.querySelector('[class*="-StyledAuthenticationPage"]') && document.body.dataset.palavraPasse) location.reload();
+      }).observe(document.body, { childList: true, subtree: true });
+    };
+    var sessao = null;
+    try { sessao = JSON.parse(localStorage.getItem(CHAVE) || 'null'); } catch (e) {}
+    if (sessao && sessao.token) { document.body.dataset.palavraPasse = '1'; return iniciar(); }
+
+    var f = document.getElementById('entrar');
+    var erro = f.querySelector('.erro');
+    var pedir = function (corpo) {
+      return fetch('/admin-entrar', { method: corpo ? 'POST' : 'GET', headers: { Accept: 'application/json', 'Content-Type': 'application/json' }, body: corpo ? JSON.stringify(corpo) : undefined })
+        .then(function (r) { return r.json().then(function (j) { j.status = r.status; return j; }, function () { return { status: r.status }; }); });
+    };
+    pedir().then(function (j) {
+      if (j.configurada === false || j.status >= 500) return iniciar();
+      document.body.dataset.palavraPasse = '1';
+      f.hidden = false;
+      f.querySelector('input').focus();
+    }, iniciar);
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var botao = f.querySelector('button');
+      botao.disabled = true; erro.textContent = '';
+      pedir({ senha: f.querySelector('input').value }).then(function (j) {
+        botao.disabled = false;
+        if (!j.token) { erro.textContent = j.erro || 'Não foi possível entrar. Tente de novo.'; return; }
+        try { localStorage.setItem(CHAVE, JSON.stringify({ token: j.token, backendName: 'github' })); } catch (e) {}
+        f.remove();
+        iniciar();
+      }, function () { botao.disabled = false; erro.textContent = 'Sem ligação. Tente de novo.'; });
+    });
+  })();
 </script>
 </body>
 </html>

@@ -60,6 +60,10 @@ Regras, emails e configuração: [docs/integracoes.md](docs/integracoes.md).
 ## Configuração inicial (uma vez)
 
 O backoffice entra com a palavra-passe da equipa (`netlify/functions/admin-entrar.mjs`).
+O /admin pede logo a palavra-passe; sem ela definida no Netlify, aparece a entrada com conta GitHub.
+
+Para confirmar as ligações (GitHub, build hook, VIP, Resend, Moloni ON, euPago), abra **`/admin-verificar`**
+(link «Verificar ligações» no canto do /admin) e escreva a palavra-passe. Só faz leituras; pode enviar um email de teste.
 Variáveis no Netlify (*Site configuration → Environment variables*, marcadas como secretas), e depois publicar de novo:
 
 - `BACKOFFICE_PASSWORD`: a palavra-passe da equipa. Para tirar o acesso a alguém, mudar a palavra-passe.

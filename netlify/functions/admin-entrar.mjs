@@ -1,6 +1,7 @@
 // Entrada no backoffice (/admin) com a palavra-passe da equipa, sem conta GitHub.
-// O botão "Entrar" do /admin abre esta janela; com a palavra-passe certa, entrega ao backoffice
-// a chave do GitHub guardada no Netlify, só para o próprio site, e a janela fecha.
+// O /admin mostra logo o pedido de palavra-passe e envia-a para aqui (pedido JSON); com a palavra-passe certa,
+// devolve a chave do GitHub guardada no Netlify, só para o próprio site. A janela com o formulário
+// (botão "Entrar" do Decap) continua a funcionar da mesma forma.
 // Variáveis no Netlify (marcadas como secretas):
 //   BACKOFFICE_PASSWORD      palavra-passe da equipa
 //   BACKOFFICE_GITHUB_TOKEN  chave fine-grained do GitHub, só deste repositório, com Contents e Pull requests em leitura e escrita
@@ -51,10 +52,24 @@ const entregar = (token) => pagina(`<p class="msg">A entrar…</p>
   })();
 </script>`);
 
+const json = (dados, status = 200) => new Response(JSON.stringify(dados), {
+  status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }
+});
+
 export default async (req) => {
   const senha = process.env.BACKOFFICE_PASSWORD;
   const token = process.env.BACKOFFICE_GITHUB_TOKEN;
   const url = new URL(req.url);
+
+  // Pedido do próprio /admin: responde em JSON, sem janela.
+  if ((req.headers.get("accept") || "").includes("application/json")) {
+    if (!senha || !token) return json({ configurada: false }, 404);
+    if (req.method !== "POST") return json({ configurada: true });
+    const dada = String((await req.json().catch(() => ({}))).senha || "");
+    if (dada && certa(dada, senha)) return json({ token });
+    await pausa(1500);
+    return json({ erro: "Palavra-passe errada." }, 401);
+  }
 
   // Sem palavra-passe configurada: entrada com conta GitHub pelo Netlify, como antes.
   if (!senha || !token) return Response.redirect("https://api.netlify.com/auth" + url.search, 302);
