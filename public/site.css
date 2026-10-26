@@ -751,6 +751,19 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .pg .vc-seg { grid-template-columns: repeat(3, 1fr); }
 .pg [data-voltar] { justify-self: start; }
 .pg-pagina { padding-block: 160px 100px; min-height: 60vh; }
+.pg-aceito a { color: inherit; text-decoration: underline; }
+
+/* Privacidade e Termos */
+.legal { max-width: 760px; }
+.legal h1 { font-size: clamp(40px, 6vw, 64px); }
+.legal__data { margin: 14px 0 34px; font-size: 13px; letter-spacing: .08em; color: var(--oat); }
+.legal h2 { font-family: var(--display); font-weight: 400; font-size: 26px; line-height: 1.2; color: var(--linen); margin: 46px 0 14px; }
+.legal p, .legal li { font-size: 16px; line-height: 1.7; color: var(--oat); }
+.legal p { margin: 0 0 14px; }
+.legal ul { margin: 0 0 14px; padding-left: 20px; }
+.legal li { margin-bottom: 8px; }
+.legal a { color: var(--linen); border-bottom: 1px solid rgba(181, 162, 136, .5); text-decoration: none; }
+.legal strong { color: var(--linen); font-weight: 600; }
 
 /* Ligações para as páginas de cada área */
 .group-t__link { float: right; letter-spacing: .2em; color: var(--linen); opacity: .75; border-bottom: 1px solid rgba(181, 162, 136, .4); }

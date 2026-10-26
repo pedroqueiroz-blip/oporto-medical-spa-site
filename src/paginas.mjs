@@ -549,3 +549,30 @@ export function areaSummary(m, P) {
     list.map((x) => x.nome + ' (' + eur(x.preco) + ')').join(', ').replace(/, ([^,]*)$/, ' e $1') +
     (d ? (d.min === d.max ? ', sessões de ' + d.min + ' minutos.' : ', sessões de ' + d.min + ' a ' + d.max + ' minutos.') : '.');
 }
+
+/* Privacidade e Termos (content/legais/), editados no backoffice. Cada secção: parágrafos separados por uma
+   linha em branco; linhas começadas por «- » fazem uma lista. */
+export function legalPage(m, L, path) {
+  const t = m.text;
+  const blocos = (txt) => String(txt || '').split(/\n\s*\n/).map((b) => {
+    const linhas = b.split('\n').map((l) => l.trim()).filter(Boolean);
+    return linhas.length && linhas.every((l) => l.startsWith('- '))
+      ? '<ul>' + linhas.map((l) => '<li>' + t.inline(l.slice(2)) + '</li>').join('') + '</ul>'
+      : '<p>' + linhas.map((l) => t.inline(l)).join('<br>') + '</p>';
+  }).join('\n');
+  const data = L.atualizado ? new Date(String(L.atualizado).slice(0, 10) + 'T12:00:00Z').toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Lisbon' }) : '';
+  const seccoes = (L.seccoes || []).map((s, i) => `<section><h2>${i + 1}. ${esc(s.titulo)}</h2>\n${blocos(s.texto)}</section>`).join('\n');
+  const body = `${header(m, { home: false, current: path })}
+<main class="wrap pg-pagina legal">
+  <p class="kicker">${esc(m.s.nome)}</p>
+  <h1 class="d">${esc(L.titulo)}</h1>
+  ${data ? `<p class="legal__data">Atualizado a ${esc(data)}</p>` : ''}
+  ${L.introducao ? blocos(L.introducao) : ''}
+  ${seccoes}
+</main>
+${footer(m, { home: false })}`;
+  return page(m, {
+    headHtml: head(m, { title: L.titulo + ' · ' + m.s.nome, description: t.plain(L.introducao || '').slice(0, 155) || L.titulo, path }),
+    ld: '', body, scripts: []
+  });
+}

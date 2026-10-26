@@ -93,6 +93,7 @@
           }).join('') + '</div></div>' +
           (st.metodo === 'mb_way' ? '<label class="field"><span>Telemóvel MB WAY</span><input id="pg-tel" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(st.telemovel) + '"></label>' : '') +
           '<label class="field"><span>NIF na fatura (opcional)</span><input id="pg-nif" inputmode="numeric" maxlength="9" value="' + esc(st.nif) + '"></label>') +
+        '<p class="bk-note pg-aceito">Ao ' + (gratis ? 'confirmar' : 'pagar') + ', aceita os <a href="/termos/" target="_blank" rel="noopener">Termos e Condições</a> e a <a href="/privacidade/" target="_blank" rel="noopener">Política de Privacidade</a>.</p>' +
         '<p class="bk-error" role="alert"' + (erro ? '' : ' hidden') + '>' + esc(erro || '') + '</p>' +
         '<button type="submit" class="btn btn--primary"' + (t == null || st.aEnviar ? ' disabled' : '') + '>' +
         (st.aEnviar ? 'Um momento…' : gratis ? (pedido.tipo === 'voucher' ? 'Confirmar' : 'Confirmar marcação') : 'Pagar ' + (t == null ? '' : eur(t))) + '</button>' +
