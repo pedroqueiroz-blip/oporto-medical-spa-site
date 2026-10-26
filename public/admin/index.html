@@ -105,6 +105,7 @@
   function inline(s) {
     return String(s || '').replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; })
       .replace(/\[\[(.+?)\]\]/g, '<mark class="tbc">$1</mark>')
+      .replace(/==(.+?)==/g, '<mark class="hl">$1</mark>')
       .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
   }
