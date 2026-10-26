@@ -1,9 +1,9 @@
 /* Build do site: content/*.json + public/ → dist/. Corre no Netlify a cada publicação (node src/build.mjs). */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, PUBLIC, readList } from './lib.mjs';
+import { ROOT, PUBLIC, readList, readJSON } from './lib.mjs';
 import { loadModel } from './modelo.mjs';
-import { home, massages, areaPage } from './paginas.mjs';
+import { home, massages, areaPage, legalPage } from './paginas.mjs';
 import { robots, sitemap, headers, llms, head, INDEXNOW_KEY } from './seo.mjs';
 import { page, header, footer } from './partes.mjs';
 import { withGoogle } from './google.mjs';
@@ -26,6 +26,10 @@ const ms = massages(m);
 write('index.html', h.html);
 write('massagens-porto/index.html', ms.html);
 const areas = m.areaPages.map((P) => { const a = areaPage(m, P); write(P.path.slice(1) + 'index.html', a.html); return a; });
+
+/* Privacidade e Termos (content/legais/) */
+const legais = readJSON('legais');
+for (const [nome, L] of Object.entries(legais)) write(nome + '/index.html', legalPage(m, L, '/' + nome + '/'));
 
 /* Página de regresso do pagamento com cartão (fora do Google) */
 write('pagamento/index.html', page(m, {

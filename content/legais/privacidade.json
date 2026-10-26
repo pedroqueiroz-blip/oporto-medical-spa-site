@@ -1,0 +1,55 @@
+{
+  "titulo": "Política de Privacidade",
+  "atualizado": "2026-10-26",
+  "introducao": "Esta política explica que dados pessoais o Oporto Medical Spa recolhe no site e no spa, para que os usa, durante quanto tempo os guarda e como pode exercer os seus direitos, nos termos do Regulamento Geral sobre a Proteção de Dados (RGPD) e da Lei n.º 58/2019.",
+  "seccoes": [
+    {
+      "titulo": "Quem é o responsável",
+      "texto": "O responsável pelo tratamento dos seus dados é CNP, Lda., NIPC 506651940, com sede em {morada}, que explora o Oporto Medical Spa, unidade registada na Entidade Reguladora da Saúde com o n.º E138084.\n\nPara qualquer questão sobre os seus dados, escreva para {email} ou ligue para {telefone}."
+    },
+    {
+      "titulo": "Que dados recolhemos",
+      "texto": "- **Marcações:** nome, email, telefone, NIF, tratamento, terapeuta, dia e hora.\n- **Confirmação do email:** um código de seis dígitos, enviado para o seu email antes do pagamento.\n- **Vouchers:** os dados de quem compra, o nome de quem recebe, o nome de quem oferece, a mensagem e o código do voucher.\n- **Pagamentos:** o meio de pagamento, o número de telemóvel MB WAY, a referência e o estado do pagamento. Os dados do cartão são escritos diretamente na página da euPago e nunca chegam ao Oporto Medical Spa.\n- **Newsletter:** o email e o registo do seu consentimento.\n- **Contactos:** o que nos enviar por email, telefone ou WhatsApp.\n- **No spa:** os dados de saúde necessários à avaliação e ao tratamento (queixas, historial, medicação, contraindicações), registados pela fisioterapeuta no seu processo. O site não pede dados de saúde.\n- **Dados técnicos:** o endereço IP e os dados de ligação que os servidores registam por segurança."
+    },
+    {
+      "titulo": "Para que usamos os dados",
+      "texto": "- **Gerir marcações e vouchers**, confirmá-los por email e contactá-lo sobre a marcação: execução do contrato (artigo 6.º, n.º 1, alínea b) do RGPD).\n- **Emitir faturas** e cumprir obrigações fiscais e legais: obrigação legal (alínea c)).\n- **Avaliar e tratar a sua saúde** e manter o processo clínico: prestação de cuidados de saúde por profissionais sujeitos a sigilo (artigo 9.º, n.º 2, alínea h) e n.º 3 do RGPD).\n- **Enviar a newsletter** e o código de boas-vindas: o seu consentimento (alínea a)), que pode retirar a qualquer momento.\n- **Confirmar o email, prevenir fraude**, proteger o site e defender os nossos direitos em caso de litígio: interesse legítimo (alínea f)).\n\nNão vendemos os seus dados, não os usamos para publicidade de terceiros nem tomamos decisões automatizadas sobre si."
+    },
+    {
+      "titulo": "Com quem partilhamos",
+      "texto": "Só com prestadores que tratam os dados por nossa conta, com contrato e garantias de proteção, e apenas no necessário:\n\n- **euPago** (Portugal): pagamentos por MB WAY, Multibanco e cartão.\n- **Moloni ON** (Portugal): faturação. As faturas são comunicadas à Autoridade Tributária.\n- **Zoho** (centro de dados na União Europeia): ficha de cliente e agenda das marcações.\n- **Resend** (Estados Unidos): envio dos emails de confirmação, vouchers e códigos.\n- **Netlify** (Estados Unidos): alojamento do site, formulários e registo dos pedidos.\n- **Google** (Estados Unidos): tipos de letra do site (Google Fonts), que recebem o endereço IP de quem visita.\n\nComunicamos também dados às autoridades quando a lei o exige e, a seu pedido, à sua seguradora ou subsistema de saúde."
+    },
+    {
+      "titulo": "Transferências para fora da União Europeia",
+      "texto": "Alguns prestadores estão nos Estados Unidos. Essas transferências fazem-se ao abrigo do Quadro de Privacidade de Dados UE-EUA, quando o prestador está certificado, ou das cláusulas contratuais-tipo aprovadas pela Comissão Europeia."
+    },
+    {
+      "titulo": "Durante quanto tempo guardamos os dados",
+      "texto": "- **Faturas e documentos contabilísticos:** 10 anos, como exige a lei fiscal.\n- **Processo clínico:** pelo prazo que a lei exige para os registos de saúde.\n- **Ficha de cliente e histórico de marcações:** enquanto for cliente e até 5 anos depois da última marcação, para responder a pedidos e reclamações.\n- **Vouchers:** até ao fim da validade e, depois, pelo prazo das faturas.\n- **Newsletter:** até cancelar a subscrição.\n- **Códigos de confirmação do email:** 10 minutos.\n- **Registos técnicos:** pelo período curto necessário à segurança do site."
+    },
+    {
+      "titulo": "Os seus direitos",
+      "texto": "Pode pedir acesso, retificação, apagamento, limitação ou portabilidade dos seus dados, opor-se ao tratamento baseado em interesse legítimo e retirar o consentimento a qualquer momento, sem afetar o tratamento já feito. Basta escrever para {email}. Respondemos no prazo de um mês e podemos pedir-lhe que confirme a sua identidade.\n\nAlguns dados não podem ser apagados enquanto a lei nos obrigar a guardá-los, como as faturas e o processo clínico.\n\nPode também apresentar reclamação à Comissão Nacional de Proteção de Dados, em [www.cnpd.pt](https://www.cnpd.pt)."
+    },
+    {
+      "titulo": "Newsletter",
+      "texto": "Só enviamos a newsletter a quem a subscreve e marca a caixa de consentimento. Pode cancelar a subscrição a qualquer momento, pela ligação em cada email ou escrevendo para {email}."
+    },
+    {
+      "titulo": "Cookies",
+      "texto": "Este site não usa cookies de publicidade, de análise de visitas nem ferramentas de seguimento. Usa apenas o armazenamento técnico estritamente necessário ao backoffice da equipa.\n\nAs ligações para o Google Maps, Waze, WhatsApp e Instagram só o levam a esses serviços se carregar nelas, e aí aplicam-se as políticas de privacidade deles."
+    },
+    {
+      "titulo": "Segurança",
+      "texto": "Os dados viajam sempre cifrados (HTTPS). O acesso ao backoffice e às contas dos prestadores é protegido por palavra-passe e limitado à equipa. Toda a equipa clínica está sujeita a sigilo profissional."
+    },
+    {
+      "titulo": "Menores",
+      "texto": "As marcações e compras no site destinam-se a maiores de 18 anos. A marcação de um menor deve ser feita pelos pais ou pelo representante legal, e o menor deve vir acompanhado."
+    },
+    {
+      "titulo": "Alterações a esta política",
+      "texto": "Podemos atualizar esta política. A versão em vigor está sempre nesta página, com a data da última atualização."
+    }
+  ]
+}

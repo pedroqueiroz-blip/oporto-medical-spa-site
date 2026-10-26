@@ -486,6 +486,42 @@ collections:
           - { name: imagem_partilha, label: Imagem ao partilhar o site, widget: image, required: false, hint: 'Horizontal, 1200 × 630 px.' }
           - { name: indexar, label: Site visível no Google, widget: boolean, required: false, default: false, hint: 'Deixe desligado até ao lançamento. Pode guardar e publicar alterações com isto desligado: o site atualiza-se na mesma e continua escondido do Google.' }
 
+  - name: legais
+    label: Privacidade e termos
+    description: 'Política de Privacidade (/privacidade/) e Termos e Condições (/termos/), ligadas no rodapé e no passo de pagamento. Antes de mudar regras de cancelamento, vouchers ou dados recolhidos, confirme que o resto do site diz o mesmo.'
+    editor: { preview: false }
+    files:
+      - name: privacidade
+        label: Política de Privacidade
+        file: content/legais/privacidade.json
+        fields:
+          - { name: titulo, label: Título, widget: string }
+          - { name: atualizado, label: Atualizado a, widget: datetime, format: 'YYYY-MM-DD', date_format: 'DD/MM/YYYY', time_format: false, hint: 'Mude esta data sempre que alterar o texto.' }
+          - { name: introducao, label: Introdução, widget: text }
+          - name: seccoes
+            label: Secções
+            label_singular: secção
+            widget: list
+            summary: '{{fields.titulo}}'
+            fields:
+              - { name: titulo, label: Título, widget: string }
+              - { name: texto, label: Texto, widget: text, hint: 'Linha em branco separa parágrafos. Linhas começadas por «- » fazem uma lista. Pode usar **negrito**, [ligação](https://...), {email}, {telefone} e {morada}.' }
+      - name: termos
+        label: Termos e Condições
+        file: content/legais/termos.json
+        fields:
+          - { name: titulo, label: Título, widget: string }
+          - { name: atualizado, label: Atualizado a, widget: datetime, format: 'YYYY-MM-DD', date_format: 'DD/MM/YYYY', time_format: false, hint: 'Mude esta data sempre que alterar o texto.' }
+          - { name: introducao, label: Introdução, widget: text }
+          - name: seccoes
+            label: Secções
+            label_singular: secção
+            widget: list
+            summary: '{{fields.titulo}}'
+            fields:
+              - { name: titulo, label: Título, widget: string }
+              - { name: texto, label: Texto, widget: text, hint: 'Linha em branco separa parágrafos. Linhas começadas por «- » fazem uma lista. Pode usar **negrito**, [ligação](https://...), {email}, {telefone} e {morada}.' }
+
   - name: indicacoes
     label: Indicações
     label_singular: Indicações
