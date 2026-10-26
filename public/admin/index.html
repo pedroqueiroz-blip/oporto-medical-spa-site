@@ -260,10 +260,14 @@
     var CHAVE = 'decap-cms-user';
     var iniciar = function () {
       CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'admin-entrar' } } });
-      // Ao sair (ou se a chave deixar de valer), o Decap mostra a sua página de entrada: volta-se ao pedido de palavra-passe.
-      new MutationObserver(function () {
-        if (document.querySelector('[class*="-StyledAuthenticationPage"]') && document.body.dataset.palavraPasse) location.reload();
-      }).observe(document.body, { childList: true, subtree: true });
+      // Ao sair (ou se a chave deixar de valer), o Decap apaga a sessão guardada: volta-se ao pedido de palavra-passe.
+      // (A página de entrada do Decap também aparece enquanto confirma a chave, por isso não serve de sinal.)
+      if (!document.body.dataset.palavraPasse) return;
+      setInterval(function () {
+        var ainda = true;
+        try { ainda = !!localStorage.getItem(CHAVE); } catch (e) {}
+        if (!ainda) location.reload();
+      }, 500);
     };
     var sessao = null;
     try { sessao = JSON.parse(localStorage.getItem(CHAVE) || 'null'); } catch (e) {}
