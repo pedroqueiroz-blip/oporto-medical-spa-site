@@ -7,7 +7,18 @@
   "foto": "",
   "bio": "Fisioterapia orientada para o movimento, o equilíbrio e a qualidade de vida.",
   "cedula": "",
-  "credencial": "Cédula OF n.º [[6137]]",
+  "credencial": "Cédula OF n.º ==6137==",
+  "en": {
+    "funcao": "Physiotherapist and osteopath",
+    "foco": "Physiotherapy. Osteopathy. Clinical and Equipment Pilates.",
+    "bio": "Physiotherapy focused on movement, balance and quality of life.",
+    "credencial": "OF licence no. [[6137]]",
+    "conhece": [
+      "Physiotherapy",
+      "Clinical Pilates",
+      "Osteopathy"
+    ]
+  },
   "ordem": 10,
   "confirmado": false,
   "funcao": "Fisioterapeuta e osteopata",
@@ -35,16 +46,5 @@
     "pos-cirurgico",
     "pos-parto",
     "postura"
-  ],
-  "en": {
-    "funcao": "Physiotherapist and osteopath",
-    "foco": "Physiotherapy. Osteopathy. Clinical and Equipment Pilates.",
-    "bio": "Physiotherapy focused on movement, balance and quality of life.",
-    "credencial": "OF licence no. [[6137]]",
-    "conhece": [
-      "Physiotherapy",
-      "Clinical Pilates",
-      "Osteopathy"
-    ]
-  }
+  ]
 }
