@@ -2,7 +2,9 @@
   "tratamento": "aroma",
   "ativa": true,
   "texto": "[[Óleos essenciais e movimentos suaves para libertar tensões e recuperar a serenidade.]]",
-  "inclui": [],
+  "inclui": [
+    "Técnicas manuais, Aromaterapia. Relaxamento profundo. Alívio de tensões"
+  ],
   "inicio": "",
   "titulo_destaque": "Aromaterapia",
   "ordem": 20,
