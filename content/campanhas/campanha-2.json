@@ -1,10 +1,8 @@
 {
   "tratamento": "aroma",
   "ativa": true,
-  "texto": "[[Texto da segunda campanha a enviar.]]",
-  "inclui": [
-    "Massagem manual com óleos quentes essenciais"
-  ],
+  "texto": "[[Óleos essenciais e movimentos suaves para libertar tensões e recuperar a serenidade.]]",
+  "inclui": [],
   "inicio": "",
   "titulo_destaque": "Aromaterapia",
   "ordem": 20,
