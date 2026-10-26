@@ -1,7 +1,8 @@
 {
   "conhece": [
     "Fisioterapia",
-    "Pilates clínico"
+    "Pilates clínico",
+    "Osteopatia"
   ],
   "foto": "",
   "bio": "Acredita que cada corpo conta uma história. O trabalho dela é ouvi-la antes de a tratar.",
@@ -10,7 +11,7 @@
   "ordem": 10,
   "confirmado": false,
   "funcao": "Fisioterapeuta e osteopata",
-  "foco": "Fisioterapia. Osteopatia. Pilates Clinico e com aparelhos.",
+  "foco": "Fisioterapia. Osteopatia. Pilates Clinico e Pilates com Aparelhos.",
   "nome": "Luísa Pinto",
   "id": "luisa",
   "faz": [
