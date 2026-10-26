@@ -80,7 +80,7 @@
       "pergunta": "Onde fica o Oporto Medical Spa?",
       "resposta": "",
       "automatica": "morada",
-      "acrescento": "[[acrescentar distância medida a um ponto de referência]]"
+      "acrescento": "Fica praticamente em frente ao Pingo Doce Ramalde – João de Brito, a menos de 1 minuto a pé, e a 2 a 3 minutos da paragem de autocarro S. João de Brito."
     },
     {
       "pergunta": "Quanto custa uma massagem no Oporto Medical Spa?",
@@ -97,7 +97,7 @@
     },
     {
       "pergunta": "Há estacionamento?",
-      "resposta": "[[confirmar: estacionamento próprio, parque próximo ou rua]]",
+      "resposta": "Sim. O Pingo Doce mesmo ao lado tem parque de estacionamento para clientes, e há lugares na via pública ao longo da Rua São João de Brito e nas ruas vizinhas, como a Rua das Andresas.",
       "automatica": "",
       "acrescento": ""
     },

@@ -93,7 +93,8 @@ Na euPago, no canal: *Receber notificação para um URL* → `https://www.oporto
 
 No Moloni ON: série `SPA`; artigos `TREAB` e `TPREV` isentos de IVA com o motivo de isenção;
 meios de pagamento com «MB WAY», «Multibanco» e «Cartão» no nome; cliente n.º 1 Consumidor final.
-`node scripts/verificar.mjs` (com as chaves no ambiente) confirma tudo isto sem criar nada.
+A página `/admin-verificar` (palavra-passe do backoffice) confirma tudo isto no próprio site, sem criar nada;
+`node scripts/verificar.mjs` faz o mesmo no computador, com as chaves no ambiente.
 
 Enquanto a euPago estiver em modo de teste, as faturas ficam sempre em rascunho no Moloni ON.
 
