@@ -101,6 +101,9 @@
   .entrar button:disabled { opacity: .6; }
   .verificar { position: fixed; left: 16px; bottom: 14px; z-index: 50; padding: 6px 14px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 0 var(--line); color: var(--muted) !important; font-size: 12px; text-decoration: none; }
   .verificar:hover { color: var(--night) !important; }
+  .publicar-tudo { position: fixed; right: 28px; bottom: 28px; z-index: 300; background: var(--night); color: var(--linen); border: 0; border-radius: 999px; padding: 14px 28px; font: 600 12px Manrope, sans-serif; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); }
+  .publicar-tudo[hidden] { display: none; }
+  .publicar-tudo:disabled { opacity: .7; cursor: wait; }
 </style>
 </head>
 <body>
@@ -296,6 +299,57 @@
         f.remove();
         iniciar();
       }, function () { botao.disabled = false; erro.textContent = 'Sem ligação. Tente de novo.'; });
+    });
+  })();
+
+  /* «Publicar tudo» no Fluxo de trabalho: publica de uma vez todas as alterações em rascunho, em revisão ou prontas.
+     Faz o mesmo que o botão Publicar de cada uma (junta o rascunho ao site no GitHub e apaga o rascunho),
+     com a sessão de quem entrou. O site atualiza-se sozinho a seguir. */
+  (function () {
+    var REPO = 'pedroqueiroz-blip/oporto-medical-spa-site', RAMO = 'main';
+    var API = 'https://api.github.com/repos/' + REPO;
+    var token = function () { try { return (JSON.parse(localStorage.getItem('decap-cms-user') || '{}') || {}).token; } catch (e) { return null; } };
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'publicar-tudo'; b.textContent = 'Publicar tudo'; b.hidden = true;
+    document.body.appendChild(b);
+    var ver = function () { b.hidden = !/^#\/workflow/.test(location.hash) || !token(); };
+    window.addEventListener('hashchange', ver); setInterval(ver, 1000);
+
+    var gh = function (url, opts) {
+      opts = opts || {};
+      opts.headers = { Authorization: 'token ' + token(), Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+      return fetch(url.indexOf('http') ? API + url : url, opts).then(function (r) {
+        return r.status === 204 ? {} : r.json().then(function (j) { if (!r.ok) throw Object.assign(new Error(j.message || r.status), { status: r.status }); return j; });
+      });
+    };
+    var nome = function (pr) { var t = pr.title.replace(/^Backoffice:\s*/, ''); return t.charAt(0).toUpperCase() + t.slice(1); };
+
+    b.addEventListener('click', function () {
+      if (!token()) { alert('Entre no backoffice primeiro.'); return; }
+      b.disabled = true; b.textContent = 'A procurar rascunhos…';
+      gh('/pulls?state=open&per_page=100&base=' + RAMO).then(function (prs) {
+        prs = prs.filter(function (p) { return p.head.ref.indexOf('cms/') === 0; });
+        if (!prs.length) { alert('Não há alterações por publicar.'); return null; }
+        var lista = prs.map(function (p) { return '• ' + nome(p); }).join('\n');
+        if (!confirm('Publicar estas ' + prs.length + ' alterações no site?\n\n' + lista)) return null;
+        var falhas = [], i = 0;
+        var seguinte = function () {
+          if (i >= prs.length) return falhas;
+          var p = prs[i++];
+          b.textContent = 'A publicar ' + i + ' de ' + prs.length + '…';
+          return gh('/pulls/' + p.number + '/merge', { method: 'PUT', body: JSON.stringify({ commit_message: 'Automatically generated. Merged on Decap CMS.', sha: p.head.sha, merge_method: 'merge' }) })
+            .then(function () { return gh('/git/refs/heads/' + p.head.ref.split('/').map(encodeURIComponent).join('/'), { method: 'DELETE' }).catch(function () {}); })
+            .catch(function (e) { falhas.push(nome(p) + (e.status === 405 || e.status === 409 ? ' (em conflito com outra alteração: publique-a sozinha)' : ' (' + e.message + ')')); })
+            .then(seguinte);
+        };
+        return seguinte();
+      }).then(function (falhas) {
+        if (falhas == null) return;
+        alert(falhas.length ? 'Algumas alterações não foram publicadas:\n\n' + falhas.join('\n') : 'Publicado. O site atualiza-se dentro de um ou dois minutos.');
+        location.reload();
+      }, function (e) {
+        alert('Não foi possível publicar: ' + e.message);
+      }).then(function () { b.disabled = false; b.textContent = 'Publicar tudo'; });
     });
   })();
 </script>
