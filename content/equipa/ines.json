@@ -5,9 +5,18 @@
   "foto": "",
   "bio": "Acompanhamento especializado na recuperação funcional e na prevenção de lesões.",
   "cedula": "",
-  "credencial": "Cédula OF n.º [[13403]]",
+  "credencial": "Cédula OF n.º ==13403==",
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy",
+    "bio": "Specialist support for functional recovery and injury prevention.",
+    "credencial": "OF licence no. ==13403==",
+    "conhece": [
+      "Physiotherapy"
+    ]
+  },
   "ordem": 30,
-  "confirmado": false,
+  "confirmado": true,
   "funcao": "Fisioterapeuta",
   "foco": "Fisioterapia",
   "nome": "Catarina Silva",
@@ -21,21 +30,11 @@
     "dren",
     "energizante",
     "esfoliacao",
-    "evasoes",
     "fisio",
     "geotermal",
     "indian-head",
     "localizada",
     "modela-360",
     "modelador"
-  ],
-  "en": {
-    "funcao": "Physiotherapist",
-    "foco": "Physiotherapy",
-    "bio": "Specialist support for functional recovery and injury prevention.",
-    "credencial": "OF licence no. [[13403]]",
-    "conhece": [
-      "Physiotherapy"
-    ]
-  }
+  ]
 }
