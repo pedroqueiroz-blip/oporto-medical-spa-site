@@ -1,7 +1,7 @@
 {
   "conhece": [
-    "Fisioterapia dermato-funcional",
-    "Drenagem linfática manual"
+    "Fisioterapia",
+    "Pilates Clínico"
   ],
   "foto": "",
   "bio": "Especialista em drenagem e recuperação pós-operatória, com mãos de uma precisão rara.",
@@ -10,7 +10,7 @@
   "ordem": 20,
   "confirmado": false,
   "funcao": "Fisioterapeuta",
-  "foco": "Fisioterapia dermato-funcional e drenagem",
+  "foco": "Fisioterapia. Osteopatia. Pilates Clinico e Pilates com Aparelhos.",
   "nome": "Beatriz Pena",
   "id": "bia",
   "faz": [
