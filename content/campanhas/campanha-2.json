@@ -1,7 +1,7 @@
 {
   "tratamento": "aroma",
   "ativa": true,
-  "texto": "[[Massagem relaxante que combina técnicas manuais e aromaterapia para aliviar tensões, reduzir o stress e promover uma profunda sensação de bem-estar.]]",
+  "texto": "Massagem relaxante que combina técnicas manuais e aromaterapia para aliviar tensões, reduzir o stress e promover uma profunda sensação de bem-estar.",
   "inclui": [
     "Técnicas manuais, Aromaterapia. Relaxamento profundo. Alívio de tensões"
   ],
@@ -9,6 +9,7 @@
   "titulo_destaque": "Aromaterapia",
   "ordem": 20,
   "fim": "",
+  "assinatura": "Óleos quentes essenciais",
   "preco": 45,
   "duracao": 60,
   "imagem": "/img/uploads/wellness-beauty-and-relaxation-concept-beautiful-young-woman-lying-with-closed-eyes-and-having-face-and-head-massage-at-spa-over-festive-lights-on-background.jpg",
