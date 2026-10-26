@@ -6,15 +6,24 @@
   "foto": "",
   "bio": "Abordagem individualizada para aliviar a dor e melhorar a função corporal.",
   "cedula": "",
-  "credencial": "Cédula OF n.º [[9428]]",
+  "credencial": "Cédula OF n.º ==9428==",
+  "en": {
+    "funcao": "Physiotherapist",
+    "foco": "Physiotherapy. Clinical and Equipment Pilates.",
+    "bio": "An individual approach to relieving pain and improving how your body works.",
+    "credencial": "OF licence no. ==9428==",
+    "conhece": [
+      "Physiotherapy",
+      "Clinical Pilates"
+    ]
+  },
   "ordem": 20,
-  "confirmado": false,
+  "confirmado": true,
   "funcao": "Fisioterapeuta",
   "foco": "Fisioterapia. Pilates Clinico e com Aparelhos.",
   "nome": "Beatriz Pena",
   "id": "bia",
   "faz": [
-    "dren",
     "fisio",
     "aroma",
     "ayurvedica",
@@ -34,15 +43,5 @@
     "pos-cirurgico",
     "pos-parto",
     "postura"
-  ],
-  "en": {
-    "funcao": "Physiotherapist",
-    "foco": "Physiotherapy. Clinical and Equipment Pilates.",
-    "bio": "An individual approach to relieving pain and improving how your body works.",
-    "credencial": "OF licence no. [[9428]]",
-    "conhece": [
-      "Physiotherapy",
-      "Clinical Pilates"
-    ]
-  }
+  ]
 }
