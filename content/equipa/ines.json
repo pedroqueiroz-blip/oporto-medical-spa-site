@@ -1,6 +1,6 @@
 {
   "conhece": [
-    "Massagem de relaxamento"
+    "Fisioterapia"
   ],
   "foto": "",
   "bio": "Desenha cada ritual à medida de quem chega. Ninguém sai igual a como entrou.",
@@ -9,7 +9,7 @@
   "ordem": 30,
   "confirmado": false,
   "funcao": "Fisioterapeuta",
-  "foco": "Fisioterapeuta Músculo-Esquelética e Desportiva",
+  "foco": "Fisioterapia",
   "nome": "Catarina Silva",
   "id": "catarina",
   "faz": [
