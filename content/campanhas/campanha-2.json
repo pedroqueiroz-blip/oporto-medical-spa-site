@@ -1,17 +1,20 @@
 {
-  "ordem": 20,
+  "tratamento": "aroma",
   "ativa": true,
-  "inicio": "",
-  "fim": "",
-  "etiqueta": "Campanha do mês",
-  "titulo": "Segunda campanha",
-  "titulo_destaque": "a confirmar",
   "texto": "[[Texto da segunda campanha a enviar.]]",
-  "imagem": "",
-  "imagem_alt": "",
-  "inclui": [],
-  "tratamento": "oil",
-  "duracao": null,
-  "preco": 64,
-  "selo_em_campanha": true
+  "inclui": [
+    "Massagem manual com óleos quentes essenciais"
+  ],
+  "inicio": "",
+  "titulo_destaque": "Aromaterapia",
+  "ordem": 20,
+  "fim": "",
+  "preco": 45,
+  "duracao": 60,
+  "imagem": "/img/uploads/lady-having-stress-relieving-massage-in-spa-salon.jpg",
+  "etiqueta": "Campanha do mês",
+  "selo_em_campanha": true,
+  "titulo": "Massagem Manual com",
+  "preco_antigo": 65,
+  "imagem_alt": ""
 }
