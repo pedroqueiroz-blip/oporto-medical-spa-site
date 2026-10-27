@@ -114,7 +114,7 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
 
 - **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
   uma hora está livre quando ela não tem nenhuma marcação no módulo Tratamentos (nem evento em Reuniões) que se sobreponha à duração do tratamento
-  (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo e ao sábado à tarde, e nunca a menos de 1 hora.
+  (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo; ao sábado só das 9:00 às 13:00, e nunca a menos de 1 hora.
 - **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
   do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
 - **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
