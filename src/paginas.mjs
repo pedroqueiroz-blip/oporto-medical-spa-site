@@ -304,7 +304,7 @@ export function home(m) {
           <a href="${telHref(s.telefone)}">${esc(s.telefone)}</a>
           <a href="mailto:${esc(s.email)}">${esc(s.email)}</a>
         </address>
-        ${I.como_chegar.texto ? '<p class="prose">' + t.inline(I.como_chegar.texto) + '</p>' : ''}
+        ${I.como_chegar.texto ? '<details class="visit__more"><summary>' + m.t('+ indicações') + '</summary><p class="prose">' + t.inline(I.como_chegar.texto) + '</p></details>' : ''}
       </div>
       <div class="mapf">
         ${MAP_SVG}
@@ -333,7 +333,7 @@ ${mbar(m, { home: true })}
       headHtml: head(m, { title: I.seo.titulo, description: homeDescription(m), path, ogTitle: I.seo.titulo_partilha, ogDescription: I.seo.descricao_partilha, ogImage: s.imagem_partilha || h.imagem }),
       ld: homeLD(m, faqItems),
       body,
-      scripts: ['/dados.js', '/prototype.js', '/pagar.js', '/site.js']
+      scripts: [m.en ? '/en/dados.js' : '/dados.js', '/prototype.js', '/pagar.js', '/site.js']
     })
   };
 }
