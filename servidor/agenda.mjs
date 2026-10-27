@@ -106,3 +106,39 @@ export async function marcarNoCRM(p) {
   p.zoho = { cliente: cliente.id, clienteNovo: cliente.novo, evento, nota: cliente.nota || "", em: new Date().toISOString() };
   await (await store(STORES.reservas)).delete(p.numero).catch(() => {});
 }
+
+/* ---------- Diagnóstico (/api/zoho/verificar) ---------- */
+
+// Últimas marcações do site, mais recentes primeiro, com o resultado no Zoho.
+export async function ultimasMarcacoes(n = 10) {
+  const s = await store(STORES.pedidos);
+  const chaves = (await s.list()).blobs.map((b) => b.key).filter((k) => k.startsWith("OMS-"));
+  const out = [];
+  for (const k of chaves) {
+    const p = await s.get(k, { type: "json" });
+    if (p?.tipo !== "marcacao") continue;
+    out.push({ numero: p.numero, criado: p.criado, data: p.marcacao?.data, hora: p.marcacao?.hora, tratamento: p.tratamento?.nome, terapeuta: p.marcacao?.terapeuta,
+      cliente: `${p.cliente?.nome || ""} · ${p.cliente?.email || ""}`, estado: p.estado, metodo: p.pagamento?.metodo || (p.total > 0 ? "" : p.codigo?.texto || ""), zoho: p.zoho || null });
+  }
+  return out.sort((a, b) => String(b.criado).localeCompare(String(a.criado))).slice(0, n);
+}
+
+// Volta a pôr no CRM uma marcação paga (ou a 0 €) que lá não ficou.
+export async function repetirNoCRM(numero) {
+  const s = await store(STORES.pedidos);
+  const p = await s.get(String(numero).toUpperCase(), { type: "json" });
+  if (p?.tipo !== "marcacao") throw new Error("Marcação não encontrada.");
+  if (!["pago", "confirmado"].includes(p.estado)) throw new Error("Só se põem na agenda marcações pagas ou a 0 €.");
+  if (p.zoho?.evento) return "já estava na agenda.";
+  if (!p.marcacao.zohoDono) {
+    // Pedido criado antes de o Zoho estar ligado: escolhe a terapeuta pelo nome guardado.
+    const t = (await equipaCRM()).find((x) => x.nome === p.marcacao.terapeuta && x.dono);
+    if (t) p.marcacao.zohoDono = t.dono;
+  }
+  delete p.zoho;
+  await marcarNoCRM(p);
+  if (!p.zoho?.evento) throw new Error("O Zoho CRM não está ligado neste site.");
+  p.atualizado = new Date().toISOString();
+  await s.setJSON(p.numero, p);
+  return "posta na agenda do Zoho.";
+}

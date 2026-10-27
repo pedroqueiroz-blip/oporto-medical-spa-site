@@ -312,6 +312,14 @@ try {
   await notificar(r.j);
   const pz = await obter(r.j.numero);
   ok(pz.estado === "pago" && /required/.test(pz.zoho.erro) && S.emails.some((e) => e.subject.includes(pz.numero) && e.html.includes("Marcar à mão")), "falha no CRM não trava o pagamento e a equipa é avisada");
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
+  Z.falhaEvento = false;
+  const nEv = Z.eventos.length;
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&repetir=" + pz.numero });
+  ok(pg.txt.includes("✓ " + pz.numero) && Z.eventos.length === nEv + 1 && (await obter(pz.numero)).zoho.evento, "«Pôr na agenda» volta a criar o evento no CRM");
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&repetir=" + pz.numero });
+  ok(Z.eventos.length === nEv + 1, "não duplica o evento se já está na agenda");
 
   console.log("\nTudo certo.");
 } finally {
