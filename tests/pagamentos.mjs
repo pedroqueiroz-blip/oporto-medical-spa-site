@@ -193,6 +193,20 @@ try {
   ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.subject.startsWith("O seu voucher") && e.html.includes("levantá-la no spa") && /OMS-[A-Z0-9]{4}-[A-Z0-9]{4}/.test(e.html)), "caixa oferta: código por email e aviso para levantar no spa");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.html.includes("Caixa oferta, levanta no SPA")), "caixa oferta: a equipa é avisada para preparar a caixa");
 
+  // 4c) Site em inglês (/en/): voucher, erros e emails em inglês; fatura e aviso à equipa em português
+  await news({ body: JSON.stringify({ payload: { form_name: "newsletter", data: { email: "kim@exemplo.co.uk", lingua: "en" } } }) });
+  ok(S.emails.some((e) => e.to[0] === "kim@exemplo.co.uk" && e.subject.startsWith("Your 10% code") && e.html.includes("/en/#reservar")), "inglês: newsletter subscrita em /en/ recebe o código em inglês");
+  r = await pedir("/api/pagamento?lingua=en", { tipo: "voucher", tratamento: relax.id, formato: "caixa", para: "Sam", nome: "Jo Smith", email: "jo@exemplo.co.uk", metodo: "card" });
+  ok(S.cartao.at(-1).payment.lang === "EN" && S.cartao.at(-1).payment.successUrl.includes(`/en/payment/?n=${r.j.numero}`) && r.j.tratamento === relax.nome_en, "inglês: cartão da euPago em inglês e regresso a /en/payment/");
+  await notificar(r.j, { mp: "CC:PT" });
+  const ven = S.emails.find((e) => e.to[0] === "jo@exemplo.co.uk");
+  ok(ven && ven.subject === `Your gift voucher · ${relax.nome_en}` && ven.html.includes("Valid until") && ven.html.includes("Gift box") && ven.html.includes("/en/#reservar") && !/Válido até/.test(ven.html), "inglês: email do voucher em inglês, com a caixa oferta");
+  ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("Caixa oferta, levanta no SPA") && e.html.includes("Inglês")), "inglês: aviso à equipa em português, com a língua do cliente");
+  r = await pedir("/api/pagamento?lingua=en", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "", metodo: "card" });
+  ok(r.status === 400 && r.j.erro === "Please enter your mobile number.", "inglês: erros em inglês");
+  r = await pedir("/api/preco?lingua=en", { tipo: "marcacao", tratamento: relax.id, codigo: "NAO-EXISTE" });
+  ok(r.status === 400 && r.j.erro === "This code isn’t valid.", "inglês: código inválido explicado em inglês");
+
   // 5) Validações
   r = await marcar({ tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "tratamento desconhecido é recusado");

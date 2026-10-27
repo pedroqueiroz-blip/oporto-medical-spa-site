@@ -1,6 +1,7 @@
 // Versão inglesa do site (/en/): mensagens de erro, datas e nomes dos tratamentos para quem marca ou compra em inglês.
 // O pedido guarda a língua (p.lingua = "en"); a fatura e o aviso à equipa ficam em português.
 import { tratamento as lerTratamento, campanha as lerCampanha } from "./catalogo.mjs";
+import catalogo from "./gerado/catalogo.json" with { type: "json" };
 
 export const lingua = (v) => (v === "en" ? "en" : "pt");
 
@@ -39,7 +40,7 @@ export function erroEN(msg) {
   const m = String(msg || "");
   if (ERROS[m]) return ERROS[m];
   const v = m.match(/^Este voucher é para (.+)\. Escolha esse tratamento para o usar\.$/);
-  if (v) return `This voucher is for ${v[1]}. Choose that treatment to use it.`;
+  if (v) return `This voucher is for ${catalogo.tratamentos.find((t) => t.nome === v[1])?.nome_en || v[1]}. Choose that treatment to use it.`;
   return "Something went wrong. Please try again in a moment.";
 }
 

@@ -40,6 +40,11 @@ Em «Contactos e horário › Google, redes e lançamento», **Versão inglesa n
 `/en/` no Google (com `hreflang`). Desligado, as páginas existem mas ficam fora do Google; nas pré-visualizações
 do Netlify o botão EN funciona sempre.
 
+Em `/en/`, a agenda, os vouchers e o pagamento aparecem em inglês (`public/prototype.js` e `public/pagar.js` leem
+`<html lang>`; tratamentos e equipa vêm de `/en/dados.js`). Os pedidos feitos em inglês levam `?lingua=en` à `/api`:
+os erros, a página da euPago, o regresso do cartão (`/en/payment/`) e os emails ao cliente seguem em inglês
+(`servidor/ingles.mjs`). A fatura (Moloni ON) e o aviso à equipa ficam em português, com a indicação «Língua: Inglês».
+
 ### SEO e GEO automáticos
 
 O build (`src/build.mjs`) gera tudo a partir do conteúdo, por isso nada disto se edita à mão:
