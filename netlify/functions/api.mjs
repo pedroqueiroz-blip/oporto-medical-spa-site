@@ -3,7 +3,7 @@
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
 import { pedirCodigo, confirmarCodigo, ErroVerificacao } from "../../servidor/verificacao.mjs";
-import { disponibilidade, confirmarHora, ErroAgenda } from "../../servidor/agenda.mjs";
+import { disponibilidade, confirmarHora, guardarHora, ErroAgenda } from "../../servidor/agenda.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
@@ -98,6 +98,7 @@ export default async (req) => {
       const p = await criar(c);
       await confirmarHora(p, { terapeutaId: c.terapeutaId, qualquer: c.qualquer === true || c.qualquer === "true" });
       const r = await pagar(p, { metodo: c.metodo, telemovel: c.telemovel, base: url.origin });
+      if (p.estado === "aguarda_pagamento") await guardarHora(p);
       return json({ ...publico(p), token: p.token, url: r.url || null });
     }
 

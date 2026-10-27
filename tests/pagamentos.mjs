@@ -152,14 +152,15 @@ try {
   const com10 = r2(relax.preco * 0.9);
   ok(r.j.total === com10 && r.j.codigo.tipo === "newsletter", `preço com o código: ${relax.preco} € → ${r.j.total} €`);
   r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
+  ok(r.status === 400 && /MB WAY ou cartão/.test(r.j.erro), "marcações não se pagam por Multibanco (só MB WAY ou cartão, que confirmam na hora)");
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
   const p2 = r.j;
-  ok(p2.total === com10 && p2.multibanco?.referencia === "123456789" && S.mb[0].valor === com10, "referência Multibanco com o valor já com desconto");
+  ok(p2.total === com10 && p2.multibanco?.referencia === "123456789" && S.mb[0].valor === com10, "voucher por Multibanco: referência com o valor já com desconto");
   ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.subject.startsWith("Dados para pagamento") && e.html.includes("123 456 789")), "email com a referência Multibanco");
   await notificar(p2, { mp: "PC:PT" });
   const d2 = Object.values(S.docs)[1];
   ok(d2.dados.products[0].productId === 102 && d2.dados.products[0].price === com10 && d2.totalValue === com10, "fatura TPREV com o valor já com o desconto");
   ok(d2.dados.customerId === 50 && d2.dados.payments[0].paymentMethodId === 4, "com NIF: cliente criado no Moloni ON; meio Multibanco");
-  ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.html.includes("cuidar da sua saúde e bem-estar. Iniciará de seguida a sua terapêutica de prevenção: " + esc(relax.nome))), "email com o texto da terapêutica de prevenção");
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo });
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "código de boas-vindas só serve uma vez");
 
@@ -309,6 +310,12 @@ try {
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no CRM é recusada antes de pagar");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
   ok(r.status === 200 && r.j.marcacao.terapeuta === "Luísa Pinto" && !("zohoDono" in r.j.marcacao), "«Sem preferência» fica com quem está livre no CRM");
+  const guardada = r.j;
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, nome: "Outra Pessoa", email: "outra@exemplo.pt", telefone: "916000000", nif: "506651940", metodo: "mb_way" });
+  ok(r.status === 400 && /ocupada/.test(r.j.erro), "enquanto o MB WAY não chega, a hora fica guardada para quem a escolheu");
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
+  ok(!r.j.livres[luisa.id][D].includes("11:00"), "a hora guardada não aparece livre no site");
+  r = { j: guardada };
   await notificar(r.j);
   const evz = Z.eventos.at(-1);
   ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");

@@ -16,6 +16,8 @@ export async function pagar(p, { metodo, telemovel, base }) {
     return { estado: p.estado };
   }
   if (!METODOS.includes(metodo)) throw new ErroCliente("Escolha como quer pagar.");
+  // Marcações só com pagamento na hora (Pedro, 27/10/2026): a hora fica registada logo que o pagamento chega.
+  if (p.tipo === "marcacao" && metodo === "multibanco") throw new ErroCliente("As marcações pagam-se por MB WAY ou cartão, para ficarem confirmadas na hora.");
   const tel = metodo === "mb_way" ? E.telemovelPT(telemovel || p.cliente.telefone) : "";
   if (metodo === "mb_way" && !tel) throw new ErroCliente("Indique um telemóvel português com 9 dígitos para o MB WAY.");
   const pagina = `${base}/pagamento/?n=${p.numero}&t=${p.token}`;

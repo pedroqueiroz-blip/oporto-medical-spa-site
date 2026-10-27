@@ -90,7 +90,7 @@
         '<button type="button" class="btn btn--ghost" data-aplicar>Aplicar</button></div>') +
         (gratis ? '' :
           '<div class="vc-row"><p class="vc-label">Como quer pagar</p><div class="vc-seg" role="group">' +
-          [['mb_way', 'MB WAY'], ['multibanco', 'Multibanco'], ['card', 'Cartão']].map(function (m) {
+          [['mb_way', 'MB WAY'], ['multibanco', 'Multibanco'], ['card', 'Cartão']].filter(function (m) { return pedido.tipo !== 'marcacao' || m[0] !== 'multibanco'; }).map(function (m) {
             return '<button type="button" data-metodo="' + m[0] + '" aria-pressed="' + (st.metodo === m[0]) + '">' + m[1] + '</button>';
           }).join('') + '</div></div>' +
           (st.metodo === 'mb_way' ? '<label class="field"><span>Telemóvel MB WAY</span><input id="pg-tel" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(st.telemovel) + '"></label>' : '') +
