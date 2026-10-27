@@ -2,11 +2,13 @@
 // (o pagamento e a fatura funcionam na mesma; o cliente vê o resultado na página de pagamento).
 import { spa, TEXTO_TERAPEUTICA } from "./catalogo.mjs";
 import { dataPT } from "./datas.mjs";
+import { dataEN, nomeEN, campanhaEN, codigoEN, TEXTO_TERAPEUTICA_EN } from "./ingles.mjs";
 
 export const emailAtivo = () => Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const eur = (v) => Number(v).toLocaleString("pt-PT", { minimumFractionDigits: Number(v) % 1 ? 2 : 0, maximumFractionDigits: 2 }) + " €";
+const eurEN = (v) => "€" + Number(v).toLocaleString("en-GB", { minimumFractionDigits: Number(v) % 1 ? 2 : 0, maximumFractionDigits: 2 });
 const site = () => String(process.env.URL_SITE || spa.url || "").replace(/\/$/, "");
 
 async function enviar({ para, assunto, html }) {
@@ -27,7 +29,7 @@ async function enviar({ para, assunto, html }) {
 }
 
 // Cores da marca: fundo linho, texto noite, acento luz de vela.
-const moldura = (conteudo) => `<!doctype html><html lang="pt-PT"><body style="margin:0;background:#E8DCC8;font-family:Manrope,Arial,Helvetica,sans-serif;color:#24180F">
+const moldura = (conteudo, lang = "pt-PT") => `<!doctype html><html lang="${lang}"><body style="margin:0;background:#E8DCC8;font-family:Manrope,Arial,Helvetica,sans-serif;color:#24180F">
 <div style="max-width:560px;margin:0 auto;padding:28px 20px">
 <p style="font-family:'EB Garamond',Georgia,serif;font-size:24px;letter-spacing:.04em;margin:0 0 18px;color:#0D0A08">${esc(spa.nome)}</p>
 <div style="background:#fff;border-radius:4px;padding:26px;line-height:1.6;font-size:15px">${conteudo}</div>
@@ -40,7 +42,7 @@ const valorPago = (p) => p.total > 0 ? eur(p.total) + (p.desconto ? ` <span styl
   : p.codigo?.tipo === "voucher" ? `Voucher oferta ${esc(p.codigo.codigo)}` : "Sem custos";
 
 // Confirmação da marcação, com o texto do Pedro para a terapêutica (TREAB ou TPREV).
-export const emailMarcacao = (p) => enviar({
+export const emailMarcacao = (p) => p.lingua === "en" ? EN.marcacao(p) : enviar({
   para: p.cliente.email,
   assunto: `Marcação confirmada · ${p.tratamento.nome}`,
   html: moldura(`${h1(`Está marcado, ${p.cliente.nome.split(" ")[0]}.`)}
@@ -52,7 +54,7 @@ ${p.total > 0 ? `<p style="font-size:13px;color:#7a6650">A fatura-recibo segue n
 });
 
 // Voucher pago: o código só aparece aqui.
-export const emailVoucher = (p) => enviar({
+export const emailVoucher = (p) => p.lingua === "en" ? EN.voucher(p) : enviar({
   para: p.cliente.email,
   assunto: `O seu voucher oferta · ${p.tratamento.nome}`,
   html: moldura(`${h1("O seu voucher oferta")}
@@ -71,6 +73,7 @@ ${p.voucher.formato === "caixa" ? `<p><b>Caixa oferta:</b> preparamos a caixa co
 });
 
 export const emailMultibanco = (p) => {
+  if (p.lingua === "en") return EN.multibanco(p);
   const mb = p.pagamento.multibanco;
   return enviar({
     para: p.cliente.email,
@@ -91,6 +94,7 @@ export const emailInterno = (p, problema) => enviar({
     p.marcacao?.terapeuta && ["Terapeuta", esc(p.marcacao.terapeuta)],
     p.voucher?.codigo && ["Voucher", `${esc(p.voucher.codigo)} · válido até ${esc(dataPT(p.voucher.validade))}`],
     p.voucher?.para && ["Para", esc(p.voucher.para)],
+    p.lingua === "en" && ["Língua", "Inglês (marcou no site em inglês)"],
     p.voucher && ["Entrega", p.voucher.formato === "caixa" ? "Caixa oferta, levanta no SPA (preparar a caixa)" : "Digital, por email"],
     ["Cliente", `${esc(p.cliente.nome)} · ${esc(p.cliente.email)} · ${esc(p.cliente.telefone)}${p.cliente.nif ? ` · NIF ${esc(p.cliente.nif)}` : ""}`],
     ["Valor", valorPago(p)], p.fatura?.numero && ["Fatura", esc(p.fatura.numero)], p.moloni?.erro && ["Moloni", esc(p.moloni.erro)],
@@ -100,7 +104,7 @@ export const emailInterno = (p, problema) => enviar({
 });
 
 // Código de 10% para quem subscreve a newsletter.
-export const emailBoasVindas = (email, codigo, pct) => enviar({
+export const emailBoasVindas = (email, codigo, pct, lingua) => lingua === "en" ? EN.boasVindas(email, codigo, pct) : enviar({
   para: email,
   assunto: `O seu código de ${pct}% no ${spa.nome}`,
   html: moldura(`${h1("Boas-vindas às cartas da casa")}
@@ -109,3 +113,60 @@ export const emailBoasVindas = (email, codigo, pct) => enviar({
 <p>Escreva-o no passo de confirmação, antes de pagar. Vale para uma compra.</p>
 <p><a href="${esc(site())}/#reservar" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">Reservar</a></p>`),
 });
+
+// Os mesmos emails para quem marca ou compra no site em inglês (/en/).
+const valorPagoEN = (p) => p.total > 0 ? eurEN(p.total) + (p.desconto ? ` <span style="color:#7a6650;font-weight:400">(${esc(codigoEN(p.codigo)?.texto || "discount")})</span>` : "")
+  : p.codigo?.tipo === "voucher" ? `Gift voucher ${esc(p.codigo.codigo)}` : "No charge";
+const nomeTrat = (p) => nomeEN(p.tratamento.id) || p.tratamento.nome;
+const siteEN = () => `${site()}/en/`;
+const EN = {
+  marcacao: (p) => enviar({
+    para: p.cliente.email,
+    assunto: `Booking confirmed · ${nomeTrat(p)}`,
+    html: moldura(`${h1(`You’re booked, ${p.cliente.nome.split(" ")[0]}.`)}
+<p>${esc(TEXTO_TERAPEUTICA_EN[p.tratamento.artigo](nomeTrat(p)))}</p>
+${linhas([["Treatment", esc(nomeTrat(p))], ["Day", esc(dataEN(p.marcacao.data, { semana: true }))], ["Time", `${esc(p.marcacao.hora)} · ${esc(p.tratamento.duracao)} min`],
+      p.marcacao.terapeuta && ["Therapist", esc(p.marcacao.terapeuta)], ["Amount", valorPagoEN(p)], ["Booking no.", esc(p.numero)]])}
+<p>Please arrive ten to fifteen minutes early: your tea will be waiting. You can change or cancel free of charge up to 24 hours beforehand by replying to this email or calling ${esc(spa.telefone)}.</p>
+${p.total > 0 ? `<p style="font-size:13px;color:#7a6650">Your invoice-receipt will follow in a separate email (in Portuguese).</p>` : ""}`, "en"),
+  }),
+  voucher: (p) => {
+    const nome = p.campanha ? campanhaEN(p.campanha.id) || nomeTrat(p) : nomeTrat(p);
+    return enviar({
+      para: p.cliente.email,
+      assunto: `Your gift voucher · ${nome}`,
+      html: moldura(`${h1("Your gift voucher")}
+<p>Thank you, ${esc(p.cliente.nome.split(" ")[0])}. Here is your voucher to give${p.voucher.para ? ` to ${esc(p.voucher.para)}` : ""}:</p>
+<div style="border:1px solid #D9A86C;padding:22px;text-align:center;margin:16px 0;background:#0D0A08;color:#E8DCC8">
+<p style="margin:0 0 6px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#B5A288">Gift voucher</p>
+<p style="font-family:'EB Garamond',Georgia,serif;font-size:24px;margin:0 0 4px">${esc(nomeTrat(p))}</p>
+<p style="font-size:13px;color:#B5A288;margin:0 0 12px">${esc(p.tratamento.duracao)} minutes${p.campanha ? ` · ${esc(campanhaEN(p.campanha.id) || p.campanha.nome)}` : ""}</p>
+${p.voucher.mensagem ? `<p style="font-style:italic;margin:0 0 12px">“${esc(p.voucher.mensagem)}”</p>` : ""}
+${p.voucher.para || p.voucher.de ? `<p style="font-size:13px;color:#B5A288;margin:0 0 14px">${p.voucher.para ? `To ${esc(p.voucher.para)}` : ""}${p.voucher.para && p.voucher.de ? " · " : ""}${p.voucher.de ? `From ${esc(p.voucher.de)}` : ""}</p>` : ""}
+<p style="font-size:26px;letter-spacing:.12em;margin:0;color:#D9A86C"><b>${esc(p.voucher.codigo)}</b></p>
+<p style="font-size:13px;margin:12px 0 0">Valid until ${esc(dataEN(p.voucher.validade))}</p></div>
+${p.voucher.formato === "caixa" ? `<p><b>Gift box:</b> we will prepare a gift box with this voucher, at no extra cost. You can collect it at the spa${spa.morada ? `, ${esc(spa.morada)}` : ""}, during opening hours. Please quote order no. ${esc(p.numero)}.</p>` : ""}
+<p>To book, choose ${esc(nomeTrat(p))} at <a href="${esc(siteEN())}#reservar">${esc(siteEN().replace(/^https?:\/\//, ""))}</a>, enter the code at the confirmation step and the booking is free of charge. You can also book by calling ${esc(spa.telefone)}.</p>
+<p style="font-size:13px;color:#7a6650">Valid for one booking. Your invoice-receipt will follow in a separate email (in Portuguese).</p>`, "en"),
+    });
+  },
+  multibanco: (p) => {
+    const mb = p.pagamento.multibanco;
+    return enviar({
+      para: p.cliente.email,
+      assunto: `Payment details · ${nomeTrat(p)}`,
+      html: moldura(`${h1("Just the payment to go")}
+<p>${p.tipo === "voucher" ? "Your voucher will be emailed to you" : "Your booking will be confirmed"} as soon as we receive the payment.</p>
+${linhas([["Entity", esc(mb.entidade)], ["Reference", esc(String(mb.referencia).replace(/(\d{3})(?=\d)/g, "$1 "))], ["Amount", eurEN(p.total)], ["Pay by", esc(dataEN(mb.validade))]])}`, "en"),
+    });
+  },
+  boasVindas: (email, codigo, pct) => enviar({
+    para: email,
+    assunto: `Your ${pct}% code at ${spa.nome}`,
+    html: moldura(`${h1("Welcome to our letters")}
+<p>Thank you for subscribing. Here is your ${pct}% discount code for your first booking or voucher:</p>
+<p style="font-size:24px;letter-spacing:.12em;text-align:center;border:1px solid #D9A86C;padding:16px;margin:16px 0"><b>${esc(codigo)}</b></p>
+<p>Enter it at the confirmation step, before paying. Valid for one purchase.</p>
+<p><a href="${esc(siteEN())}#reservar" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">Book</a></p>`, "en"),
+  }),
+};

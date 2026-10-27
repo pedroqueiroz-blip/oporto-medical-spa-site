@@ -36,16 +36,23 @@
       does: ['aroma', 'world', 'oil'], tone: 4 }
   ];
 
+  // Páginas em inglês (/en/): textos, datas e preços (€35) em inglês. Os dados (tratamentos, equipa) vêm de /en/dados.js.
+  var EN = (document.documentElement.lang || '').slice(0, 2) === 'en';
+  function L(pt, en) { return EN ? en : pt; }
+
   var HOURS = ['08:00', '09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
-  var WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
-  var MONTHS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  var WEEKDAYS = EN ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  var MONTHS = EN ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function eur(n) { return n.toLocaleString('pt-PT', n % 1 ? { minimumFractionDigits: 2 } : {}) + ' €'; }
+  function eur(n) {
+    if (EN) return '€' + n.toLocaleString('en-GB', n % 1 ? { minimumFractionDigits: 2 } : {});
+    return n.toLocaleString('pt-PT', n % 1 ? { minimumFractionDigits: 2 } : {}) + ' €';
+  }
   function byId(list, id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
   function initials(name) { return name.split(' ').map(function (p) { return p[0]; }).join(''); }
   function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) % 1000003; return h; }
@@ -66,7 +73,7 @@
     if (AGENDA[treatment] || !window.fetch || !window.OMS_PAGAR) return;
     AGENDA[treatment] = { loading: true };
     var span = Math.round((days[days.length - 1] - days[0]) / 864e5) + 1;
-    fetch('/api/disponibilidade?tratamento=' + encodeURIComponent(treatment) + '&de=' + isoDay(days[0]) + '&dias=' + span)
+    fetch('/api/disponibilidade?tratamento=' + encodeURIComponent(treatment) + '&de=' + isoDay(days[0]) + '&dias=' + span + (EN ? '&lingua=en' : ''))
       .then(function (r) { return r.ok ? r.json() : { fonte: 'simulada' }; })
       .catch(function () { return { fonte: 'simulada' }; })
       .then(function (j) { AGENDA[treatment] = j; done(treatment); });
@@ -95,7 +102,7 @@
   /* ---------- Agenda ---------- */
   function mountBooking(root, opts) {
     opts = opts || {};
-    var labels = opts.labels || ['Tratamento', 'Terapeuta', 'Dia e hora', 'Confirmar'];
+    var labels = opts.labels || (EN ? ['Treatment', 'Therapist', 'Day and time', 'Confirm'] : ['Tratamento', 'Terapeuta', 'Dia e hora', 'Confirmar']);
     var days = nextDays(12);
     var s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '', hasVoucher: false, vcod: '' };
 
@@ -119,15 +126,15 @@
       var areas = [];
       TREATMENTS.forEach(function (t) { if (areas.indexOf(t.area) < 0) areas.push(t.area); });
       var cur = s.treatment && byId(TREATMENTS, s.treatment);
-      return '<div class="bk-panel"><p class="bk-q">Por onde quer começar?</p>' + areas.map(function (a, i) {
+      return '<div class="bk-panel"><p class="bk-q">' + L('Por onde quer começar?', 'Where would you like to start?') + '</p>' + areas.map(function (a, i) {
         // Cada área abre como lista suspensa (fica aberta a do tratamento escolhido)
         var open = !!(s.openAreas && s.openAreas[a]) || !!(cur && cur.area === a);
         return '<div class="bk-group' + (open ? ' is-open' : '') + '"><button type="button" class="bk-group__t" data-area="' + esc(a) + '" aria-expanded="' + open + '" aria-controls="bk-area-' + i + '">' + esc(a) + '<span class="bk-group__n">' + TREATMENTS.filter(function (t) { return t.area === a; }).length + '</span>' + (AREA_TEXT[a] ? '<span class="bk-group__d">- ' + esc(AREA_TEXT[a]) + '</span>' : '') + '</button><div class="bk-options bk-options--list" id="bk-area-' + i + '">' +
           TREATMENTS.filter(function (t) { return t.area === a; }).map(function (t) {
             return '<button type="button" class="bk-option bk-option--row" data-treat="' + t.id + '" aria-pressed="' + (s.treatment === t.id) + '">' +
-              '<span class="bk-option__title">' + esc(t.name) + (t.camp ? ' <span class="bk-camp">Em campanha</span>' : '') + '</span>' +
+              '<span class="bk-option__title">' + esc(t.name) + (t.camp ? ' <span class="bk-camp">' + L('Em campanha', 'On offer') + '</span>' : '') + '</span>' +
               '<span class="bk-option__meta"><span>' + t.min + ' min</span><span class="bk-option__price' + (t.camp ? ' is-camp' : '') + '">' + eur(t.price) +
-              (t.oldPrice ? '<s><span class="sr-only">Preço normal </span>' + eur(t.oldPrice) + '</s>' : '') + '</span></span></button>';
+              (t.oldPrice ? '<s><span class="sr-only">' + L('Preço normal ', 'Usual price ') + '</span>' + eur(t.oldPrice) + '</s>' : '') + '</span></span></button>';
           }).join('') + '</div></div>';
       }).join('') + '</div>';
     }
@@ -135,10 +142,10 @@
     function panelTherapist() {
       var tr = byId(TREATMENTS, s.treatment);
       var list = TEAM.filter(function (t) { return t.does.indexOf(s.treatment) > -1; });
-      return '<div class="bk-panel"><p class="bk-q">Com quem se sente melhor? <span class="bk-q__sub">' + esc(tr.name) + '</span></p><div class="bk-options bk-options--team">' +
+      return '<div class="bk-panel"><p class="bk-q">' + L('Com quem se sente melhor?', 'Who would you like to see?') + ' <span class="bk-q__sub">' + esc(tr.name) + '</span></p><div class="bk-options bk-options--team">' +
         '<button type="button" class="bk-option bk-option--any" data-ther="any" aria-pressed="' + (s.therapist === 'any') + '">' +
-        '<span class="pms-avatar pms-tone-0" aria-hidden="true">✦</span><span class="bk-option__title">Sem preferência</span>' +
-        '<span class="bk-option__text">Mostramos todas as horas livres e escolhemos por si quem estiver disponível.</span></button>' +
+        '<span class="pms-avatar pms-tone-0" aria-hidden="true">✦</span><span class="bk-option__title">' + L('Sem preferência', 'No preference') + '</span>' +
+        '<span class="bk-option__text">' + L('Mostramos todas as horas livres e escolhemos por si quem estiver disponível.', 'We show every free time and choose whoever is available for you.') + '</span></button>' +
         list.map(function (t) {
           return '<button type="button" class="bk-option bk-option--person" data-ther="' + t.id + '" aria-pressed="' + (s.therapist === t.id) + '">' +
             avatar(t) + '<span class="bk-option__title">' + esc(t.name) + '</span>' +
@@ -154,13 +161,13 @@
 
     function agendaNote() {
       var a = AGENDA[s.treatment];
-      if (a && a.loading) return 'A ver as horas livres…';
-      if (a && a.fonte === 'zoho') return 'Horas livres neste momento. Encerra ao domingo.';
-      return 'Horários ilustrativos. Encerra ao domingo.';
+      if (a && a.loading) return L('A ver as horas livres…', 'Checking free times…');
+      if (a && a.fonte === 'zoho') return L('Horas livres neste momento. Encerra ao domingo.', 'Times free right now. Closed on Sundays.');
+      return L('Horários ilustrativos. Encerra ao domingo.', 'Illustrative times. Closed on Sundays.');
     }
 
     function panelTime() {
-      var html = '<div class="bk-panel"><p class="bk-q">Quando lhe faz sentido parar?</p><div class="bk-days" role="listbox" aria-label="Dia">';
+      var html = '<div class="bk-panel"><p class="bk-q">' + L('Quando lhe faz sentido parar?', 'When would you like to pause?') + '</p><div class="bk-days" role="listbox" aria-label="' + L('Dia', 'Day') + '">';
       html += days.map(function (d, i) {
         var sel = dayKey(d) === dayKey(s.day);
         var any = HOURS.some(function (h) { return slotFree(d, h); });
@@ -186,7 +193,7 @@
       s.conta = null; s.vmsg = '';
       if (!code || !window.OMS_PAGAR) { render(); return; }
       OMS_PAGAR.preco({ tipo: 'marcacao', tratamento: s.treatment, codigo: code }).then(function (c) {
-        s.conta = c; s.vmsg = c.total === 0 ? c.codigo.texto + ' aplicado: não há nada a pagar.' : c.codigo.texto + ' aplicado.';
+        s.conta = c; s.vmsg = c.total === 0 ? c.codigo.texto + L(' aplicado: não há nada a pagar.', ' applied: there is nothing to pay.') : c.codigo.texto + L(' aplicado.', ' applied.');
       }, function (e) { s.vmsg = e.message; }).then(function () {
         render();
         var i = focus && root.querySelector('#bk-vcod'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
@@ -196,36 +203,36 @@
     function panelConfirm() {
       var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist();
       return '<div class="bk-panel bk-panel--confirm"><div class="bk-summary">' +
-        '<p class="bk-summary__eyebrow">A sua marcação</p>' +
+        '<p class="bk-summary__eyebrow">' + L('A sua marcação', 'Your booking') + '</p>' +
         '<p class="bk-summary__title">' + esc(tr.name) + '</p>' +
         '<dl class="bk-summary__list">' +
-        '<div><dt>Terapeuta</dt><dd>' + esc(th ? th.name : '') + (s.therapist === 'any' ? ' <small>(atribuída)</small>' : '') + '</dd></div>' +
-        '<div><dt>Dia</dt><dd>' + longDate(s.day) + '</dd></div>' +
-        '<div><dt>Hora</dt><dd>' + s.hour + ' · ' + tr.min + ' min</dd></div>' +
-        (s.conta && s.conta.desconto ? '<div><dt>Preço</dt><dd>' + eur(s.conta.precoBase) + '</dd></div><div><dt>' + esc(s.conta.codigo.texto) + '</dt><dd>−' + eur(s.conta.desconto) + '</dd></div>' : '') +
+        '<div><dt>' + L('Terapeuta', 'Therapist') + '</dt><dd>' + esc(th ? th.name : '') + (s.therapist === 'any' ? ' <small>' + L('(atribuída)', '(assigned)') + '</small>' : '') + '</dd></div>' +
+        '<div><dt>' + L('Dia', 'Day') + '</dt><dd>' + longDate(s.day) + '</dd></div>' +
+        '<div><dt>' + L('Hora', 'Time') + '</dt><dd>' + s.hour + ' · ' + tr.min + ' min</dd></div>' +
+        (s.conta && s.conta.desconto ? '<div><dt>' + L('Preço', 'Price') + '</dt><dd>' + eur(s.conta.precoBase) + '</dd></div><div><dt>' + esc(s.conta.codigo.texto) + '</dt><dd>−' + eur(s.conta.desconto) + '</dd></div>' : '') +
         '<div class="bk-summary__total"><dt>Total</dt><dd>' + eur(total()) + '</dd></div></dl></div>' +
         '<form class="bk-form" novalidate>' +
-        '<label class="field"><span>Nome</span><input id="bk-name" autocomplete="name" value="' + esc(s.name) + '" required></label>' +
+        '<label class="field"><span>' + L('Nome', 'Name') + '</span><input id="bk-name" autocomplete="name" value="' + esc(s.name) + '" required></label>' +
         '<label class="field"><span>Email</span><input id="bk-email" type="email" autocomplete="email" value="' + esc(s.email) + '" required></label>' +
-        '<label class="field"><span>Telemóvel</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '" required></label>' +
-        '<label class="field"><span>NIF para a fatura (opcional)</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '"></label>' +
-        '<label class="field field--check"><input id="bk-voucher" type="checkbox"' + (s.hasVoucher ? ' checked' : '') + '><span>Tenho um voucher para usar</span></label>' +
-        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>Código do voucher ou VIP</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
-          '<button type="button" class="btn btn--ghost" data-vapply>Aplicar</button></div>' +
+        '<label class="field"><span>' + L('Telemóvel', 'Mobile') + '</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '" required></label>' +
+        '<label class="field"><span>' + L('NIF para a fatura (opcional)', 'Tax number (NIF) for the invoice (optional)') + '</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '"></label>' +
+        '<label class="field field--check"><input id="bk-voucher" type="checkbox"' + (s.hasVoucher ? ' checked' : '') + '><span>' + L('Tenho um voucher para usar', 'I have a voucher to use') + '</span></label>' +
+        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>' + L('Código do voucher ou VIP', 'Voucher or VIP code') + '</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
+          '<button type="button" class="btn btn--ghost" data-vapply>' + L('Aplicar', 'Apply') + '</button></div>' +
           (s.vmsg ? '<p class="' + (s.conta ? 'bk-note' : 'bk-error') + '" role="status">' + esc(s.vmsg) + '</p>' : '') : '') +
-        '<p class="bk-error" role="alert" hidden>Indique o seu nome, um email válido e o telemóvel para recebermos a marcação. O NIF, se o indicar, tem 9 dígitos.</p>' +
-        '<button type="submit" class="btn btn--primary"' + (s.sending ? ' disabled' : '') + '>' + (s.sending ? 'Um momento…' : total() === 0 ? 'Confirmar marcação' : 'Confirmar e pagar ' + eur(total())) + '</button>' +
-        '<p class="bk-note">Pode cancelar ou alterar sem custos até 24 horas antes.</p></form></div>';
+        '<p class="bk-error" role="alert" hidden>' + L('Indique o seu nome, um email válido e o telemóvel para recebermos a marcação. O NIF, se o indicar, tem 9 dígitos.', 'Please enter your name, a valid email address and your mobile number so we can take your booking. The tax number (NIF), if you give one, has 9 digits.') + '</p>' +
+        '<button type="submit" class="btn btn--primary"' + (s.sending ? ' disabled' : '') + '>' + (s.sending ? L('Um momento…', 'One moment…') : total() === 0 ? L('Confirmar marcação', 'Confirm booking') : L('Confirmar e pagar ', 'Confirm and pay ') + eur(total())) + '</button>' +
+        '<p class="bk-note">' + L('Pode cancelar ou alterar sem custos até 24 horas antes.', 'You can cancel or change free of charge up to 24 hours beforehand.') + '</p></form></div>';
     }
 
     function panelDone() {
       var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist();
       return '<div class="bk-panel bk-done"><p class="bk-done__mark" aria-hidden="true">✦</p>' +
-        '<p class="bk-done__title">Está marcado, ' + esc(s.name.split(' ')[0]) + '.</p>' +
-        '<p class="bk-done__text">' + esc(tr.name) + ' com ' + esc(th.name) + ', ' + longDate(s.day) + ' às ' + s.hour + '. ' +
-        'Chegue dez a quinze minutos antes: o chá fica à sua espera.</p>' +
-        '<p class="bk-note">Protótipo: nenhuma marcação foi enviada.</p>' +
-        '<button type="button" class="btn btn--ghost" data-reset>Fazer outra marcação</button></div>';
+        '<p class="bk-done__title">' + L('Está marcado, ', 'You’re booked, ') + esc(s.name.split(' ')[0]) + '.</p>' +
+        '<p class="bk-done__text">' + esc(tr.name) + L(' com ', ' with ') + esc(th.name) + ', ' + longDate(s.day) + L(' às ', ' at ') + s.hour + '. ' +
+        L('Chegue dez a quinze minutos antes: o chá fica à sua espera.', 'Please arrive ten to fifteen minutes early: your tea will be waiting.') + '</p>' +
+        '<p class="bk-note">' + L('Protótipo: nenhuma marcação foi enviada.', 'Prototype: no booking was sent.') + '</p>' +
+        '<button type="button" class="btn btn--ghost" data-reset>' + L('Fazer outra marcação', 'Make another booking') + '</button></div>';
     }
 
     function render() {
@@ -233,10 +240,10 @@
       var nav = '';
       if (!s.done && s.step < 3) {
         nav = '<div class="bk-actions">' +
-          (s.step > 0 ? '<button type="button" class="btn btn--ghost" data-go="' + (s.step - 1) + '">Voltar</button>' : '<span></span>') +
-          '<button type="button" class="btn btn--primary" data-go="' + (s.step + 1) + '"' + (canGo(s.step + 1) ? '' : ' disabled') + '>Continuar</button></div>';
+          (s.step > 0 ? '<button type="button" class="btn btn--ghost" data-go="' + (s.step - 1) + '">' + L('Voltar', 'Back') + '</button>' : '<span></span>') +
+          '<button type="button" class="btn btn--primary" data-go="' + (s.step + 1) + '"' + (canGo(s.step + 1) ? '' : ' disabled') + '>' + L('Continuar', 'Continue') + '</button></div>';
       } else if (!s.done) {
-        nav = '<div class="bk-actions"><button type="button" class="btn btn--ghost" data-go="2">Voltar</button><span></span></div>';
+        nav = '<div class="bk-actions"><button type="button" class="btn btn--ghost" data-go="2">' + L('Voltar', 'Back') + '</button><span></span></div>';
       }
       root.innerHTML = '<div class="bk">' + (s.done ? '' : stepsBar()) + body + nav + '</div>';
       if (s.treatment) loadAgenda(s.treatment, days, function (t) { if (s.treatment === t && !s.done && s.step === 2) render(); });
@@ -330,39 +337,41 @@
     // Válido até ao último dia do mês, daqui a 12 meses
     function validUntil() {
       var d = new Date(), end = new Date(d.getFullYear() + 1, d.getMonth() + 1, 0);
+      if (EN) return end.getDate() + ' ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][end.getMonth()] + ' ' + end.getFullYear();
       return end.getDate() + ' de ' + ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'][end.getMonth()] + ' de ' + end.getFullYear();
     }
 
     function card() {
       var t = cur();
       return '<div class="vc-card' + (v.format === 'caixa' ? ' vc-card--box' : '') + '" aria-live="polite">' +
-        '<img class="vc-card__logo" src="logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
-        '<div class="vc-card__top"><span class="vc-card__kind">Voucher oferta</span></div>' +
+        '<img class="vc-card__logo" src="/logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
+        '<div class="vc-card__top"><span class="vc-card__kind">' + L('Voucher oferta', 'Gift voucher') + '</span></div>' +
         (t.camp ? '<p class="vc-card__camp">' + esc(t.label) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
-        '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? ' (Reserve ' + t.min + ' min.)' : '') + '</p>' +
-        '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : 'A sua mensagem aparece aqui.') + '</p>' +
-        '<div class="vc-card__foot"><span>Para ' + esc(v.to || '…') + '</span><span>De ' + esc(v.from || '…') + '</span></div>' +
-        '<p class="vc-card__info">Válido até ' + validUntil() + '.' + (S.telefone ? '<br>' + esc(S.telefone) : '') + '</p></div>';
+        '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? L(' (Reserve ', ' (Allow ') + t.min + ' min.)' : '') + '</p>' +
+        '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : L('A sua mensagem aparece aqui.', 'Your message appears here.')) + '</p>' +
+        '<div class="vc-card__foot"><span>' + L('Para ', 'To ') + esc(v.to || '…') + '</span><span>' + L('De ', 'From ') + esc(v.from || '…') + '</span></div>' +
+        '<p class="vc-card__info">' + L('Válido até ', 'Valid until ') + validUntil() + '.' + (S.telefone ? '<br>' + esc(S.telefone) : '') + '</p></div>';
     }
 
     function form() {
       var t = cur();
       return '<div class="vc-form">' +
-        '<div class="vc-row"><label class="vc-label" for="vc-exp">Massagem ou ritual a oferecer</label><select id="vc-exp" class="vc-select">' + (CAMPS.length ? '<optgroup label="Campanhas">' + CAMPS.map(function (x) {
-          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.label) + ' · ' + esc(x.name) + ' ' + x.min + ' min · ' + eur(x.price) + (x.oldPrice ? ' (em vez de ' + eur(x.oldPrice) + ')' : '') + '</option>';
-        }).join('') + '</optgroup><optgroup label="Massagens e tratamentos">' : '') + TREATMENTS.map(function (x) {
+        '<div class="vc-row"><label class="vc-label" for="vc-exp">' + L('Massagem ou ritual a oferecer', 'Massage or ritual to give') + '</label><select id="vc-exp" class="vc-select">' + (CAMPS.length ? '<optgroup label="' + L('Campanhas', 'Offers') + '">' + CAMPS.map(function (x) {
+          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.label) + ' · ' + esc(x.name) + ' ' + x.min + ' min · ' + eur(x.price) + (x.oldPrice ? L(' (em vez de ', ' (instead of ') + eur(x.oldPrice) + ')' : '') + '</option>';
+        }).join('') + '</optgroup><optgroup label="' + L('Massagens e tratamentos', 'Massages and treatments') + '">' : '') + TREATMENTS.map(function (x) {
           return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + '</option>';
         }).join('') + (CAMPS.length ? '</optgroup>' : '') + '</select><p class="vc-desc">' + esc(t.text || '') + '</p></div>' +
-        '<div class="vc-row"><p class="vc-label">Entrega</p><div class="vc-seg" role="group">' +
-        '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">Digital, por email</button>' +
-        '<button type="button" data-format="caixa" aria-pressed="' + (v.format === 'caixa') + '">Caixa oferta, no SPA</button></div></div>' +
-        '<div class="vc-row vc-row--two"><label class="field"><span>Para</span><input id="vc-to" value="' + esc(v.to) + '" placeholder="Nome de quem recebe"></label>' +
-        '<label class="field"><span>De</span><input id="vc-from" value="' + esc(v.from) + '" placeholder="O seu nome"></label></div>' +
-        '<label class="field"><span>Mensagem</span><textarea id="vc-msg" rows="3" maxlength="140" placeholder="Para te lembrares de parar.">' + esc(v.msg) + '</textarea></label>' +
+        '<div class="vc-row"><p class="vc-label">' + L('Entrega', 'Delivery') + '</p><div class="vc-seg" role="group">' +
+        '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">' + L('Digital, por email', 'Digital, by email') + '</button>' +
+        '<button type="button" data-format="caixa" aria-pressed="' + (v.format === 'caixa') + '">' + L('Caixa oferta, no SPA', 'Gift box, at the spa') + '</button></div></div>' +
+        '<div class="vc-row vc-row--two"><label class="field"><span>' + L('Para', 'To') + '</span><input id="vc-to" value="' + esc(v.to) + '" placeholder="' + L('Nome de quem recebe', 'Recipient’s name') + '"></label>' +
+        '<label class="field"><span>' + L('De', 'From') + '</span><input id="vc-from" value="' + esc(v.from) + '" placeholder="' + L('O seu nome', 'Your name') + '"></label></div>' +
+        '<label class="field"><span>' + L('Mensagem', 'Message') + '</span><textarea id="vc-msg" rows="3" maxlength="140" placeholder="' + L('Para te lembrares de parar.', 'A reminder to pause.') + '">' + esc(v.msg) + '</textarea></label>' +
         '<div class="vc-buy"><p class="vc-total">Total <strong>' + eur(total()) + '</strong>' + (t.oldPrice ? ' <s>' + eur(t.oldPrice) + '</s>' : '') + '</p>' +
-        '<button type="button" class="btn btn--primary" data-buy>Oferecer este voucher</button></div>' +
-        '<p class="bk-note" data-bought hidden>Adicionado ao carrinho. Protótipo: nada foi cobrado.</p>' +
-        '<p class="bk-note">Válido até ' + validUntil() + '. O número do voucher segue no email enviado com o voucher. ' + (v.format === 'digital' ? 'Enviado para o seu email logo após o pagamento.' : 'A caixa oferta, sem custo extra, fica à sua espera no SPA para levantar.') + '</p></div>';
+        '<button type="button" class="btn btn--primary" data-buy>' + L('Oferecer este voucher', 'Give this voucher') + '</button></div>' +
+        '<p class="bk-note" data-bought hidden>' + L('Adicionado ao carrinho. Protótipo: nada foi cobrado.', 'Added to cart. Prototype: nothing was charged.') + '</p>' +
+        '<p class="bk-note">' + (EN ? 'Valid until ' + validUntil() + '. The voucher number is in the email sent with the voucher. ' + (v.format === 'digital' ? 'Sent to your email straight after payment.' : 'The gift box, at no extra cost, will be waiting for you to collect at the spa.')
+          : 'Válido até ' + validUntil() + '. O número do voucher segue no email enviado com o voucher. ' + (v.format === 'digital' ? 'Enviado para o seu email logo após o pagamento.' : 'A caixa oferta, sem custo extra, fica à sua espera no SPA para levantar.')) + '</p></div>';
     }
 
     function render(keepFocus) {
@@ -417,10 +426,10 @@
   function mountTeam(root, opts) {
     opts = opts || {};
     root.innerHTML = '<div class="tm">' + TEAM.map(function (t) {
-      return '<article class="tm-card">' + '<div class="tm-card__photo pms-tone-' + t.tone + '"><span>' + initials(t.name) + '</span><small>fotografia</small></div>' +
+      return '<article class="tm-card">' + '<div class="tm-card__photo pms-tone-' + t.tone + '"><span>' + initials(t.name) + '</span><small>' + L('fotografia', 'photo') + '</small></div>' +
         '<p class="tm-card__role">' + esc(t.role) + '</p><h3 class="tm-card__name">' + esc(t.name) + '</h3>' +
         '<p class="tm-card__focus">' + esc(t.focus) + '</p><p class="tm-card__bio">' + esc(t.bio) + '</p>' +
-        '<button type="button" class="tm-card__cta" data-book-with="' + t.id + '">Marcar com ' + esc(t.name.split(' ')[0]) + '</button></article>';
+        '<button type="button" class="tm-card__cta" data-book-with="' + t.id + '">' + L('Marcar com ', 'Book with ') + esc(t.name.split(' ')[0]) + '</button></article>';
     }).join('') + '</div>';
     root.addEventListener('click', function (e) {
       var b = e.target.closest('[data-book-with]'); if (b && opts.onBook) opts.onBook(b.getAttribute('data-book-with'));

@@ -3,6 +3,7 @@
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
 import { disponibilidade, confirmarHora, guardarHora, ErroAgenda } from "../../servidor/agenda.mjs";
+import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
@@ -29,13 +30,16 @@ export default async (req) => {
   const url = new URL(req.url);
   const rota = url.pathname.replace(/^\/api/, "").replace(/\/$/, "");
   const m = req.method;
+  // Páginas em inglês (/en/) pedem com ?lingua=en: erros, códigos e pedido em inglês.
+  const en = lingua(url.searchParams.get("lingua")) === "en";
+  const erro = (msg) => (en ? erroEN(msg) : msg);
   try {
     // Valor a pagar com um código (VIP, newsletter ou voucher), para a página de confirmação.
     if (rota === "/preco" && m === "POST") {
       const c = await corpo(req);
       if (c.codigo) await pausa(300);
       const r = await calcular({ tipo: c.tipo, tratamento: c.tratamento, codigo: c.codigo, campanha: c.campanha });
-      return json({ precoBase: r.precoBase, desconto: r.desconto, total: r.total, codigo: r.codigo && { tipo: r.codigo.tipo, texto: r.codigo.texto } });
+      return json({ precoBase: r.precoBase, desconto: r.desconto, total: r.total, codigo: r.codigo && { tipo: r.codigo.tipo, texto: (en ? codigoEN(r.codigo) : r.codigo).texto } });
     }
 
     // Ligação ao Zoho CRM (uma vez): palavra-passe do backoffice → autorização no Zoho → regresso com a chave.
@@ -83,7 +87,7 @@ export default async (req) => {
     if (rota === "/pagamento" && m === "POST") {
       const c = await corpo(req);
       if (c.codigo) await pausa(300);
-      const p = await criar(c);
+      const p = await criar({ ...c, lingua: en ? "en" : "pt" });
       await confirmarHora(p, { terapeutaId: c.terapeutaId, qualquer: c.qualquer === true || c.qualquer === "true" });
       const r = await pagar(p, { metodo: c.metodo, telemovel: c.telemovel, base: url.origin });
       if (p.estado === "aguarda_pagamento") await guardarHora(p);
@@ -93,7 +97,7 @@ export default async (req) => {
     // Estado do pedido (a página de pagamento pergunta até ficar pago).
     if (rota === "/pedido" && m === "GET") {
       const p = await obter(url.searchParams.get("n"));
-      if (!p || p.token !== url.searchParams.get("t")) return json({ erro: "Pedido não encontrado." }, 404);
+      if (!p || p.token !== url.searchParams.get("t")) return json({ erro: erro("Pedido não encontrado.") }, 404);
       return json(publico(p));
     }
 
@@ -106,10 +110,10 @@ export default async (req) => {
       return json({ recebido: true });
     }
 
-    return json({ erro: "Não encontrado." }, 404);
+    return json({ erro: erro("Não encontrado.") }, 404);
   } catch (e) {
-    if (e instanceof ErroCliente || e instanceof ErroAgenda) return json({ erro: e.message }, 400);
+    if (e instanceof ErroCliente || e instanceof ErroAgenda) return json({ erro: erro(e.message) }, 400);
     console.error("API", rota, e);
-    return json({ erro: e.message || "Ocorreu um erro. Tente de novo dentro de momentos." }, 502);
+    return json({ erro: en ? erroEN("") : e.message || "Ocorreu um erro. Tente de novo dentro de momentos." }, 502);
   }
 };

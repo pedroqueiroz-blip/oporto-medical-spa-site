@@ -4,17 +4,18 @@
   var $ = function (s, r) { return (r || document).querySelector(s); };
 
   // Agenda e vouchers (só onde existem)
+  var EN = (document.documentElement.lang || '').slice(0, 2) === 'en';
   var bookingEl = $('#booking'), booking = null;
-  if (bookingEl && window.PMS) booking = PMS.mountBooking(bookingEl, { labels: ['Ritual', 'Terapeuta', 'Quando', 'Confirmar'] });
+  if (bookingEl && window.PMS) booking = PMS.mountBooking(bookingEl, { labels: EN ? ['Ritual', 'Therapist', 'When', 'Confirm'] : ['Ritual', 'Terapeuta', 'Quando', 'Confirmar'] });
   function goBook(p) {
     if (booking) { booking.preset(p); $('#reservar').scrollIntoView(); }
-    else location.href = '/#reservar';
+    else location.href = (EN ? '/en/' : '/') + '#reservar';
   }
   var voucherEl = $('#voucher'), voucher = null;
   if (voucherEl && window.PMS) {
     var count = 0, sum = 0, cart = $('#cart');
     voucher = PMS.mountVoucher(voucherEl, { onBuy: function (v) {
-      count++; sum += v; cart.hidden = false; cart.textContent = (document.documentElement.lang === 'en' ? 'Cart · ' : 'Carrinho · ') + count + ' · ' + PMS.eur(sum);
+      count++; sum += v; cart.hidden = false; cart.textContent = (EN ? 'Cart · ' : 'Carrinho · ') + count + ' · ' + PMS.eur(sum);
     } });
   }
   document.addEventListener('click', function (e) {

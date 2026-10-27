@@ -10,7 +10,7 @@ export const handler = async (event) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || payload.data?.empresa) return { statusCode: 200, body: "ignorado" };
   const { codigo, novo } = await codigoNewsletter(email);
   if (novo) {
-    const r = await emailBoasVindas(email, codigo, DESCONTO_NEWSLETTER);
+    const r = await emailBoasVindas(email, codigo, DESCONTO_NEWSLETTER, payload.data?.lingua);
     if (!r.enviado) console.error("Newsletter: código", codigo, "não enviado", r.erro || "(email não configurado)");
   }
   return { statusCode: 200, body: "ok" };

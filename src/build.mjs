@@ -29,7 +29,7 @@ const enLink = enPublic || process.env.CONTEXT !== 'production';
 const LEGAIS = { privacidade: { pt: '/privacidade/', en: '/en/privacy/' }, termos: { pt: '/termos/', en: '/en/terms/' } };
 const pares = [['/', '/en/'], [m.pageFor('Relaxar').path, mEN.pageFor('Relaxar').path],
   ...m.areaPages.map((P) => [P.path, (mEN.areaPages.find((x) => x._id === P._id) || {}).path]).filter((x) => x[1]),
-  ...Object.values(LEGAIS).map((x) => [x.pt, x.en])];
+  ...Object.values(LEGAIS).map((x) => [x.pt, x.en]), ['/pagamento/', '/en/payment/']];
 for (const [mm, i, o] of [[m, 0, 1], [mEN, 1, 0]]) {
   Object.assign(mm, {
     enPublic, enLink,
@@ -68,28 +68,37 @@ write('pagamento/index.html', page(m, {
   body: header(m, { home: false, current: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
   scripts: ['/pagar.js']
 }));
+write('en/payment/index.html', page(mEN, {
+  headHtml: head(mEN, { title: 'Payment · ' + mEN.s.nome, description: 'The status of your booking or voucher payment.', path: '/en/payment/' })
+    .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
+  ld: '',
+  body: header(mEN, { home: false, current: '/en/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">Loading…</p></div></main>\n' + footer(mEN, { home: false }),
+  scripts: ['/pagar.js']
+}));
 
-/* Dados para a agenda e os vouchers (prototype.js) */
-const dados = {
-  treatments: m.treatments.map((t) => {
+/* Dados para a agenda e os vouchers (prototype.js), em português (/dados.js) e em inglês (/en/dados.js) */
+const dadosDe = (mm) => ({
+  treatments: mm.treatments.map((t) => {
     /* Tratamento em campanha: preço de campanha, com o normal guardado para aparecer riscado */
-    const camp = t.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== t.preco;
-    return { id: t.id, area: t.grupo, name: t.nome, min: t.duracao, price: camp ? m.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
+    const camp = t.id === mm.campaignTreatment && mm.campaignPrice && mm.campaignPrice !== t.preco;
+    return { id: t.id, area: mm.groupName(t.grupo), name: t.nome, min: t.duracao, price: camp ? mm.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
   }),
   /* Indicação de cada área, igual à do cartão em «Cuidar de si» (aparece à frente da área na agenda, no computador) */
-  areaText: Object.fromEntries(((m.inicio.casa || {}).pilares || []).filter((p) => p.titulo && p.texto).map((p) => [p.titulo, m.text.plain(p.texto)])),
+  areaText: Object.fromEntries(((mm.inicio.casa || {}).pilares || []).filter((p) => p.titulo && p.texto).map((p) => [p.titulo, mm.text.plain(p.texto)])),
   spa: (() => {
-    const h = m.s.horario || {}, f = (x) => String(x || '').replace(/^0/, '').replace(':', 'h');
-    return { telefone: m.s.telefone, horario: '2.ª a 6.ª ' + f(h.semana_abre) + '–' + f(h.semana_fecha) + (h.sabado_aberto ? ', sábado ' + f(h.sabado_abre) + '–' + f(h.sabado_fecha) : '') };
+    const h = mm.s.horario || {}, f = (x) => String(x || '').replace(/^0/, '').replace(':', 'h');
+    return { telefone: mm.s.telefone, horario: (mm.en ? 'Mon–Fri ' : '2.ª a 6.ª ') + f(h.semana_abre) + '–' + f(h.semana_fecha) + (h.sabado_aberto ? (mm.en ? ', Saturday ' : ', sábado ') + f(h.sabado_abre) + '–' + f(h.sabado_fecha) : '') };
   })(),
   /* Vouchers de campanha em vigor (Black Week, Natal…): aparecem primeiro na escolha do voucher */
-  campaignVouchers: [m.campaign, ...m.extraCampaigns].filter((c) => c && c.so_vouchers && c.tratamento && c.preco && m.byId(c.tratamento)).map((c) => {
-    const t = m.byId(c.tratamento);
-    return { id: 'c-' + c._id, camp: c._id, treatment: t.id, area: t.grupo, name: t.nome_completo || t.nome, label: (c.etiqueta || 'Campanha').split(' · ')[0], min: c.duracao || t.duracao, price: c.preco, oldPrice: c.preco_antigo || null, text: t.texto, camp_title: [c.titulo, c.titulo_destaque].filter(Boolean).join(' ') };
+  campaignVouchers: [mm.campaign, ...mm.extraCampaigns].filter((c) => c && c.so_vouchers && c.tratamento && c.preco && mm.byId(c.tratamento)).map((c) => {
+    const t = mm.byId(c.tratamento);
+    return { id: 'c-' + c._id, camp: c._id, treatment: t.id, area: mm.groupName(t.grupo), name: t.nome_completo || t.nome, label: (c.etiqueta || (mm.en ? 'Offer' : 'Campanha')).split(' · ')[0], min: c.duracao || t.duracao, price: c.preco, oldPrice: c.preco_antigo || null, text: t.texto, camp_title: [c.titulo, c.titulo_destaque].filter(Boolean).join(' ') };
   }),
-  team: m.team.map((p, i) => ({ id: p.id, name: p.nome, role: p.funcao, focus: p.foco, bio: p.bio, does: p.faz || [], tone: (i % 4) + 1, photo: p.foto || '' }))
-};
+  team: mm.team.map((p, i) => ({ id: p.id, name: p.nome, role: p.funcao, focus: p.foco, bio: p.bio, does: p.faz || [], tone: (i % 4) + 1, photo: p.foto || '' }))
+});
+const dados = dadosDe(m);
 write('dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nwindow.OMS_DATA = ' + JSON.stringify(dados) + ';\n');
+write('en/dados.js', '/* Gerado no build a partir do backoffice. Não editar. */\nwindow.OMS_DATA = ' + JSON.stringify(dadosDe(mEN)) + ';\n');
 
 /* Catálogo para o servidor de pagamentos (netlify/functions): os mesmos preços que o site mostra.
    Relaxar fatura como TPREV (Terapêuticas de Prevenção), o resto como TREAB (Reabilitação). */
@@ -98,14 +107,16 @@ const PAGINAS_EN = enPublic ? PAGINAS.map((p) => m.altPath(p)).filter(Boolean) :
 const catalogo = {
   gerado: new Date().toISOString(),
   spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
-  tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' })),
+  tratamentos: m.treatments.map((t, i) => ({ id: t.id, nome: t.nome, nome_en: (mEN.byId(t.id) || {}).nome || '', grupo: t.grupo, duracao: dados.treatments[i].min, preco: dados.treatments[i].price, artigo: t.grupo === 'Relaxar' ? 'TPREV' : 'TREAB' })),
   /* Equipa para a agenda (servidor/agenda.mjs): cada pessoa liga-se a um utilizador do Zoho CRM pelo nome ou pelo email */
   equipa: m.team.map((p) => ({ id: p.id, nome: p.nome, faz: p.faz || [], zoho: p.zoho || '' })),
   /* Para avisar o Bing/IndexNow depois de cada publicação (netlify/functions/deploy-succeeded.mjs) */
   /* Campanhas de vouchers (todas as ligadas): o servidor confirma as datas e o limite no momento da compra */
   campanhas: readList('campanhas').filter((c) => c.ativa && c.so_vouchers && c.tratamento && c.preco && m.byId(c.tratamento)).map((c) => {
     const t = m.byId(c.tratamento);
-    return { id: c._id, nome: (c.etiqueta ? c.etiqueta.split(' · ')[0] + ' · ' : '') + (t.nome_completo || t.nome), tratamento: t.id, preco: c.preco, preco_antigo: c.preco_antigo || t.preco, duracao: c.duracao || t.duracao,
+    const cEN = readList('campanhas', 'en').find((x) => x._id === c._id) || c, tEN = mEN.byId(t.id) || t;
+    return { id: c._id, nome: (c.etiqueta ? c.etiqueta.split(' · ')[0] + ' · ' : '') + (t.nome_completo || t.nome),
+      nome_en: (cEN.etiqueta ? cEN.etiqueta.split(' · ')[0] + ' · ' : '') + (tEN.nome_completo || tEN.nome), tratamento: t.id, preco: c.preco, preco_antigo: c.preco_antigo || t.preco, duracao: c.duracao || t.duracao,
       inicio: c.inicio ? c.inicio.slice(0, 10) : '', fim: c.fim ? c.fim.slice(0, 10) : '', limite: Number(c.limite_vouchers) || 0 };
   }),
   seo: { indexar: !!m.s.indexar, chave: INDEXNOW_KEY, paginas: PAGINAS.map((p) => m.s.url + p).concat(m.s.url + '/llms.txt') }

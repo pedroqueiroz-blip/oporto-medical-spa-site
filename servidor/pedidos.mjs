@@ -5,6 +5,7 @@ import { store, STORES } from "./store.mjs";
 import { tratamento as lerTratamento, campanha as lerCampanha } from "./catalogo.mjs";
 import { lerCodigo } from "./codigos.mjs";
 import { hojeISO } from "./datas.mjs";
+import { lingua, nomeEN, campanhaEN } from "./ingles.mjs";
 
 export class ErroCliente extends Error {}
 
@@ -93,6 +94,7 @@ export async function criar(corpo) {
     campanha: conta.campanha ? { id: conta.campanha.id, nome: conta.campanha.nome, precoNormal: conta.campanha.preco_antigo || null } : null,
     precoBase: conta.precoBase, desconto: conta.desconto, total: conta.total, codigo: conta.codigo,
     cliente,
+    lingua: lingua(corpo.lingua),
   };
   if (tipo === "marcacao") {
     const data = limpar(corpo.data, 10), hora = limpar(corpo.hora, 5);
@@ -110,7 +112,8 @@ export async function criar(corpo) {
 
 // O que o browser pode ver de um pedido (na página de pagamento).
 export const publico = (p) => ({
-  numero: p.numero, tipo: p.tipo, estado: p.estado, total: p.total, tratamento: p.tratamento.nome,
+  numero: p.numero, tipo: p.tipo, estado: p.estado, total: p.total, lingua: p.lingua || "pt",
+  tratamento: p.lingua === "en" ? (p.campanha ? campanhaEN(p.campanha.id) : nomeEN(p.tratamento.id)) || p.tratamento.nome : p.tratamento.nome,
   marcacao: p.marcacao ? { data: p.marcacao.data, hora: p.marcacao.hora, terapeuta: p.marcacao.terapeuta } : null,
   metodo: p.pagamento?.metodo || null,
   multibanco: p.pagamento?.multibanco || null,

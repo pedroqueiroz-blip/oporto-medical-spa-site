@@ -20,17 +20,17 @@ export async function pagar(p, { metodo, telemovel, base }) {
   if (p.tipo === "marcacao" && metodo === "multibanco") throw new ErroCliente("As marcações pagam-se por MB WAY ou cartão, para ficarem confirmadas na hora.");
   const tel = metodo === "mb_way" ? E.telemovelPT(telemovel || p.cliente.telefone) : "";
   if (metodo === "mb_way" && !tel) throw new ErroCliente("Indique um telemóvel português com 9 dígitos para o MB WAY.");
-  const pagina = `${base}/pagamento/?n=${p.numero}&t=${p.token}`;
+  const pagina = `${base}${p.lingua === "en" ? "/en/payment/" : "/pagamento/"}?n=${p.numero}&t=${p.token}`;
   p.pagamento = { metodo, id: p.numero, em: new Date().toISOString() };
   p.estado = "aguarda_pagamento";
   let url = null;
   if (metodo === "multibanco") {
     p.pagamento.multibanco = await E.criarMultibanco({ valor: p.total, id: p.numero });
   } else if (metodo === "mb_way") {
-    const r = await E.criarMbway({ valor: p.total, id: p.numero, telemovel: tel, nome: p.cliente.nome, email: p.cliente.email });
+    const r = await E.criarMbway({ valor: p.total, id: p.numero, telemovel: tel, nome: p.cliente.nome, email: p.cliente.email, lingua: p.lingua });
     Object.assign(p.pagamento, { telemovel: tel, transacao: r.transacao, referencia: r.referencia });
   } else {
-    const r = await E.criarCartao({ valor: p.total, id: p.numero, email: p.cliente.email, sucesso: pagina, falha: `${pagina}&falhou=1`, voltar: `${pagina}&falhou=1` });
+    const r = await E.criarCartao({ valor: p.total, id: p.numero, email: p.cliente.email, lingua: p.lingua, sucesso: pagina, falha: `${pagina}&falhou=1`, voltar: `${pagina}&falhou=1` });
     Object.assign(p.pagamento, { transacao: r.transacao, referencia: r.referencia });
     url = r.url;
   }

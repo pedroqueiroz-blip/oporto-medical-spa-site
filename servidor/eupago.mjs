@@ -72,9 +72,9 @@ export async function criarMultibanco({ valor: v, id }) {
 }
 
 // Pedido de pagamento na app MB WAY do cliente.
-export async function criarMbway({ valor: v, id, telemovel, nome, email }) {
+export async function criarMbway({ valor: v, id, telemovel, nome, email, lingua }) {
   const r = await pedido("/api/v1.02/mbway/create", {
-    payment: { identifier: id, amount: { value: valor(v), currency: "EUR" }, customerPhone: telemovel, countryCode: "+351", lang: "PT" },
+    payment: { identifier: id, amount: { value: valor(v), currency: "EUR" }, customerPhone: telemovel, countryCode: "+351", lang: lingua === "en" ? "EN" : "PT" },
     customer: { notify: false, ...(nome ? { name: nome } : {}), ...(email ? { email } : {}) },
   }, { apiKey: true });
   const j = v2(r, "enviar o pedido MB WAY");
@@ -82,9 +82,9 @@ export async function criarMbway({ valor: v, id, telemovel, nome, email }) {
 }
 
 // Página de pagamento com cartão da euPago (o cliente é encaminhado para lá e volta ao site).
-export async function criarCartao({ valor: v, id, email, sucesso, falha, voltar }) {
+export async function criarCartao({ valor: v, id, email, lingua, sucesso, falha, voltar }) {
   const r = await pedido("/api/v1.02/creditcard/create", {
-    payment: { identifier: id, amount: { value: valor(v), currency: "EUR" }, successUrl: sucesso, failUrl: falha, backUrl: voltar, lang: "PT", minutesFormUp: 60 },
+    payment: { identifier: id, amount: { value: valor(v), currency: "EUR" }, successUrl: sucesso, failUrl: falha, backUrl: voltar, lang: lingua === "en" ? "EN" : "PT", minutesFormUp: 60 },
     customer: { notify: false, email },
   }, { apiKey: true });
   const j = v2(r, "abrir o pagamento com cartão");
