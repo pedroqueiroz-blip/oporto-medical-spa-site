@@ -79,6 +79,7 @@
         '<p class="bk-summary__title">' + esc(pedido.nomeTratamento || '') + '</p><dl class="bk-summary__list">' +
         (pedido.marcacao ? '<div><dt>Quando</dt><dd>' + esc(pedido.marcacao) + '</dd></div>' : '') +
         (pedido.para ? '<div><dt>Para</dt><dd>' + esc(pedido.para) + '</dd></div>' : '') +
+        (pedido.tipo === 'voucher' ? '<div><dt>Entrega</dt><dd>' + (pedido.formato === 'caixa' ? 'Caixa oferta, no SPA' : 'Digital, por email') + '</dd></div>' : '') +
         (st.conta && st.conta.desconto ? '<div><dt>Preço</dt><dd>' + eur(st.conta.precoBase) + '</dd></div><div><dt>' + esc(st.conta.codigo.texto) + '</dt><dd>−' + eur(st.conta.desconto) + '</dd></div>' : '') +
         '<div class="bk-summary__total"><dt>Total</dt><dd>' + (t == null ? '…' : eur(t)) + '</dd></div></dl></div>' +
         '<form class="bk-form" novalidate>' +

@@ -258,7 +258,7 @@
     function cur() { return byId(LIST, v.exp) || TREATMENTS[0]; }
 
     function value() { return cur().price; }
-    function total() { return value() + (v.format === 'caixa' ? 6 : 0); }
+    function total() { return value(); } // a caixa oferta não tem custo extra
     // Válido até ao último dia do mês, daqui a 12 meses
     function validUntil() {
       var d = new Date(), end = new Date(d.getFullYear() + 1, d.getMonth() + 1, 0);
@@ -285,16 +285,16 @@
         }).join('') + '</optgroup><optgroup label="Massagens e tratamentos">' : '') + TREATMENTS.map(function (x) {
           return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + '</option>';
         }).join('') + (CAMPS.length ? '</optgroup>' : '') + '</select><p class="vc-desc">' + esc(t.text || '') + '</p></div>' +
-        '<div class="vc-row"><p class="vc-label">Formato</p><div class="vc-seg" role="group">' +
+        '<div class="vc-row"><p class="vc-label">Entrega</p><div class="vc-seg" role="group">' +
         '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">Digital, por email</button>' +
-        '<button type="button" data-format="caixa" aria-pressed="' + (v.format === 'caixa') + '">Caixa oferta (+6 €)</button></div></div>' +
+        '<button type="button" data-format="caixa" aria-pressed="' + (v.format === 'caixa') + '">Caixa oferta, no SPA</button></div></div>' +
         '<div class="vc-row vc-row--two"><label class="field"><span>Para</span><input id="vc-to" value="' + esc(v.to) + '" placeholder="Nome de quem recebe"></label>' +
         '<label class="field"><span>De</span><input id="vc-from" value="' + esc(v.from) + '" placeholder="O seu nome"></label></div>' +
         '<label class="field"><span>Mensagem</span><textarea id="vc-msg" rows="3" maxlength="140" placeholder="Para te lembrares de parar.">' + esc(v.msg) + '</textarea></label>' +
-        '<div class="vc-buy"><p class="vc-total">Total <strong>' + eur(total()) + '</strong>' + (t.oldPrice && v.format !== 'caixa' ? ' <s>' + eur(t.oldPrice) + '</s>' : '') + '</p>' +
+        '<div class="vc-buy"><p class="vc-total">Total <strong>' + eur(total()) + '</strong>' + (t.oldPrice ? ' <s>' + eur(t.oldPrice) + '</s>' : '') + '</p>' +
         '<button type="button" class="btn btn--primary" data-buy>Oferecer este voucher</button></div>' +
         '<p class="bk-note" data-bought hidden>Adicionado ao carrinho. Protótipo: nada foi cobrado.</p>' +
-        '<p class="bk-note">Válido até ' + validUntil() + '. O número do voucher segue no email enviado com o voucher. ' + (v.format === 'digital' ? 'Enviado de imediato ou na data que escolher.' : 'Entregue em casa em 2 a 3 dias úteis.') + '</p></div>';
+        '<p class="bk-note">Válido até ' + validUntil() + '. O número do voucher segue no email enviado com o voucher. ' + (v.format === 'digital' ? 'Enviado para o seu email logo após o pagamento.' : 'A caixa oferta, sem custo extra, fica à sua espera no SPA para levantar.') + '</p></div>';
     }
 
     function render(keepFocus) {
@@ -305,7 +305,7 @@
     }
     function soft() { // atualiza só o cartão e o total, sem refazer o formulário
       root.querySelector('.vc-preview').innerHTML = card();
-      root.querySelector('.vc-total').innerHTML = 'Total <strong>' + eur(total()) + '</strong>' + (cur().oldPrice && v.format !== 'caixa' ? ' <s>' + eur(cur().oldPrice) + '</s>' : '');
+      root.querySelector('.vc-total').innerHTML = 'Total <strong>' + eur(total()) + '</strong>' + (cur().oldPrice ? ' <s>' + eur(cur().oldPrice) + '</s>' : '');
       var d = root.querySelector('.vc-desc'); if (d) d.textContent = cur().text || '';
     }
 

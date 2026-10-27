@@ -138,6 +138,7 @@ try {
   const ev = S.emails.find((e) => e.to[0] === "joao@exemplo.pt" && e.subject.startsWith("O seu voucher"));
   const vcod = ev?.html.match(/OMS-[A-Z0-9]{4}-[A-Z0-9]{4}/)?.[0];
   ok(vcod && ev.html.includes("Válido até") && ev.html.includes(validadeVoucher().slice(0, 4)), `voucher: código ${vcod} e validade só no email`);
+  ok(S.emails.some((e) => e.subject.includes(p4.numero) && e.html.includes("Digital, por email")), "voucher digital: a equipa vê a entrega por email");
   r = await pedir(`/api/pedido?n=${p4.numero}&t=${p4.token}`, null, "GET");
   ok(r.j.estado === "pago" && !JSON.stringify(r.j).includes(vcod), "a página do pedido não mostra o código do voucher");
   const d4 = Object.values(S.docs).at(-1);
@@ -150,9 +151,15 @@ try {
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: vcod });
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "voucher só serve uma vez");
 
+  // 4b) Voucher em caixa oferta: mesmo preço, levantamento no spa
+  const cartoes = S.cartao.length;
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, formato: "caixa", para: "Ana", nome: "Rui", email: "rui@exemplo.pt", metodo: "card" });
+  ok(S.cartao.length === cartoes + 1 && S.cartao.at(-1).payment.amount.value === relax.preco, "caixa oferta: sem custo extra");
+  await notificar(r.j, { mp: "CC:PT" });
+  ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.subject.startsWith("O seu voucher") && e.html.includes("levantá-la no spa") && /OMS-[A-Z0-9]{4}-[A-Z0-9]{4}/.test(e.html)), "caixa oferta: código por email e aviso para levantar no spa");
+  ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.html.includes("Caixa oferta, levanta no SPA")), "caixa oferta: a equipa é avisada para preparar a caixa");
+
   // 5) Validações
-  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, formato: "caixa", nome: "João", email: "joao@exemplo.pt", metodo: "card" });
-  ok(r.status === 400 && /caixa/.test(r.j.erro), "caixa oferta ainda não se compra online");
   r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "tratamento desconhecido é recusado");
   r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "123", metodo: "mb_way" });
