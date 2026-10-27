@@ -107,8 +107,8 @@ export const emailInterno = (p, problema) => enviar({
 export const emailBoasVindas = (email, codigo, pct, lingua) => lingua === "en" ? EN.boasVindas(email, codigo, pct) : enviar({
   para: email,
   assunto: `O seu código de ${pct}% no ${spa.nome}`,
-  html: moldura(`${h1("Boas-vindas às cartas da casa")}
-<p>Obrigado por subscrever as nossas cartas. Este é o seu código de ${pct}% de desconto na primeira marcação ou voucher:</p>
+  html: moldura(`${h1("O seu desconto de boas-vindas.")}
+<p>Obrigado por subscrever a nossa newsletter. Este é o seu código de ${pct}% de desconto na primeira marcação ou voucher:</p>
 <p style="font-size:24px;letter-spacing:.12em;text-align:center;border:1px solid #D9A86C;padding:16px;margin:16px 0"><b>${esc(codigo)}</b></p>
 <p>Escreva-o no passo de confirmação, antes de pagar. Vale para uma compra.</p>
 <p><a href="${esc(site())}/#reservar" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">Reservar</a></p>`),
@@ -163,8 +163,8 @@ ${linhas([["Entity", esc(mb.entidade)], ["Reference", esc(String(mb.referencia).
   boasVindas: (email, codigo, pct) => enviar({
     para: email,
     assunto: `Your ${pct}% code at ${spa.nome}`,
-    html: moldura(`${h1("Welcome to our letters")}
-<p>Thank you for subscribing. Here is your ${pct}% discount code for your first booking or voucher:</p>
+    html: moldura(`${h1("Your welcome discount.")}
+<p>Thank you for subscribing to our newsletter. Here is your ${pct}% discount code for your first booking or voucher:</p>
 <p style="font-size:24px;letter-spacing:.12em;text-align:center;border:1px solid #D9A86C;padding:16px;margin:16px 0"><b>${esc(codigo)}</b></p>
 <p>Enter it at the confirmation step, before paying. Valid for one purchase.</p>
 <p><a href="${esc(siteEN())}#reservar" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">Book</a></p>`, "en"),
