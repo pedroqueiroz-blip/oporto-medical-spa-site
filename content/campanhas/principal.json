@@ -17,7 +17,7 @@
   "imagem": "/img/uploads/massagem-facial-anti-idade-porto.jpg",
   "tipo_servico": "Massagem de assinatura",
   "etiqueta": "Destaque do mês. Experiência exclusiva.",
-  "selo_em_campanha": false,
+  "selo_em_campanha": true,
   "selo": true,
   "selo_texto": "Marca registada no INPI",
   "titulo": "A Melhor Massagem",

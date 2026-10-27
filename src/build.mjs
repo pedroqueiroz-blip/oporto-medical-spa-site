@@ -65,14 +65,14 @@ write('pagamento/index.html', page(m, {
   headHtml: head(m, { title: 'Pagamento · ' + m.s.nome, description: 'Estado do pagamento da sua marcação ou voucher.', path: '/pagamento/' })
     .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
   ld: '',
-  body: header(m, { home: false, current: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
+  body: header(m, { home: false, current: '/', alt: '/en/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
   scripts: ['/pagar.js']
 }));
 write('en/payment/index.html', page(mEN, {
   headHtml: head(mEN, { title: 'Payment · ' + mEN.s.nome, description: 'The status of your booking or voucher payment.', path: '/en/payment/' })
     .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
   ld: '',
-  body: header(mEN, { home: false, current: '/en/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">Loading…</p></div></main>\n' + footer(mEN, { home: false }),
+  body: header(mEN, { home: false, current: '/en/', alt: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">Loading…</p></div></main>\n' + footer(mEN, { home: false }),
   scripts: ['/pagar.js']
 }));
 
@@ -80,8 +80,8 @@ write('en/payment/index.html', page(mEN, {
 const dadosDe = (mm) => ({
   treatments: mm.treatments.map((t) => {
     /* Tratamento em campanha: preço de campanha, com o normal guardado para aparecer riscado */
-    const camp = t.id === mm.campaignTreatment && mm.campaignPrice && mm.campaignPrice !== t.preco;
-    return { id: t.id, area: mm.groupName(t.grupo), name: t.nome, min: t.duracao, price: camp ? mm.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
+    const camp = mm.inCampaign(t.id) && mm.campaignPrice(t.id) && mm.campaignPrice(t.id) !== t.preco;
+    return { id: t.id, area: mm.groupName(t.grupo), name: t.nome, min: t.duracao, price: camp ? mm.campaignPrice(t.id) : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
   }),
   /* Indicação de cada área, igual à do cartão em «Cuidar de si» (aparece à frente da área na agenda, no computador) */
   areaText: Object.fromEntries(((mm.inicio.casa || {}).pilares || []).filter((p) => p.titulo && p.texto).map((p) => [p.titulo, mm.text.plain(p.texto)])),
