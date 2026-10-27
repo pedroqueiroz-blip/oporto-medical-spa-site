@@ -335,6 +335,10 @@ try {
   const livresL = r.j.livres?.[luisa.id]?.[D] || [];
   ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && !livresL.includes("19:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm das marcações do Zoho (${livresL.length} livres; 10:00 e 19:00 ocupadas, a cancelada não conta)`);
   ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não está nas listas de profissionais fica fora da agenda online");
+  let sab = new Date(Date.now() + 3 * 864e5); while (sab.getUTCDay() !== 6) sab = new Date(sab.getTime() + 864e5);
+  const S6 = sab.toISOString().slice(0, 10);
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${S6}&dias=1`, null, "GET");
+  ok(!r.j.livres[luisa.id][S6].includes("08:00") && r.j.livres[luisa.id][S6].includes("09:00") && !r.j.livres[luisa.id][S6].includes("14:00"), "ao sábado abre às 9:00 e fecha à tarde");
   const zc = { nome: "Carla Nova", email: "carla@exemplo.pt", telefone: "913000000", nif: "123456789" };
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "10:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no Zoho é recusada antes de pagar");

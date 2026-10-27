@@ -82,7 +82,7 @@
     var a = AGENDA[treatment];
     if (a && a.loading) return true;
     if (a && a.fonte === 'zoho') return ((a.livres[therapistId] || {})[isoDay(day)] || []).indexOf(hour) < 0;
-    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && hour > '13:00');
+    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && (hour < '09:00' || hour > '13:00'));
   }
   function freeFor(day, hour, treatment) {
     return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id, treatment); });
