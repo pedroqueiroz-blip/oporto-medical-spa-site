@@ -55,7 +55,7 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
-const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false };
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false, camposAgenda: [] };
 function zoho(req, body, j, res, out) {
   const u = new URL(req.url, B);
   if (u.pathname === "/zoho/contas/oauth/v2/token") {
@@ -69,7 +69,7 @@ function zoho(req, body, j, res, out) {
   if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }] });
   if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
     ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
-    : ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" })) });
+    : [...["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" })), ...Z.camposAgenda] });
   if (cam === "/coql") return out({ data: Z.eventos, info: { more_records: false } });
   if (cam === "/Contacts/search") {
     const [, campo, nif] = u.searchParams.get("criteria")?.match(/\((\w+):equals:(\d+)\)/) || [], email = u.searchParams.get("email");
@@ -270,10 +270,16 @@ try {
   ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Módulo da agenda (Events)") && pg.txt.includes("✓ Terapeuta: Luísa Pinto") && pg.txt.includes("✗ Terapeuta:"), "verificação pelos metadados: encontra o campo do NIF, a agenda e quem falta ligar");
+  ok(pg.txt.includes("✗ Tratamento nas marcações") && pg.txt.includes("crie em Reuniões um campo «Tratamento»"), "sem campo do tratamento na agenda, a verificação explica como o criar");
 
   // Dia útil daqui a 3+ dias; a Luísa (ligada ao utilizador u1 pelo nome) tem um evento às 10:00
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
   const D = dia.toISOString().slice(0, 10);
+  // A agenda passa a ter o campo «Tratamento» (lista de escolha) só com um dos tratamentos do site
+  const tz0 = cat.tratamentos.find((t) => cat.equipa.find((p) => p.nome === "Luísa Pinto").faz.includes(t.id) && t.duracao <= 60 && t.grupo !== "Relaxar") || cat.tratamentos.find((t) => cat.equipa.find((p) => p.nome === "Luísa Pinto").faz.includes(t.id) && t.duracao <= 60);
+  Z.camposAgenda = [{ api_name: "Tratamento", field_label: "Tratamento", data_type: "picklist", custom_field: true, pick_list_values: [{ display_value: "-None-" }, { display_value: tz0.nome.toUpperCase() }] }];
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("preenchem «Tratamento» (Tratamento, picklist)") && pg.txt.includes("Sem valor igual na lista"), "verificação encontra o campo do tratamento e diz que tratamentos faltam na lista");
   const { instanteLisboa } = await import("../servidor/datas.mjs");
   Z.eventos.push({ Owner: { id: "u1" }, Start_DateTime: instanteLisboa(D, "10:00").iso, End_DateTime: instanteLisboa(D, "11:00").iso, All_day: false });
   const luisa = cat.equipa.find((p) => p.nome === "Luísa Pinto");
@@ -297,6 +303,7 @@ try {
   const evz = Z.eventos.at(-1);
   ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");
   ok(evz.Owner.id === "u1" && evz.Who_Id.id === Z.criados[0].id && evz.Start_DateTime === instanteLisboa(D, "11:00").iso && evz.End_DateTime === instanteLisboa(D, "11:00", tz.duracao).iso && evz.Description.includes(r.j.numero), "marcação paga entra na agenda da Luísa, ligada à ficha");
+  ok(evz.Tratamento === tz0.nome.toUpperCase() && evz.Description.includes("Tratamento: " + tz.nome), "a marcação fica associada ao tratamento (valor da lista do Zoho)");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("ficha de cliente nova")), "aviso à equipa diz que ficou na agenda");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "a mesma hora já não se pode marcar");

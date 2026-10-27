@@ -99,8 +99,8 @@ export async function marcarNoCRM(p) {
   const evento = await criarEvento({
     titulo: `${p.tratamento.nome} · ${p.cliente.nome}`,
     inicio: instanteLisboa(data, hora).iso, fim: instanteLisboa(data, hora, dur).iso,
-    dono: p.marcacao.zohoDono, cliente: cliente.id,
-    descricao: [`Marcação pelo site ${p.numero}`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
+    dono: p.marcacao.zohoDono, cliente: cliente.id, tratamento: p.tratamento.nome,
+    descricao: [`Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
       `Email: ${p.cliente.email}`, p.cliente.telefone && `Telemóvel: ${p.cliente.telefone}`, p.cliente.nif && `NIF: ${p.cliente.nif}`, cliente.nota].filter(Boolean).join("\n"),
   });
   p.zoho = { cliente: cliente.id, clienteNovo: cliente.novo, evento, nota: cliente.nota || "", em: new Date().toISOString() };

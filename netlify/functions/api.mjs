@@ -67,7 +67,7 @@ export default async (req) => {
         try { aviso = `✓ ${e(form.get("repetir"))}: ${e(await repetirNoCRM(form.get("repetir")))}`; }
         catch (err) { aviso = `✗ ${e(form.get("repetir"))}: ${e(err.message)}`; }
       }
-      const linhas = estado.ligado ? await verificarCRM(catalogo.equipa || []) : [{ ok: false, titulo: "Ligação ao Zoho CRM", detalhe: estado.configurado ? "Por ligar neste site: abra /api/zoho/ligar." : "Faltam ZOHO_CLIENT_ID e ZOHO_CLIENT_SECRET neste site (Netlify, contexto de produção)." }];
+      const linhas = estado.ligado ? await verificarCRM(catalogo.equipa || [], catalogo.tratamentos || []) : [{ ok: false, titulo: "Ligação ao Zoho CRM", detalhe: estado.configurado ? "Por ligar neste site: abra /api/zoho/ligar." : "Faltam ZOHO_CLIENT_ID e ZOHO_CLIENT_SECRET neste site (Netlify, contexto de produção)." }];
       const marc = await ultimasMarcacoes(10);
       const ESTADOS = { novo: "por pagar", aguarda_pagamento: "à espera do pagamento", pago: "pago", confirmado: "confirmado (0 €)" };
       const linhaMarc = (x) => {

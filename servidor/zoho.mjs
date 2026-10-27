@@ -8,11 +8,32 @@ import { store, STORES } from "./store.mjs";
 const CONTAS = () => (process.env.ZOHO_ACCOUNTS_BASE || "https://accounts.zoho.eu").replace(/\/$/, "");
 export const ESCOPOS = "ZohoCRM.modules.ALL,ZohoCRM.users.READ,ZohoCRM.coql.READ,ZohoCRM.settings.modules.READ,ZohoCRM.settings.fields.READ";
 
-// Campo do NIF e módulo da agenda: variável no Netlify, senão o que a verificação (/api/zoho/verificar)
-// encontrou nos metadados do CRM, senão os nomes habituais.
+// Campo do NIF, módulo da agenda e campo do tratamento: variável no Netlify, senão o que a verificação
+// (/api/zoho/verificar) encontrou nos metadados do CRM, senão os nomes habituais.
 async function configuracao() {
   const g = (await (await gaveta()).get("config", { type: "json" })) || {};
-  return { campoNif: process.env.ZOHO_CAMPO_NIF || g.campoNif || "NIF", moduloAgenda: process.env.ZOHO_MODULO_AGENDA || g.moduloAgenda || "Events" };
+  return {
+    campoNif: process.env.ZOHO_CAMPO_NIF || g.campoNif || "NIF", moduloAgenda: process.env.ZOHO_MODULO_AGENDA || g.moduloAgenda || "Events",
+    tratamento: g.tratamento?.campo && (!process.env.ZOHO_CAMPO_TRATAMENTO || process.env.ZOHO_CAMPO_TRATAMENTO === g.tratamento.campo) ? g.tratamento : null,
+  };
+}
+
+const simples = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+
+// Valor do campo do tratamento na agenda: lista de escolha (valor com o mesmo nome), texto, ou ligação a
+// um registo de outro módulo (p. ex. Produtos) com o mesmo nome. Sem correspondência, fica só no título.
+async function valorTratamento(cfg, nome) {
+  if (!cfg) return undefined;
+  if (cfg.tipo === "picklist" || cfg.tipo === "multiselectpicklist") {
+    const v = (cfg.valores || []).find((x) => simples(x) === simples(nome));
+    return v === undefined ? undefined : cfg.tipo === "picklist" ? v : [v];
+  }
+  if (cfg.tipo === "lookup" && cfg.modulo) {
+    const j = await crm("GET", `/${cfg.modulo}/search?word=${encodeURIComponent(nome)}`);
+    const r = (j?.data || []).find((x) => Object.values(x).some((v) => typeof v === "string" && simples(v) === simples(nome)));
+    return r ? { id: r.id } : undefined;
+  }
+  return ["text", "textarea"].includes(cfg.tipo) ? nome : undefined;
 }
 
 export const zohoConfigurado = () => Boolean(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET);
@@ -131,11 +152,14 @@ export async function eventos(de, ate) {
   return out;
 }
 
-export async function criarEvento({ titulo, inicio, fim, dono, cliente, descricao }) {
-  const j = await crm("POST", `/${(await configuracao()).moduloAgenda}`, { data: [{
+export async function criarEvento({ titulo, inicio, fim, dono, cliente, descricao, tratamento }) {
+  const cfg = await configuracao();
+  const trat = tratamento ? await valorTratamento(cfg.tratamento, tratamento).catch(() => undefined) : undefined;
+  const j = await crm("POST", `/${cfg.moduloAgenda}`, { data: [{
     Event_Title: titulo, Start_DateTime: inicio, End_DateTime: fim, Description: descricao,
     ...(dono ? { Owner: { id: dono } } : {}),
     ...(cliente ? { Who_Id: { id: cliente } } : {}),
+    ...(trat !== undefined ? { [cfg.tratamento.campo]: trat } : {}),
   }] });
   return criado(j);
 }
@@ -145,7 +169,7 @@ export async function criarEvento({ titulo, inicio, fim, dono, cliente, descrica
 // Confere no CRM real o que a integração precisa: módulos, campo do NIF, campos da agenda, utilizadores
 // da equipa e leitura de eventos. Quando o campo do NIF não tem o nome habitual e há um só candidato,
 // fica guardado para o site o usar. Devolve linhas { ok, titulo, detalhe } para a página de verificação.
-export async function verificarCRM(equipa = []) {
+export async function verificarCRM(equipa = [], tratamentos = []) {
   const linhas = [], add = (ok, titulo, detalhe = "") => linhas.push({ ok, titulo, detalhe });
   const g = await gaveta(), guardado = (await g.get("config", { type: "json" })) || {};
   try { await acesso(); add(true, "Ligação ao Zoho CRM", "Chave de acesso renovada com sucesso."); }
@@ -185,6 +209,21 @@ export async function verificarCRM(equipa = []) {
     add(!faltam.length, `Módulo da agenda (${agenda})`, faltam.length ? `Faltam os campos ${faltam.join(", ")}.` : "Título, início, fim, responsável e contacto disponíveis.");
     // Campos próprios da agenda (onde pode estar a terapeuta de cada marcação)
     const proprios = campos.filter((f) => f.custom_field || ["picklist", "multiselectpicklist", "lookup", "userlookup", "ownerlookup"].includes(f.data_type));
+    // Campo do tratamento: ZOHO_CAMPO_TRATAMENTO no Netlify, senão um único campo com nome parecido.
+    const pedido = process.env.ZOHO_CAMPO_TRATAMENTO;
+    const cand = pedido ? campos.filter((f) => f.api_name === pedido) : campos.filter((f) => /tratamento|servi[cç]o|treatment|service/i.test(`${f.api_name} ${f.field_label}`));
+    if (cand.length === 1) {
+      const f = cand[0], valores = (f.pick_list_values || []).map((v) => v.display_value);
+      guardado.tratamento = { campo: f.api_name, tipo: f.data_type, valores, modulo: f.lookup?.module?.api_name || "" };
+      const semValor = ["picklist", "multiselectpicklist"].includes(f.data_type) ? tratamentos.filter((t) => !valores.some((v) => simples(v) === simples(t.nome))) : [];
+      add(!semValor.length, "Tratamento nas marcações", `As marcações do site preenchem «${f.field_label}» (${f.api_name}, ${f.data_type}${guardado.tratamento.modulo ? ` → ${guardado.tratamento.modulo}` : ""}) com o nome do tratamento.`
+        + (semValor.length ? ` Sem valor igual na lista: ${semValor.map((t) => t.nome).join(", ")}. Acrescente-os à lista no Zoho (com o mesmo nome do site); até lá, nessas o tratamento fica só no título.` : ""));
+    } else {
+      delete guardado.tratamento;
+      add(false, "Tratamento nas marcações", cand.length
+        ? `Há vários campos possíveis: ${cand.map((f) => `«${f.field_label}» (${f.api_name})`).join(", ")}. Indique o certo em ZOHO_CAMPO_TRATAMENTO no Netlify.`
+        : pedido ? `Não há o campo «${pedido}» na agenda.` : `A agenda não tem um campo «Tratamento»: o tratamento fica só no título e na descrição. Para o ter num campo próprio, crie em Reuniões um campo «Tratamento» (lista de escolha com os nomes do site, ou texto) e verifique de novo.`);
+    }
     if (proprios.length) add(true, `Campos da agenda que podem indicar a terapeuta`, proprios.map((f) => `«${f.field_label}» (${f.api_name}, ${f.data_type}${f.pick_list_values?.length ? `: ${f.pick_list_values.map((v) => v.display_value).join(" / ")}` : ""}${f.lookup?.module?.api_name ? ` → ${f.lookup.module.api_name}` : ""})`).join("; "));
   } catch (e) { add(false, `Módulo da agenda (${agenda})`, e.message); }
 
@@ -202,7 +241,6 @@ export async function verificarCRM(equipa = []) {
   // Equipa do site ↔ utilizadores do CRM
   try {
     const us = await utilizadores();
-    const simples = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
     for (const p of equipa) {
       const u = us.find((x) => (p.zoho && x.email === simples(p.zoho)) || simples(x.nome) === simples(p.nome));
       add(Boolean(u), `Terapeuta: ${p.nome}`, u ? `Utilizador do CRM «${u.nome}» (${u.email}).` : `Sem utilizador no CRM com este nome. Utilizadores: ${us.map((x) => `${x.nome} (${x.email})`).join(", ")}. Indique o email no backoffice (Equipa → «Utilizador no Zoho CRM»).`);
