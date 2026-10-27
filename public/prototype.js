@@ -393,16 +393,7 @@
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
           var tr = cur();
-          var dados = { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
-          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif, codigo: s.conta ? s.vcod.trim() : '' };
-        // Código por validar: valida primeiro. Voucher ou VIP que deixa a 0 €: confirma logo, sem passo de pagamento.
-        if (s.hasVoucher && s.vcod.trim() && !s.conta) { applyCode(false); return; }
-        if (s.conta && s.conta.total === 0) {
-          s.sending = true; render();
-          OMS_PAGAR.enviar(root, dados).catch(function (err) { s.sending = false; s.conta = null; s.vmsg = err.message; render(); });
-          return;
-        }
-        OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
+          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;
