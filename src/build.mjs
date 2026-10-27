@@ -65,14 +65,14 @@ write('pagamento/index.html', page(m, {
   headHtml: head(m, { title: 'Pagamento · ' + m.s.nome, description: 'Estado do pagamento da sua marcação ou voucher.', path: '/pagamento/' })
     .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
   ld: '',
-  body: header(m, { home: false, current: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
+  body: header(m, { home: false, current: '/', alt: '/en/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">A carregar…</p></div></main>\n' + footer(m, { home: false }),
   scripts: ['/pagar.js']
 }));
 write('en/payment/index.html', page(mEN, {
   headHtml: head(mEN, { title: 'Payment · ' + mEN.s.nome, description: 'The status of your booking or voucher payment.', path: '/en/payment/' })
     .replace(/<meta name="robots"[^>]*>/, '<meta name="robots" content="noindex, nofollow">'),
   ld: '',
-  body: header(mEN, { home: false, current: '/en/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">Loading…</p></div></main>\n' + footer(mEN, { home: false }),
+  body: header(mEN, { home: false, current: '/en/', alt: '/' }) + '\n<main class="wrap pg-pagina"><div id="pagamento-estado"><p class="bk-note">Loading…</p></div></main>\n' + footer(mEN, { home: false }),
   scripts: ['/pagar.js']
 }));
 

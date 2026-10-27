@@ -116,7 +116,7 @@ export function home(m) {
   const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, (max-width: 1100px) 44vw, 22vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 
-  const body = `${header(m, { home: true, current: m.href('/'), alt: m.altPath('/') })}
+  const body = `${header(m, { home: true, current: m.href('/'), alt: m.altPath(m.href('/')) })}
 
 <main id="inicio">
   <section class="hero2" id="hero">
