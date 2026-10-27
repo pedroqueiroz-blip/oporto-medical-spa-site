@@ -55,7 +55,26 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
-const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false };
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [] };
+// Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
+const CAMPOS_TRAT = [
+  { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" },
+  { api_name: "Name", field_label: "Nome de Tratamento", data_type: "text" },
+  { api_name: "Data_do_tratamento", field_label: "Data do tratamento", data_type: "datetime" },
+  { api_name: "Pagamento", field_label: "Pagamento", data_type: "picklist", pick_list_values: ["-None-", "Efetuado", "Pendente", "Isento", "Faturado"].map((v) => ({ display_value: v })) },
+  { api_name: "Estado", field_label: "Estado", data_type: "picklist", pick_list_values: ["-None-", "Agendado", "Realizado", "Cancelado"].map((v) => ({ display_value: v })) },
+  { api_name: "Tipo_de_Tratamento", field_label: "Tipo de Tratamento", data_type: "picklist", pick_list_values: ["-None-", "Cavitação", "Vanquish"].map((v) => ({ display_value: v })) },
+  { api_name: "Notas_da_Sessao", field_label: "Notas da Sessao", data_type: "textarea" },
+  { api_name: "Cliente", field_label: "Cliente", data_type: "lookup", lookup: { module: { api_name: "Contacts" } } },
+  { api_name: "Terapeutas", field_label: "Terapeutas", data_type: "multiselectpicklist", pick_list_values: ["Sofia Costa", "Maria Barroso"].map((v) => ({ display_value: v })) },
+  { api_name: "Hora_fim_do_tratamento", field_label: "Hora fim do tratamento", data_type: "datetime" },
+  { api_name: "Valor", field_label: "Valor", data_type: "currency" },
+  { api_name: "Especialidade", field_label: "Especialidade", data_type: "picklist", pick_list_values: ["-None-", "Nutrição", "Laser Clinic", "Spa"].map((v) => ({ display_value: v })) },
+  { api_name: "Artigo", field_label: "Artigo", data_type: "lookup", lookup: { module: { api_name: "Products" } } },
+  { api_name: "Profissionais_LC", field_label: "Profissionais LC", data_type: "multiselectpicklist", pick_list_values: ["Ana Cruz", "Luísa Pinto", "Pedro Queiroz"].map((v) => ({ display_value: v })) },
+  { api_name: "Preferencia_Terapeuta", field_label: "Preferência pela terapeuta", data_type: "boolean" },
+  { api_name: "Origem_Marcacao", field_label: "Origem da marcação", data_type: "picklist", pick_list_values: ["-None-", "Backoffice", "Online", "Google"].map((v) => ({ display_value: v })) },
+];
 function zoho(req, body, j, res, out) {
   const u = new URL(req.url, B);
   if (u.pathname === "/zoho/contas/oauth/v2/token") {
@@ -66,10 +85,14 @@ function zoho(req, body, j, res, out) {
   const cam = u.pathname.replace("/zoho/api/crm/v6", "");
   if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
   if (cam === "/users") return out({ users: Z.users });
-  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }] });
+  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : [])] });
+  if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
+  if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
+  if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
+  if (cam === "/Tratamentos_SPA" && req.method === "POST") { if (Z.falhaMarcacao) return out({ data: [{ status: "error", message: "required field not found" }] }); const m = { id: "t" + (Z.marcacoes.length + 1), ...j.data[0] }; Z.marcacoes.push(m); return out({ data: [{ status: "success", details: { id: m.id } }] }); }
   if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
     ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
-    : ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" })) });
+    : [...["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" }))] });
   if (cam === "/coql") return out({ data: Z.eventos, info: { more_records: false } });
   if (cam === "/Contacts/search") {
     const [, campo, nif] = u.searchParams.get("criteria")?.match(/\((\w+):equals:(\d+)\)/) || [], email = u.searchParams.get("email");
@@ -80,7 +103,6 @@ function zoho(req, body, j, res, out) {
   if (cam === "/Contacts" && req.method === "POST") { const c = { id: "c" + (Z.contactos.length + 1), ...j.data[0] }; Z.contactos.push(c); Z.criados.push(c); return out({ data: [{ status: "success", details: { id: c.id } }] }); }
   if (cam === "/Contacts" && req.method === "PUT") { Object.assign(Z.contactos.find((c) => c.id === j.data[0].id), j.data[0]); return out({ data: [{ status: "success", details: { id: j.data[0].id } }] }); }
   if (cam === "/Events" && req.method === "POST") {
-    if (Z.falhaEvento) return out({ data: [{ status: "error", message: "required field not found" }] });
     const e = { id: "e" + (Z.eventos.length + 1), ...j.data[0] }; Z.eventos.push(e); return out({ data: [{ status: "success", details: { id: e.id } }] });
   }
   res.statusCode = 404; out({ erro: "zoho desconhecido " + cam });
@@ -283,49 +305,79 @@ try {
   pg = await pagina("/api/zoho/verificar", form("errada"));
   ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
-  ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Módulo da agenda (Events)") && pg.txt.includes("✓ Terapeuta: Luísa Pinto") && pg.txt.includes("✗ Terapeuta:"), "verificação pelos metadados: encontra o campo do NIF, a agenda e quem falta ligar");
+  ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Reuniões (Events)") && pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("não entram no Zoho"), "verificação pelos metadados: campo do NIF, Reuniões e falta do módulo Tratamentos");
 
-  // Dia útil daqui a 3+ dias; a Luísa (ligada ao utilizador u1 pelo nome) tem um evento às 10:00
+  // Dia útil daqui a 3+ dias
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
   const D = dia.toISOString().slice(0, 10);
   const { instanteLisboa } = await import("../servidor/datas.mjs");
-  Z.eventos.push({ Owner: { id: "u1" }, Start_DateTime: instanteLisboa(D, "10:00").iso, End_DateTime: instanteLisboa(D, "11:00").iso, All_day: false });
   const luisa = cat.equipa.find((p) => p.nome === "Luísa Pinto");
   const tz = cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60 && t.grupo !== "Relaxar") || cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60);
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
+  ok(r.j.fonte === "simulada" && /Tratamentos/.test(r.j.aviso), "sem módulo Tratamentos a agenda do site fica simulada");
+
+  // Módulo «Tratamentos» (como o do SPA). Sem campo de data não está pronto; a hora de criação nunca serve de início.
+  Z.moduloTrat = true;
+  const semData = CAMPOS_TRAT.splice(2, 1);
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && !/Início<\/b><br><span class="nota">«Hora de criação/.test(pg.txt), "sem data do tratamento o módulo não está pronto; a hora de criação nunca é o início");
+  CAMPOS_TRAT.splice(2, 0, ...semData);
+  Z.produtos.push({ id: "p1", Product_Name: tz.nome });
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("✓ Módulo das marcações (Tratamentos)") && pg.txt.includes("«Data do tratamento» (Data_do_tratamento") && pg.txt.includes("«Hora fim do tratamento»") && pg.txt.includes("Profissionais_LC") && pg.txt.includes("«Notas da Sessao»"), "verificação liga início, fim, terapeuta (várias listas) e notas aos campos certos");
+  ok(pg.txt.includes("terapeutas sem nome nas listas") && pg.txt.includes("Beatriz Pena"), "verificação diz que terapeutas do site faltam nas listas do Zoho");
+
+  // Horas ocupadas: evento da Luísa (utilizadora u1) às 10:00, marcação no módulo às 19:00 e uma cancelada às 08:00
+  Z.eventos.push({ Owner: { id: "u1" }, Start_DateTime: instanteLisboa(D, "10:00").iso, End_DateTime: instanteLisboa(D, "11:00").iso, All_day: false });
+  Z.marcacoes.push({ id: "t0", Terapeutas: ["Sofia Costa"], Profissionais_LC: ["Luísa Pinto"], Estado: "Agendado", Data_do_tratamento: instanteLisboa(D, "19:00").iso, Hora_fim_do_tratamento: instanteLisboa(D, "20:00").iso },
+    { id: "tc", Profissionais_LC: ["Luísa Pinto"], Estado: "Cancelado", Data_do_tratamento: instanteLisboa(D, "08:00").iso, Hora_fim_do_tratamento: instanteLisboa(D, "09:00").iso });
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
   const livresL = r.j.livres?.[luisa.id]?.[D] || [];
-  ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm do CRM (${livresL.length} livres; 10:00 ocupada)`);
-  ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não tem utilizador no CRM fica fora da agenda online");
+  ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && !livresL.includes("19:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm das marcações do Zoho (${livresL.length} livres; 10:00 e 19:00 ocupadas, a cancelada não conta)`);
+  ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não está nas listas de profissionais fica fora da agenda online");
   const zc = { nome: "Carla Nova", email: "carla@exemplo.pt", telefone: "913000000", nif: "123456789" };
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "10:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
-  ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no CRM é recusada antes de pagar");
+  ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no Zoho é recusada antes de pagar");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
-  ok(r.status === 200 && r.j.marcacao.terapeuta === "Luísa Pinto" && !("zohoDono" in r.j.marcacao), "«Sem preferência» fica com quem está livre no CRM");
+  ok(r.status === 200 && r.j.marcacao.terapeuta === "Luísa Pinto" && !("zohoDono" in r.j.marcacao), "«Sem preferência» fica com quem está livre no Zoho");
   const guardada = r.j;
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, nome: "Outra Pessoa", email: "outra@exemplo.pt", telefone: "916000000", nif: "506651940", metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "enquanto o MB WAY não chega, a hora fica guardada para quem a escolheu");
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
   ok(!r.j.livres[luisa.id][D].includes("11:00"), "a hora guardada não aparece livre no site");
   r = { j: guardada };
+  const nEv0 = Z.eventos.length;
   await notificar(r.j);
-  const evz = Z.eventos.at(-1);
+  const mz = Z.marcacoes.at(-1);
   ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");
-  ok(evz.Owner.id === "u1" && evz.Who_Id.id === Z.criados[0].id && evz.Start_DateTime === instanteLisboa(D, "11:00").iso && evz.End_DateTime === instanteLisboa(D, "11:00", tz.duracao).iso && evz.Description.includes(r.j.numero), "marcação paga entra na agenda da Luísa, ligada à ficha");
+  ok(Z.eventos.length === nEv0 && mz.Name === tz.nome && mz.Artigo.id === "p1" && !mz.Terapeutas && mz.Profissionais_LC[0] === "Luísa Pinto" && mz.Estado === "Agendado" && mz.Pagamento === "Efetuado"
+    && mz.Especialidade === "Spa" && mz.Valor === tz.preco && mz.Preferencia_Terapeuta === false && mz.Origem_Marcacao === "Online" && !("Created_Time" in mz) && mz.Cliente.id === Z.criados[0].id
+    && mz.Data_do_tratamento === instanteLisboa(D, "11:00").iso && mz.Hora_fim_do_tratamento === instanteLisboa(D, "11:00", tz.duracao).iso && mz.Notas_da_Sessao.startsWith(r.j.numero + " · Origem online"), "marcação paga criada só no módulo Tratamentos, nos campos do SPA (nome, artigo, profissional, estado, pagamento, especialidade, valor, notas)");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("ficha de cliente nova")), "aviso à equipa diz que ficou na agenda");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "a mesma hora já não se pode marcar");
-  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "15:00", qualquer: true, ...zc, email: "carla.outro@exemplo.pt", metodo: "mb_way" });
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "15:00", terapeutaId: luisa.id, ...zc, email: "carla.outro@exemplo.pt", metodo: "mb_way" });
   await notificar(r.j);
-  ok(Z.criados.length === 1 && Z.eventos.at(-1).Who_Id.id === Z.criados[0].id && Z.eventos.at(-1).Description.includes("diferente"), "cliente existente reconhecido pelo NIF: sem ficha duplicada, com nota do email diferente");
+  ok(Z.criados.length === 1 && Z.marcacoes.at(-1).Cliente.id === Z.criados[0].id && Z.marcacoes.at(-1).Notas_da_Sessao.includes("diferente") && Z.marcacoes.at(-1).Preferencia_Terapeuta === true, "cliente existente reconhecido pelo NIF: sem ficha duplicada, com nota do email diferente; terapeuta escolhida fica como preferência");
   Z.contactos.push({ id: "c-antigo", Last_Name: "Antiga", Email: "antiga@exemplo.pt" });
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "16:00", qualquer: true, nome: "Rita Antiga", email: "antiga@exemplo.pt", telefone: "914000000", nif: "506651940", metodo: "mb_way" });
   await notificar(r.j);
-  ok(Z.criados.length === 1 && Z.contactos.find((c) => c.id === "c-antigo").Contribuinte === "506651940" && Z.eventos.at(-1).Who_Id.id === "c-antigo", "ficha sem NIF encontrada pelo email recebe o NIF");
-  Z.falhaEvento = true;
+  ok(Z.criados.length === 1 && Z.contactos.find((c) => c.id === "c-antigo").Contribuinte === "506651940" && Z.marcacoes.at(-1).Cliente.id === "c-antigo", "ficha sem NIF encontrada pelo email recebe o NIF");
+  Z.falhaMarcacao = true;
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "17:00", qualquer: true, ...zc, metodo: "mb_way" });
   await notificar(r.j);
   const pz = await obter(r.j.numero);
   ok(pz.estado === "pago" && /required/.test(pz.zoho.erro) && S.emails.some((e) => e.subject.includes(pz.numero) && e.html.includes("Marcar à mão")), "falha no CRM não trava o pagamento e a equipa é avisada");
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
+  Z.falhaMarcacao = false;
+  const nM = Z.marcacoes.length;
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&repetir=" + pz.numero });
+  ok(pg.txt.includes("✓ " + pz.numero) && Z.marcacoes.length === nM + 1 && (await obter(pz.numero)).zoho.evento, "«Pôr na agenda» volta a criar a marcação no Zoho");
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&repetir=" + pz.numero });
+  ok(Z.marcacoes.length === nM + 1, "não duplica a marcação se já está na agenda");
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "18:00", qualquer: true, ...zc, codigo: "VIP" });
+  ok(r.j.estado === "confirmado" && Z.marcacoes.at(-1).Pagamento === "Isento", "marcação com código VIP fica com Pagamento = Isento");
 
   console.log("\nTudo certo.");
 } finally {

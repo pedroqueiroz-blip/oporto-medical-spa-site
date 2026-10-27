@@ -2,7 +2,7 @@
 // e a notificação de pagamento da euPago. A fatura (Moloni ON) e os emails seguem do servidor.
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
-import { disponibilidade, confirmarHora, guardarHora, ErroAgenda } from "../../servidor/agenda.mjs";
+import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, ErroAgenda } from "../../servidor/agenda.mjs";
 import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
@@ -57,15 +57,31 @@ export default async (req) => {
     }
     // Verificação da ligação pela API de metadados do CRM (protegida pela palavra-passe do backoffice).
     if (rota === "/zoho/verificar") {
-      const ok = m === "POST" && senhaCerta(new URLSearchParams(await req.text()).get("senha") || "");
-      if (!ok) {
+      const form = m === "POST" ? new URLSearchParams(await req.text()) : new URLSearchParams();
+      const senha = form.get("senha") || "";
+      if (!senhaCerta(senha)) {
         if (m === "POST") await pausa(1500);
-        return pagina(`<h1>Verificar o Zoho CRM</h1><p class="nota">Confere módulos, campo do NIF, agenda e equipa no CRM.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Verificar</button></form>`, m === "POST" ? 401 : 200);
+        return pagina(`<h1>Verificar o Zoho CRM</h1><p class="nota">Confere módulos, campo do NIF, agenda e equipa no CRM, e as últimas marcações do site.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Verificar</button></form>`, m === "POST" ? 401 : 200);
       }
-      if (!(await estadoLigacao()).ligado) return pagina(`<h1>Zoho CRM por ligar</h1><p><a href="/api/zoho/ligar" style="color:inherit">Ligar primeiro</a>.</p>`);
-      const linhas = await verificarCRM(catalogo.equipa || []);
-      const e = (x) => String(x).replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
-      return pagina(`<h1>Verificação do Zoho CRM</h1><div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}</div>`);
+      const e = (x) => String(x ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      const estado = await estadoLigacao();
+      // «Pôr na agenda»: repete a marcação no CRM de um pedido pago (ou a 0 €) que não lá ficou.
+      let aviso = "";
+      if (form.get("repetir")) {
+        try { aviso = `✓ ${e(form.get("repetir"))}: ${e(await repetirNoCRM(form.get("repetir")))}`; }
+        catch (err) { aviso = `✗ ${e(form.get("repetir"))}: ${e(err.message)}`; }
+      }
+      const linhas = estado.ligado ? await verificarCRM(catalogo.equipa || [], catalogo.tratamentos || []) : [{ ok: false, titulo: "Ligação ao Zoho CRM", detalhe: estado.configurado ? "Por ligar neste site: abra /api/zoho/ligar." : "Faltam ZOHO_CLIENT_ID e ZOHO_CLIENT_SECRET neste site (Netlify, contexto de produção)." }];
+      const marc = await ultimasMarcacoes(10);
+      const ESTADOS = { novo: "por pagar", aguarda_pagamento: "à espera do pagamento", pago: "pago", confirmado: "confirmado (0 €)" };
+      const linhaMarc = (x) => {
+        const zoho = x.zoho?.evento ? "✓ na agenda do Zoho" : x.zoho?.erro ? `✗ ${x.zoho.erro}` : ["pago", "confirmado"].includes(x.estado) ? "✗ não foi enviada ao Zoho" : "— só vai para o Zoho depois de pago";
+        const botao = ["pago", "confirmado"].includes(x.estado) && !x.zoho?.evento && estado.ligado
+          ? `<form method="post" style="margin:6px 0 0"><input type="hidden" name="senha" value="${e(senha)}"><input type="hidden" name="repetir" value="${e(x.numero)}"><button type="submit" style="margin:0;width:auto;padding:8px 16px">Pôr na agenda</button></form>` : "";
+        return `<p><b>${e(x.numero)}</b> · ${e(x.data)} ${e(x.hora)} · ${e(x.tratamento)} · ${e(x.terapeuta || "")}<br><span class="nota">${e(x.cliente)} · ${e(ESTADOS[x.estado] || x.estado)}${x.metodo ? ` (${e(x.metodo)})` : ""} · ${e(zoho)}</span>${botao}</p>`;
+      };
+      return pagina(`<h1>Verificação do Zoho CRM</h1>${aviso ? `<p class="${aviso.startsWith("✓") ? "nota" : "erro"}">${aviso}</p>` : ""}<div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}
+<h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Últimas marcações do site</h2>${marc.length ? marc.map(linhaMarc).join("") : `<p class="nota">Ainda não há marcações.</p>`}</div>`);
     }
 
     if (rota === "/zoho/retorno" && m === "GET") {
