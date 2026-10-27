@@ -95,7 +95,7 @@
         '<form class="bk-form" novalidate>' +
         (pedeDados ? '<label class="field"><span>' + L('O seu nome', 'Your name') + '</span><input id="pg-nome" autocomplete="name" value="' + esc(st.nome) + '" required></label>' +
           '<label class="field"><span>' + L('O seu email', 'Your email') + '</span><input id="pg-email" type="email" autocomplete="email" value="' + esc(st.email) + '" required></label>' : '') +
-        (opts.semCodigo ? '<p class="bk-note">' + L('Preço de campanha, não acumulável com outros códigos ou descontos.', 'Offer price, cannot be combined with other codes or discounts.') + '</p>' : '<div class="pg-codigo"><label class="field"><span>' + (pedido.tipo === 'voucher' ? L('Código de desconto', 'Discount code') : L('Código VIP, de desconto ou de voucher', 'VIP, discount or voucher code')) + '</span><input id="pg-codigo" autocomplete="off" autocapitalize="characters" value="' + esc(st.codigo) + '"></label>' +
+        (opts.semCodigo ? '<p class="bk-note">' + L('Preço de campanha, não acumulável com outros códigos ou descontos.', 'Offer price, cannot be combined with other codes or discounts.') + '</p>' : '<div class="pg-codigo"><label class="field"><span>' + (pedido.tipo === 'voucher' ? L('Código de desconto', 'Discount code') : L('Código de desconto ou de voucher', 'Discount or voucher code')) + '</span><input id="pg-codigo" autocomplete="off" autocapitalize="characters" value="' + esc(st.codigo) + '"></label>' +
         '<button type="button" class="btn btn--ghost" data-aplicar>' + L('Aplicar', 'Apply') + '</button></div>') +
         (gratis ? '' :
           '<div class="vc-row"><p class="vc-label">' + L('Como quer pagar', 'How would you like to pay?') + '</p><div class="vc-seg" role="group">' +
