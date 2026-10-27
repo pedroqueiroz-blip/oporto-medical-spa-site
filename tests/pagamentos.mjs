@@ -58,11 +58,12 @@ const servidor = http.createServer(async (req, res) => {
 const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false, camposAgenda: [], moduloTrat: false, marcacoes: [] };
 // Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
 const CAMPOS_TRAT = [
+  { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" },
   { api_name: "Name", field_label: "Nome", data_type: "text" },
   { api_name: "Tratamento", field_label: "Tratamento", data_type: "picklist", pick_list_values: [] },
   { api_name: "Terapeuta", field_label: "Terapeuta", data_type: "userlookup" },
   { api_name: "Estado", field_label: "Estado", data_type: "picklist", pick_list_values: ["Agendado", "Realizado", "Cancelado"].map((v) => ({ display_value: v })) },
-  { api_name: "Pagamento", field_label: "Pagamento", data_type: "picklist", pick_list_values: ["Por pagar", "Pago", "Voucher"].map((v) => ({ display_value: v })) },
+  { api_name: "Pagamento", field_label: "Pagamento", data_type: "picklist", pick_list_values: ["-None-", "Efetuado", "Pendente", "Isento", "Faturado"].map((v) => ({ display_value: v })) },
   { api_name: "Descricao", field_label: "Descrição", data_type: "textarea" },
   { api_name: "Inicio", field_label: "Início", data_type: "datetime" },
   { api_name: "Fim", field_label: "Fim", data_type: "datetime" },
@@ -348,7 +349,11 @@ try {
 
   // Módulo «Tratamentos»: as marcações passam a ser criadas lá e as horas ocupadas também vêm de lá
   Z.moduloTrat = true;
-  CAMPOS_TRAT[1].pick_list_values = [{ display_value: tz.nome }];
+  const semTrat = CAMPOS_TRAT.splice(2, 1);
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("continuam em Reuniões") && !pg.txt.includes("Created_Time, datetime)</span></p><p><b>✓ Tratamentos: Início"), "sem campo do tratamento as marcações continuam em Reuniões; a hora de criação nunca é o início");
+  CAMPOS_TRAT.splice(2, 0, ...semTrat);
+  CAMPOS_TRAT.find((f) => f.api_name === "Tratamento").pick_list_values = [{ display_value: tz.nome }];
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("✓ Módulo das marcações (Tratamentos)") && pg.txt.includes("Tratamentos: Terapeuta") && pg.txt.includes("tratamentos sem valor igual"), "verificação encontra o módulo Tratamentos e os seus campos");
   Z.marcacoes.push({ id: "t0", Terapeuta: { id: "u1", name: "Luísa Pinto" }, Estado: "Agendado", Inicio: instanteLisboa(D, "19:00").iso, Fim: instanteLisboa(D, "20:00").iso },
@@ -359,7 +364,7 @@ try {
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "18:00", qualquer: true, ...zc, metodo: "mb_way" });
   await notificar(r.j);
   const mz = Z.marcacoes.at(-1);
-  ok(Z.eventos.length === nEv2 && mz.Tratamento === tz.nome && mz.Terapeuta.id === "u1" && mz.Estado === "Agendado" && mz.Pagamento === "Pago" && mz.Origem_Marcacao === "Online"
+  ok(Z.eventos.length === nEv2 && mz.Tratamento === tz.nome && mz.Terapeuta.id === "u1" && mz.Estado === "Agendado" && mz.Pagamento === "Efetuado" && mz.Origem_Marcacao === "Online"
     && mz.Inicio === instanteLisboa(D, "18:00").iso && mz.Fim === instanteLisboa(D, "18:00", tz.duracao).iso && mz.Cliente.id && mz.Descricao.startsWith(r.j.numero + " · Origem online"), "marcação paga criada no módulo Tratamentos com tratamento, terapeuta, estado, pagamento e origem");
 
   console.log("\nTudo certo.");

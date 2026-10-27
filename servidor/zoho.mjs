@@ -171,12 +171,14 @@ export async function criarEvento({ titulo, inicio, fim, dono, cliente, descrica
 // ZOHO_MODULO_MARCACOES) e ficam guardados um dia; a verificação volta a procurá-los. Sem o módulo,
 // as marcações continuam como eventos (Reuniões).
 const CANCELADA = /cancel|anulad|desmarc|falt/;
+const SISTEMA = /^(Created|Modified|Last_Activity|Last_Enriched|Unsubscribed)_(Time|By)$|^(Owner|Tag|Record_Image|Locked__s)$/;
 const resumo = (f) => ({ api: f.api_name, rotulo: f.field_label, tipo: f.data_type, valores: (f.pick_list_values || []).map((v) => v.display_value), modulo: f.lookup?.module?.api_name || "" });
 function mapear(campos) {
-  const r = campos.map(resumo), por = (re) => r.find((f) => re.test(simples(f.rotulo)));
+  // Campos do sistema (hora de criação, etc.) nunca contam como início ou outro campo da marcação.
+  const r = campos.map(resumo).filter((f) => !SISTEMA.test(f.api)), por = (re) => r.find((f) => re.test(simples(f.rotulo)));
   const datas = r.filter((f) => f.tipo === "datetime");
   const fim = datas.find((f) => /^(fim|termino|end|ate)/.test(simples(f.rotulo)));
-  const inicio = datas.find((f) => f !== fim && /inicio|^data|^hora|start/.test(simples(f.rotulo))) || datas.find((f) => f !== fim);
+  const inicio = datas.find((f) => f !== fim && /inicio|start/.test(simples(f.rotulo))) || datas.find((f) => f !== fim && /^data|^hora/.test(simples(f.rotulo))) || (datas.length === 1 && datas[0] !== fim ? datas[0] : undefined);
   return {
     nome: r.find((f) => f.api === "Name"), inicio, fim,
     tratamento: por(/^tratamento/), terapeuta: por(/^terapeuta|^profissiona/),
@@ -186,7 +188,7 @@ function mapear(campos) {
   };
 }
 async function descobrirMarcacoes() {
-  const out = { em: new Date().toISOString(), modulo: null };
+  const out = { versao: 2, em: new Date().toISOString(), modulo: null };
   const mods = (await crm("GET", "/settings/modules"))?.modules || [];
   const pedido = process.env.ZOHO_MODULO_MARCACOES;
   const m = mods.find((x) => pedido ? x.api_name === pedido : x.api_name !== "Products" && (simples(x.plural_label) === "tratamentos" || simples(x.singular_label) === "tratamento"));
@@ -194,14 +196,16 @@ async function descobrirMarcacoes() {
   const campos = (await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || [];
   return { ...out, modulo: m.api_name, nomeModulo: m.plural_label || m.api_name, campos: mapear(campos), todos: campos.map(resumo) };
 }
+// Só se marca no módulo quando se sabe onde vão o início, a terapeuta e o tratamento; senão, Reuniões.
+const completo = (mm) => Boolean(mm?.modulo && mm.campos?.inicio && mm.campos?.terapeuta && mm.campos?.tratamento);
 export async function moduloMarcacoes() {
   const g = await gaveta(), cfg = (await g.get("config", { type: "json" })) || {};
   let mm = cfg.marcacoes;
-  if (!mm || Date.now() - Date.parse(mm.em) > 864e5) {
+  if (!mm || mm.versao !== 2 || Date.now() - Date.parse(mm.em) > 864e5) {
     mm = await descobrirMarcacoes();
     await g.setJSON("config", { ...((await g.get("config", { type: "json" })) || {}), marcacoes: mm });
   }
-  return mm.modulo && mm.campos?.inicio && mm.campos?.terapeuta ? mm : null;
+  return completo(mm) ? mm : null;
 }
 
 // Valor de um campo: lista de escolha (valor com o mesmo nome), utilizador, ligação a outro módulo
@@ -237,7 +241,8 @@ export async function criarMarcacao(mm, { titulo, inicio, fim, dono, terapeuta, 
   await por(c.tratamento, valorCampo(c.tratamento, tratamento).catch(() => undefined));
   await por(c.terapeuta, valorCampo(c.terapeuta, terapeuta, dono).catch(() => undefined));
   await por(c.estado, escolher(c.estado, "Agendado", /^agendad/, /^marcad/, /^confirmad/));
-  await por(c.pagamento, semPagamento ? escolher(c.pagamento, "Voucher", /voucher|oferta|vip/, /^pag[oa]$/) : escolher(c.pagamento, "Pago", /^pag[oa]$/, /^pag[oa] /));
+  await por(c.pagamento, semPagamento === "isento" ? escolher(c.pagamento, "Isento", /^isent/, /vip|oferta/)
+    : semPagamento ? escolher(c.pagamento, "Voucher", /voucher/, /^efetuad/, /^pag[oa]$/) : escolher(c.pagamento, "Pago", /^efetuad/, /^pag[oa]$/, /^pag[oa] /));
   await por(c.descricao, ["text", "textarea"].includes(c.descricao?.tipo) ? descricao : undefined);
   await por(c.cliente, cliente ? { id: cliente } : undefined);
   await por(c.origem, escolher(c.origem, "Online", /^online$/));
@@ -352,10 +357,10 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
     if (!mm.modulo) add(false, "Módulo das marcações (Tratamentos)", "Não há um módulo «Tratamentos»: as marcações vão para Reuniões. Se tiver outro nome, indique-o em ZOHO_MODULO_MARCACOES no Netlify.");
     else {
       const c = mm.campos, txt = (f) => `«${f.rotulo}» (${f.api}, ${f.tipo}${f.valores.length ? `: ${f.valores.join(" / ")}` : ""}${f.modulo ? ` → ${f.modulo}` : ""})`;
-      const ok = Boolean(c.inicio && c.terapeuta);
-      add(ok, `Módulo das marcações (${mm.nomeModulo})`, ok ? `As marcações do site são criadas em ${mm.modulo} e as horas ocupadas também se leem daqui.` : "Faltam os campos de início e/ou terapeuta: as marcações continuam em Reuniões.");
+      const ok = completo(mm);
+      add(ok, `Módulo das marcações (${mm.nomeModulo})`, ok ? `As marcações do site são criadas em ${mm.modulo} e as horas ocupadas também se leem daqui.` : "Falta saber o campo do início, da terapeuta ou do tratamento (abaixo): até lá, as marcações continuam em Reuniões, como antes.");
       const nomes = { inicio: "Início", fim: "Fim", tratamento: "Tratamento", terapeuta: "Terapeuta", estado: "Estado (Agendado)", pagamento: "Pagamento (Pago)", descricao: "Descrição", cliente: "Cliente (Contactos)", origem: "Origem_Marcacao (Online)" };
-      for (const [k, n] of Object.entries(nomes)) add(Boolean(c[k]) || ["fim", "descricao", "origem"].includes(k), `${mm.nomeModulo}: ${n}`, c[k] ? txt(c[k]) : "Campo não encontrado.");
+      for (const [k, n] of Object.entries(nomes)) add(Boolean(c[k]), `${mm.nomeModulo}: ${n}`, c[k] ? txt(c[k]) : "Campo não encontrado.");
       if (c.tratamento?.valores.length) {
         const falta = tratamentos.filter((t) => !c.tratamento.valores.some((v) => simples(v) === simples(t.nome)));
         if (falta.length) add(false, `${mm.nomeModulo}: tratamentos sem valor igual na lista`, `${falta.map((t) => t.nome).join(", ")}. Acrescente-os à lista com o mesmo nome do site; até lá, nessas o tratamento fica só no nome e na descrição.`);
