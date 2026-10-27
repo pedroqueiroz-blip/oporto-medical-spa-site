@@ -277,9 +277,10 @@ try {
   const D = dia.toISOString().slice(0, 10);
   // A agenda passa a ter o campo «Tratamento» (lista de escolha) só com um dos tratamentos do site
   const tz0 = cat.tratamentos.find((t) => cat.equipa.find((p) => p.nome === "Luísa Pinto").faz.includes(t.id) && t.duracao <= 60 && t.grupo !== "Relaxar") || cat.tratamentos.find((t) => cat.equipa.find((p) => p.nome === "Luísa Pinto").faz.includes(t.id) && t.duracao <= 60);
-  Z.camposAgenda = [{ api_name: "Tratamento", field_label: "Tratamento", data_type: "picklist", custom_field: true, pick_list_values: [{ display_value: "-None-" }, { display_value: tz0.nome.toUpperCase() }] }];
+  Z.camposAgenda = [{ api_name: "Origem_Marcacao", field_label: "Origem da marcação", data_type: "picklist", custom_field: true, pick_list_values: [{ display_value: "Telefone" }, { display_value: "Online" }] }, { api_name: "Tratamento", field_label: "Tratamento", data_type: "picklist", custom_field: true, pick_list_values: [{ display_value: "-None-" }, { display_value: tz0.nome.toUpperCase() }] }];
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("preenchem «Tratamento» (Tratamento, picklist)") && pg.txt.includes("Sem valor igual na lista"), "verificação encontra o campo do tratamento e diz que tratamentos faltam na lista");
+  ok(pg.txt.includes("✓ Origem da marcação"), "verificação confirma o campo Origem_Marcacao com o valor Online");
   const { instanteLisboa } = await import("../servidor/datas.mjs");
   Z.eventos.push({ Owner: { id: "u1" }, Start_DateTime: instanteLisboa(D, "10:00").iso, End_DateTime: instanteLisboa(D, "11:00").iso, All_day: false });
   const luisa = cat.equipa.find((p) => p.nome === "Luísa Pinto");
@@ -304,6 +305,7 @@ try {
   ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");
   ok(evz.Owner.id === "u1" && evz.Who_Id.id === Z.criados[0].id && evz.Start_DateTime === instanteLisboa(D, "11:00").iso && evz.End_DateTime === instanteLisboa(D, "11:00", tz.duracao).iso && evz.Description.includes(r.j.numero), "marcação paga entra na agenda da Luísa, ligada à ficha");
   ok(evz.Tratamento === tz0.nome.toUpperCase() && evz.Description.includes("Tratamento: " + tz.nome), "a marcação fica associada ao tratamento (valor da lista do Zoho)");
+  ok(evz.Origem_Marcacao === "Online", "a marcação fica com Origem_Marcacao = Online");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("ficha de cliente nova")), "aviso à equipa diz que ficou na agenda");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "a mesma hora já não se pode marcar");

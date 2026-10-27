@@ -156,7 +156,7 @@ export async function criarEvento({ titulo, inicio, fim, dono, cliente, descrica
   const cfg = await configuracao();
   const trat = tratamento ? await valorTratamento(cfg.tratamento, tratamento).catch(() => undefined) : undefined;
   const j = await crm("POST", `/${cfg.moduloAgenda}`, { data: [{
-    Event_Title: titulo, Start_DateTime: inicio, End_DateTime: fim, Description: descricao,
+    Event_Title: titulo, Start_DateTime: inicio, End_DateTime: fim, Description: descricao, Origem_Marcacao: "Online",
     ...(dono ? { Owner: { id: dono } } : {}),
     ...(cliente ? { Who_Id: { id: cliente } } : {}),
     ...(trat !== undefined ? { [cfg.tratamento.campo]: trat } : {}),
@@ -209,6 +209,10 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
     add(!faltam.length, `Módulo da agenda (${agenda})`, faltam.length ? `Faltam os campos ${faltam.join(", ")}.` : "Título, início, fim, responsável e contacto disponíveis.");
     // Campos próprios da agenda (onde pode estar a terapeuta de cada marcação)
     const proprios = campos.filter((f) => f.custom_field || ["picklist", "multiselectpicklist", "lookup", "userlookup", "ownerlookup"].includes(f.data_type));
+    // As marcações do site gravam Origem_Marcacao = «Online» (pedido do SPA).
+    const origem = campos.find((f) => f.api_name === "Origem_Marcacao");
+    const valoresOrigem = (origem?.pick_list_values || []).map((v) => v.display_value);
+    add(Boolean(origem) && (!valoresOrigem.length || valoresOrigem.includes("Online")), "Origem da marcação", !origem ? "A agenda não tem o campo Origem_Marcacao." : valoresOrigem.length && !valoresOrigem.includes("Online") ? `A lista de «${origem.field_label}» não tem o valor «Online» (tem: ${valoresOrigem.join(" / ")}).` : `As marcações do site ficam com «${origem.field_label}» = Online.`);
     // Campo do tratamento: ZOHO_CAMPO_TRATAMENTO no Netlify, senão um único campo com nome parecido.
     const pedido = process.env.ZOHO_CAMPO_TRATAMENTO;
     const cand = pedido ? campos.filter((f) => f.api_name === pedido) : campos.filter((f) => /tratamento|servi[cç]o|treatment|service/i.test(`${f.api_name} ${f.field_label}`));
