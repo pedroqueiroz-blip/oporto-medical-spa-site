@@ -95,16 +95,7 @@ const pedir = async (rota, dados, metodo = "POST") => {
   return { status: r.status, j: await r.json() };
 };
 const notificar = (p, extra = {}) => pedir(`/api/eupago-notificacao?${new URLSearchParams({ chave_api: "demo-chave-teste", identificador: p.numero, valor: String(p.total), transacao: "t-" + p.numero, mp: "MW:PT", ...extra })}`, null, "GET");
-// Marcações: o email confirma-se com o código (lido do email simulado) e o NIF é obrigatório.
-const chaves = {};
-async function verificar(email) {
-  if (chaves[email]) return chaves[email];
-  const r = await pedir("/api/verificacao", { email });
-  if (r.status !== 200) throw new Error("verificação: " + r.j.erro);
-  const codigo = S.emails.filter((e) => e.to[0] === email && e.subject.includes("código")).at(-1).subject.slice(0, 6);
-  return (chaves[email] = (await pedir("/api/verificacao/confirmar", { email, codigo })).j.verificacao);
-}
-const marcar = async (d) => pedir("/api/pagamento", { nif: "506651940", verificacao: await verificar(d.email), ...d });
+const marcar = (d) => pedir("/api/pagamento", d);
 const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tratamentos.find((t) => t.grupo !== "Relaxar");
 const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
 const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
@@ -133,7 +124,7 @@ try {
   ok(d1.status === 1 && d1.dados.documentSetId === 7, "fatura-recibo fechada na série SPA");
   ok(d1.dados.products.length === 1 && d1.dados.products[0].productId === 101 && d1.dados.products[0].taxes.length === 0 && d1.dados.products[0].exemptionReason === "M10", "linha TREAB, sem IVA, com motivo de isenção");
   ok(d1.dados.products[0].price === outro.preco && d1.totalValue === outro.preco && d1.dados.payments[0].paymentMethodId === 3, "valor da fatura = valor pago, meio MB WAY");
-  ok(d1.dados.customerId === 50, "marcação com NIF: cliente criado no Moloni ON");
+  ok(d1.dados.customerId === 1, "sem NIF: Consumidor final");
   ok(S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome), "fatura enviada com o texto da terapêutica de reabilitação");
   const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && !e.subject.includes("código"));
   ok(e1 && e1.html.includes("Iniciará de seguida a sua terapêutica de reabilitação: " + esc(outro.nome)) && e1.subject.includes("Marcação confirmada"), "email de confirmação com o texto do Pedro (reabilitação)");
@@ -151,7 +142,7 @@ try {
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: codigo.toLowerCase() });
   const com10 = r2(relax.preco * 0.9);
   ok(r.j.total === com10 && r.j.codigo.tipo === "newsletter", `preço com o código: ${relax.preco} € → ${r.j.total} €`);
-  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", telefone: "915000000", nif: "506651940", codigo, metodo: "multibanco" });
   ok(r.status === 400 && /MB WAY ou cartão/.test(r.j.erro), "marcações não se pagam por Multibanco (só MB WAY ou cartão, que confirmam na hora)");
   r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
   const p2 = r.j;
@@ -166,7 +157,7 @@ try {
 
   // 3) Código VIP: massagem a 0 €, sem pagamento nem fatura
   const docsAntes = Object.keys(S.docs).length, eupagoAntes = S.mb.length + S.mbway.length + S.cartao.length;
-  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "11:00", nome: "Cliente VIP", email: "vip@exemplo.pt", codigo: " vip " });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "11:00", nome: "Cliente VIP", email: "vip@exemplo.pt", telefone: "915000001", codigo: " vip " });
   ok(r.j.estado === "confirmado" && r.j.total === 0, "código VIP: marcação confirmada a 0 €");
   ok(Object.keys(S.docs).length === docsAntes && S.mb.length + S.mbway.length + S.cartao.length === eupagoAntes, "VIP: sem pagamento na euPago e sem fatura");
   ok(S.emails.some((e) => e.to[0] === "vip@exemplo.pt" && e.html.includes("terapêutica de prevenção") && e.html.includes("Sem custos")), "VIP: email de confirmação na mesma");
@@ -189,7 +180,7 @@ try {
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: outro.id, codigo: vcod });
   ok(r.status === 400 && r.j.erro.includes(relax.nome), "voucher só para o tratamento dele");
   const docs5 = Object.keys(S.docs).length;
-  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "17:00", nome: "Maria", email: "maria@exemplo.pt", codigo: vcod });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "17:00", nome: "Maria", email: "maria@exemplo.pt", telefone: "915000002", codigo: vcod });
   ok(r.j.estado === "confirmado" && r.j.total === 0 && Object.keys(S.docs).length === docs5, "marcação com o voucher: 0 €, sem segunda fatura");
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: vcod });
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "voucher só serve uma vez");
@@ -209,25 +200,11 @@ try {
   ok(r.status === 400 && /telemóvel/.test(r.j.erro), "MB WAY sem telemóvel válido é recusado");
   r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, nif: "123456788", metodo: "card" });
   ok(r.status === 400 && /NIF/.test(r.j.erro), "NIF inválido é recusado");
-  // Verificação do email e NIF nas marcações
-  const base = { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, metodo: "card" };
-  r = await pedir("/api/pagamento", { ...base, nif: "506651940" });
-  ok(r.status === 400 && /código/.test(r.j.erro), "marcação sem email verificado é recusada");
-  r = await pedir("/api/pagamento", { ...base, nif: "506651940", verificacao: "inventada" });
-  ok(r.status === 400 && /código/.test(r.j.erro), "chave de verificação falsa é recusada");
-  r = await pedir("/api/pagamento", { ...base, nif: "", verificacao: await verificar(cliente.email) });
-  ok(r.status === 400 && /NIF/.test(r.j.erro), "marcação sem NIF é recusada");
-  r = await pedir("/api/pagamento", { ...base, email: "outro@exemplo.pt", nif: "506651940", verificacao: await verificar(cliente.email) });
-  ok(r.status === 400 && /código/.test(r.j.erro), "a chave só vale para o email verificado");
-  r = await pedir("/api/verificacao", { email: "bea@exemplo.pt" });
-  ok(r.status === 200 && r.j.enviado && !r.j.codigoTeste, "código enviado por email, nunca na resposta");
-  r = await pedir("/api/verificacao", { email: "bea@exemplo.pt" });
-  ok(r.status === 400 && /instantes/.test(r.j.erro), "não reenvia o código logo a seguir");
-  for (let i = 0; i < 5; i++) r = await pedir("/api/verificacao/confirmar", { email: "bea@exemplo.pt", codigo: "000000" === S.emails.at(-1).subject.slice(0, 6) ? "111111" : "000000" });
-  ok(r.status === 400 && /certo/.test(r.j.erro), "código errado é recusado");
-  const certo = S.emails.filter((e) => e.to[0] === "bea@exemplo.pt").at(-1).subject.slice(0, 6);
-  r = await pedir("/api/verificacao/confirmar", { email: "bea@exemplo.pt", codigo: certo });
-  ok(r.status === 400 && /tentativas/.test(r.j.erro), "depois de 5 tentativas erradas, nem o certo passa");
+  // Dados obrigatórios nas marcações: nome, email e telemóvel; o NIF é opcional
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "", metodo: "card" });
+  ok(r.status === 400 && /telemóvel/.test(r.j.erro), "marcação sem telemóvel é recusada");
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "09:00", ...cliente, metodo: "card" });
+  ok(r.status === 200, "marcação sem NIF é aceite (o NIF só serve para a fatura)");
   r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: "2020-01-01", hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "dia no passado é recusado");
 

@@ -1,7 +1,6 @@
 /* Oporto Medical Spa: passo de pagamento das marcações e dos vouchers.
    OMS_PAGAR.abrir(root, pedido, { voltar }) mostra o resumo, o código (VIP, 10% da newsletter ou voucher),
    o NIF e o meio de pagamento (MB WAY, Multibanco, cartão). O valor é sempre calculado no servidor (/api).
-   Nas marcações, OMS_PAGAR.verificar(root, pedido, opts) confirma antes o email com um código de 6 dígitos.
    Na página /pagamento/ (regresso do cartão), OMS_PAGAR.estado(root, numero, token) mostra como ficou. */
 (function () {
   'use strict';
@@ -138,12 +137,7 @@
       for (var k in pedido) dados[k] = pedido[k];
       dados.nome = st.nome; dados.email = st.email; dados.telefone = st.telefone || st.telemovel;
       dados.codigo = st.codigo.trim(); dados.metodo = st.metodo; dados.telemovel = st.telemovel; dados.nif = st.nif;
-      api('/pagamento', dados).then(function (p) {
-        if (p.url) { location.href = p.url; return; }
-        if (p.estado === 'confirmado' || p.estado === 'pago') return feito(root, p);
-        if (p.metodo === 'multibanco') return multibanco(root, p);
-        esperar(root, p.numero, p.token, p);
-      }).catch(function (err) { st.aEnviar = false; render(err.message); });
+      enviar(root, dados).catch(function (err) { st.aEnviar = false; render(err.message); });
     };
     ligar(root);
 
@@ -151,52 +145,14 @@
     calcular(st.codigo.trim(), opts.codigo);
   }
 
-  /* Marcações: o email confirma-se com um código de 6 dígitos antes de pagar. Depois segue para abrir(). */
-  function verificar(root, pedido, opts) {
-    opts = opts || {};
-    var st = { codigo: '', enviado: false, teste: '', aEnviar: false };
-
-    function render(erro) {
-      root.innerHTML = '<div class="bk-panel bk-panel--confirm pg"><div class="bk-summary">' +
-        '<p class="bk-summary__eyebrow">Confirmar o email</p>' +
-        '<p class="bk-summary__title">' + esc(pedido.email) + '</p>' +
-        '<p class="bk-note">' + (st.enviado ? 'Enviámos um código de 6 dígitos para este email. Veja também a pasta de spam.' : 'A enviar o código…') + '</p>' +
-        (st.teste ? '<p class="bk-note">Pré-visualização sem envio de emails: o código é <b>' + esc(st.teste) + '</b>.</p>' : '') + '</div>' +
-        '<form class="bk-form" novalidate>' +
-        '<label class="field"><span>Código do email</span><input id="vf-codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6" value="' + esc(st.codigo) + '"></label>' +
-        '<p class="bk-error" role="alert"' + (erro ? '' : ' hidden') + '>' + esc(erro || '') + '</p>' +
-        '<button type="submit" class="btn btn--primary"' + (st.aEnviar || !st.enviado ? ' disabled' : '') + '>' + (st.aEnviar ? 'Um momento…' : 'Confirmar') + '</button>' +
-        '<button type="button" class="btn btn--ghost" data-reenviar>Enviar outro código</button>' +
-        (opts.voltar ? '<button type="button" class="btn btn--ghost" data-voltar>Voltar</button>' : '') +
-        '</form></div>';
-      var i = root.querySelector('#vf-codigo'); if (i && st.enviado && !erro) i.focus();
-    }
-    function enviar() {
-      return api('/verificacao', { email: pedido.email })
-        .then(function (r) { st.enviado = true; st.teste = r.codigoTeste || ''; render(); })
-        .catch(function (e) { st.enviado = true; render(e.message); });
-    }
-
-    var h = root._pg = {};
-    h.input = function (e) { if (e.target.id === 'vf-codigo') st.codigo = e.target.value.replace(/\D/g, ''); };
-    h.click = function (e) {
-      var b = e.target.closest('button'); if (!b) return;
-      if (b.hasAttribute('data-reenviar')) enviar();
-      else if (b.hasAttribute('data-voltar')) opts.voltar();
-    };
-    h.submit = function (e) {
-      e.preventDefault(); e.stopImmediatePropagation();
-      if (st.codigo.length !== 6) return render('Escreva os 6 dígitos do código.');
-      st.aEnviar = true; render();
-      api('/verificacao/confirmar', { email: pedido.email, codigo: st.codigo }).then(function (r) {
-        var p = {}; for (var k in pedido) p[k] = pedido[k];
-        p.verificacao = r.verificacao;
-        abrir(root, p, opts);
-      }).catch(function (err) { st.aEnviar = false; render(err.message); });
-    };
-    ligar(root);
-    render();
-    enviar();
+  /* Cria o pedido e segue para o resultado: cartão, MB WAY à espera, Multibanco ou já confirmado (0 €). */
+  function enviar(root, dados) {
+    return api('/pagamento', dados).then(function (p) {
+      if (p.url) { location.href = p.url; return; }
+      if (p.estado === 'confirmado' || p.estado === 'pago') return feito(root, p);
+      if (p.metodo === 'multibanco') return multibanco(root, p);
+      esperar(root, p.numero, p.token, p);
+    });
   }
 
   /* Página /pagamento/: regresso do pagamento com cartão. */
@@ -212,7 +168,7 @@
     }).catch(function (e) { root.innerHTML = '<div class="bk-panel"><p class="bk-note">' + esc(e.message) + '</p></div>'; });
   }
 
-  window.OMS_PAGAR = { abrir: abrir, verificar: verificar, estado: estado };
+  window.OMS_PAGAR = { abrir: abrir, enviar: enviar, preco: function (dados) { return api('/preco', dados); }, estado: estado };
 
   var pg = document.getElementById('pagamento-estado');
   if (pg) {

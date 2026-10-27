@@ -57,7 +57,6 @@ export async function store(name) {
 export const STORES = {
   pedidos: "pedidos",   // marcações e vouchers comprados
   codigos: "codigos",   // vouchers emitidos e códigos de 10% da newsletter
-  verificacoes: "verificacoes", // códigos de verificação do email antes da marcação
   zoho: "zoho",         // ligação ao Zoho CRM (chave de renovação)
   reservas: "reservas", // horas guardadas enquanto o pagamento (MB WAY ou cartão) não chega
 };

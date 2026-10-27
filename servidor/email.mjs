@@ -109,13 +109,3 @@ export const emailBoasVindas = (email, codigo, pct) => enviar({
 <p>Escreva-o no passo de confirmação, antes de pagar. Vale para uma compra.</p>
 <p><a href="${esc(site())}/#reservar" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">Reservar</a></p>`),
 });
-
-// Código para confirmar o email antes da marcação.
-export const emailCodigo = (email, codigo) => enviar({
-  para: email,
-  assunto: `${codigo} é o seu código · ${spa.nome}`,
-  html: moldura(`${h1("Confirme o seu email")}
-<p>Para concluir a marcação, escreva este código no site:</p>
-<p style="font-size:28px;letter-spacing:.3em;text-align:center;border:1px solid #D9A86C;padding:16px;margin:16px 0"><b>${esc(codigo)}</b></p>
-<p style="font-size:13px;color:#7a6650">É válido durante 10 minutos. Se não pediu este código, ignore este email.</p>`),
-});

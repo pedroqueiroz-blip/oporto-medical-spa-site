@@ -2,7 +2,6 @@
 // e a notificação de pagamento da euPago. A fatura (Moloni ON) e os emails seguem do servidor.
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
-import { pedirCodigo, confirmarCodigo, ErroVerificacao } from "../../servidor/verificacao.mjs";
 import { disponibilidade, confirmarHora, guardarHora, ErroAgenda } from "../../servidor/agenda.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
@@ -80,17 +79,6 @@ export default async (req) => {
       return json(await disponibilidade({ tratamento: url.searchParams.get("tratamento"), de: url.searchParams.get("de"), dias: url.searchParams.get("dias") }));
     }
 
-    // Verificação do email antes da marcação: envia o código e, depois, confirma-o.
-    if (rota === "/verificacao" && m === "POST") {
-      const c = await corpo(req);
-      return json(await pedirCodigo(c.email));
-    }
-    if (rota === "/verificacao/confirmar" && m === "POST") {
-      const c = await corpo(req);
-      await pausa(300);
-      return json(await confirmarCodigo(c.email, c.codigo));
-    }
-
     // Cria o pedido e o pagamento. Com total 0 (VIP ou voucher) fica logo confirmado.
     if (rota === "/pagamento" && m === "POST") {
       const c = await corpo(req);
@@ -120,7 +108,7 @@ export default async (req) => {
 
     return json({ erro: "Não encontrado." }, 404);
   } catch (e) {
-    if (e instanceof ErroCliente || e instanceof ErroVerificacao || e instanceof ErroAgenda) return json({ erro: e.message }, 400);
+    if (e instanceof ErroCliente || e instanceof ErroAgenda) return json({ erro: e.message }, 400);
     console.error("API", rota, e);
     return json({ erro: e.message || "Ocorreu um erro. Tente de novo dentro de momentos." }, 502);
   }

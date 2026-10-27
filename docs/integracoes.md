@@ -101,19 +101,12 @@ A página `/admin-verificar` (palavra-passe do backoffice) confirma tudo isto no
 
 Enquanto a euPago estiver em modo de teste, as faturas ficam sempre em rascunho no Moloni ON.
 
-## Verificação do cliente nas marcações
+## Dados do cliente nas marcações (Pedro, 27/10/2026)
 
-O cliente é reconhecido pelo **NIF e pelo email** (pedido do Pedro, 26/10/2026). Nas marcações o NIF é obrigatório
-e o email é confirmado antes de pagar:
-
-1. No passo «Confirmar», o cliente indica nome, email, telemóvel e NIF (validado com o dígito de controlo).
-2. `POST /api/verificacao` envia um código de 6 dígitos para o email (válido 10 minutos; um envio a cada 45 segundos).
-3. `POST /api/verificacao/confirmar` confere o código (5 tentativas) e devolve uma chave válida durante 1 hora.
-4. `POST /api/pagamento` só aceita a marcação com essa chave, para o mesmo email.
-
-Os códigos guardam-se só como resumo (SHA-256) no Netlify Blobs (`verificacoes`). Sem `RESEND_API_KEY` e `EMAIL_FROM`
-(testes e pré-visualizações) o código aparece no ecrã, para se poder experimentar: em produção a Resend tem de estar ativa.
-Os vouchers não pedem verificação.
+- **Obrigatórios:** nome, email e telemóvel. O **NIF é opcional**, só para a fatura (com NIF, cliente próprio no Moloni ON).
+- No Zoho CRM o cliente procura-se pelo NIF, quando o há, e senão pelo email.
+- «Tenho um voucher para usar» mostra o campo para o código (voucher `OMS-XXXX-XXXX`, `VIP` ou o código de 10% da newsletter).
+  O código valida-se logo (`/api/preco`) e o total atualiza-se; a 0 € a marcação confirma-se sem passo de pagamento.
 
 ## Agenda (Zoho CRM, conta zoho.eu)
 

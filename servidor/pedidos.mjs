@@ -5,7 +5,6 @@ import { store, STORES } from "./store.mjs";
 import { tratamento as lerTratamento, campanha as lerCampanha } from "./catalogo.mjs";
 import { lerCodigo } from "./codigos.mjs";
 import { hojeISO } from "./datas.mjs";
-import { emailVerificado } from "./verificacao.mjs";
 
 export class ErroCliente extends Error {}
 
@@ -99,9 +98,8 @@ export async function criar(corpo) {
     const data = limpar(corpo.data, 10), hora = limpar(corpo.hora, 5);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data < hojeISO()) throw new ErroCliente("Escolha o dia da marcação.");
     if (!/^\d{2}:\d{2}$/.test(hora)) throw new ErroCliente("Escolha a hora da marcação.");
-    // O cliente é reconhecido pelo NIF e pelo email, confirmado com o código enviado por email.
-    if (!cliente.nif) throw new ErroCliente("Indique o seu NIF: é com ele e com o email que reconhecemos a sua ficha.");
-    if (!(await emailVerificado(cliente.email, corpo.verificacao))) throw new ErroCliente("Confirme o seu email com o código que lhe enviámos antes de marcar.");
+    // Marcações: nome, email e telemóvel obrigatórios (Pedro, 27/10/2026). O NIF é opcional, só para a fatura.
+    if (!cliente.telefone.replace(/\D/g, "")) throw new ErroCliente("Indique o seu telemóvel.");
     p.marcacao = { data, hora, terapeuta: limpar(corpo.terapeuta, 80) };
   } else {
     // Entrega: digital (só o email) ou caixa oferta para levantar no spa, sem custo extra. O código segue sempre por email.

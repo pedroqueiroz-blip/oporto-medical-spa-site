@@ -97,7 +97,7 @@
     opts = opts || {};
     var labels = opts.labels || ['Tratamento', 'Terapeuta', 'Dia e hora', 'Confirmar'];
     var days = nextDays(12);
-    var s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '' };
+    var s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '', hasVoucher: false, vcod: '' };
 
     function canGo(i) {
       if (i === 0) return true;
@@ -179,6 +179,20 @@
       var f = freeFor(s.day, s.hour, s.treatment); return f[0] || null;
     }
 
+    // Total com o código do voucher ou VIP já validado no servidor (/api/preco); sem código, o preço do tratamento.
+    function total() { return s.conta ? s.conta.total : byId(TREATMENTS, s.treatment).price; }
+    function applyCode(focus) {
+      var code = s.vcod.trim();
+      s.conta = null; s.vmsg = '';
+      if (!code || !window.OMS_PAGAR) { render(); return; }
+      OMS_PAGAR.preco({ tipo: 'marcacao', tratamento: s.treatment, codigo: code }).then(function (c) {
+        s.conta = c; s.vmsg = c.total === 0 ? c.codigo.texto + ' aplicado: não há nada a pagar.' : c.codigo.texto + ' aplicado.';
+      }, function (e) { s.vmsg = e.message; }).then(function () {
+        render();
+        var i = focus && root.querySelector('#bk-vcod'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+      });
+    }
+
     function panelConfirm() {
       var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist();
       return '<div class="bk-panel bk-panel--confirm"><div class="bk-summary">' +
@@ -188,16 +202,19 @@
         '<div><dt>Terapeuta</dt><dd>' + esc(th ? th.name : '') + (s.therapist === 'any' ? ' <small>(atribuída)</small>' : '') + '</dd></div>' +
         '<div><dt>Dia</dt><dd>' + longDate(s.day) + '</dd></div>' +
         '<div><dt>Hora</dt><dd>' + s.hour + ' · ' + tr.min + ' min</dd></div>' +
-        '<div class="bk-summary__total"><dt>Total</dt><dd>' + eur(tr.price) + '</dd></div></dl></div>' +
+        (s.conta && s.conta.desconto ? '<div><dt>Preço</dt><dd>' + eur(s.conta.precoBase) + '</dd></div><div><dt>' + esc(s.conta.codigo.texto) + '</dt><dd>−' + eur(s.conta.desconto) + '</dd></div>' : '') +
+        '<div class="bk-summary__total"><dt>Total</dt><dd>' + eur(total()) + '</dd></div></dl></div>' +
         '<form class="bk-form" novalidate>' +
         '<label class="field"><span>Nome</span><input id="bk-name" autocomplete="name" value="' + esc(s.name) + '" required></label>' +
         '<label class="field"><span>Email</span><input id="bk-email" type="email" autocomplete="email" value="' + esc(s.email) + '" required></label>' +
-        '<label class="field"><span>Telemóvel</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '"></label>' +
-        '<label class="field"><span>NIF</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '" required></label>' +
-        '<label class="field field--check"><input id="bk-voucher" type="checkbox"><span>Tenho um voucher para usar</span></label>' +
-        '<p class="bk-error" role="alert" hidden>Indique o seu nome, um email válido e o NIF (9 dígitos) para recebermos a marcação.</p>' +
-        '<p class="bk-note">Com o NIF e o email reconhecemos a sua ficha. Vamos enviar-lhe um código para confirmar o email.</p>' +
-        '<button type="submit" class="btn btn--primary">Confirmar e pagar ' + eur(tr.price) + '</button>' +
+        '<label class="field"><span>Telemóvel</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '" required></label>' +
+        '<label class="field"><span>NIF para a fatura (opcional)</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '"></label>' +
+        '<label class="field field--check"><input id="bk-voucher" type="checkbox"' + (s.hasVoucher ? ' checked' : '') + '><span>Tenho um voucher para usar</span></label>' +
+        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>Código do voucher ou VIP</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
+          '<button type="button" class="btn btn--ghost" data-vapply>Aplicar</button></div>' +
+          (s.vmsg ? '<p class="' + (s.conta ? 'bk-note' : 'bk-error') + '" role="status">' + esc(s.vmsg) + '</p>' : '') : '') +
+        '<p class="bk-error" role="alert" hidden>Indique o seu nome, um email válido e o telemóvel para recebermos a marcação. O NIF, se o indicar, tem 9 dígitos.</p>' +
+        '<button type="submit" class="btn btn--primary"' + (s.sending ? ' disabled' : '') + '>' + (s.sending ? 'Um momento…' : total() === 0 ? 'Confirmar marcação' : 'Confirmar e pagar ' + eur(total())) + '</button>' +
         '<p class="bk-note">Pode cancelar ou alterar sem custos até 24 horas antes.</p></form></div>';
     }
 
@@ -232,6 +249,7 @@
         g.classList.toggle('is-open', on); b.setAttribute('aria-expanded', on);
         s.openAreas = s.openAreas || {}; s.openAreas[b.getAttribute('data-area')] = on; return;
       }
+      if (b.hasAttribute('data-vapply')) { applyCode(true); return; }
       if (b.hasAttribute('data-go')) { s.step = +b.getAttribute('data-go'); render(); return; }
       if (b.hasAttribute('data-treat')) {
         s.treatment = b.getAttribute('data-treat');
@@ -241,25 +259,41 @@
       if (b.hasAttribute('data-ther')) { s.therapist = b.getAttribute('data-ther'); s.hour = null; s.step = 2; render(); return; }
       if (b.hasAttribute('data-day')) { s.day = days[+b.getAttribute('data-day')]; s.hour = null; render(); return; }
       if (b.hasAttribute('data-hour')) { s.hour = b.getAttribute('data-hour'); s.step = 3; render(); return; }
-      if (b.hasAttribute('data-reset')) { s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '' }; render(); }
+      if (b.hasAttribute('data-reset')) { s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '', hasVoucher: false, vcod: '' }; render(); }
     });
     root.addEventListener('input', function (e) {
       if (e.target.id === 'bk-name') s.name = e.target.value;
       if (e.target.id === 'bk-email') s.email = e.target.value;
       if (e.target.id === 'bk-phone') s.phone = e.target.value;
       if (e.target.id === 'bk-nif') s.nif = e.target.value.replace(/\D/g, '');
+      if (e.target.id === 'bk-vcod') { s.vcod = e.target.value; if (s.conta) { s.conta = null; s.vmsg = ''; } }
+    });
+    // «Tenho um voucher para usar» mostra o campo para o código.
+    root.addEventListener('change', function (e) {
+      if (e.target.id !== 'bk-voucher') return;
+      s.hasVoucher = e.target.checked;
+      if (!s.hasVoucher) { s.conta = null; s.vmsg = ''; }
+      render();
+      var c = root.querySelector(s.hasVoucher ? '#bk-vcod' : '#bk-voucher'); if (c) c.focus();
     });
     root.addEventListener('submit', function (e) {
       e.preventDefault();
-      var ok = s.name.trim() && /.+@.+\..+/.test(s.email) && nifOk(s.nif);
+      var ok = s.name.trim() && /.+@.+\..+/.test(s.email) && s.phone.replace(/\D/g, '').length >= 9 && (!s.nif || nifOk(s.nif));
       if (!ok) { root.querySelector('.bk-error').hidden = false; return; }
       // Pagamento (public/pagar.js): código, meio de pagamento e confirmação no servidor
       if (window.OMS_PAGAR) {
         var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist(), d = s.day;
         var iso = isoDay(d);
-        var voucher = root.querySelector('#bk-voucher');
-        OMS_PAGAR.verificar(root, { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
-          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif }, { voltar: render, codigo: !!(voucher && voucher.checked) });
+        var dados = { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
+          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif, codigo: s.conta ? s.vcod.trim() : '' };
+        // Código por validar: valida primeiro. Voucher ou VIP que deixa a 0 €: confirma logo, sem passo de pagamento.
+        if (s.hasVoucher && s.vcod.trim() && !s.conta) { applyCode(false); return; }
+        if (s.conta && s.conta.total === 0) {
+          s.sending = true; render();
+          OMS_PAGAR.enviar(root, dados).catch(function (err) { s.sending = false; s.conta = null; s.vmsg = err.message; render(); });
+          return;
+        }
+        OMS_PAGAR.abrir(root, dados, { voltar: render });
         return;
       }
       s.done = true; render();
@@ -350,7 +384,16 @@
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
           var tr = cur();
-          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
+          var dados = { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
+          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif, codigo: s.conta ? s.vcod.trim() : '' };
+        // Código por validar: valida primeiro. Voucher ou VIP que deixa a 0 €: confirma logo, sem passo de pagamento.
+        if (s.hasVoucher && s.vcod.trim() && !s.conta) { applyCode(false); return; }
+        if (s.conta && s.conta.total === 0) {
+          s.sending = true; render();
+          OMS_PAGAR.enviar(root, dados).catch(function (err) { s.sending = false; s.conta = null; s.vmsg = err.message; render(); });
+          return;
+        }
+        OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;
