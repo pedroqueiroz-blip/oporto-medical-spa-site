@@ -6,6 +6,7 @@ const EN = {
   'Equipa': 'Team',
   'Oferecer': 'Gift',
   'Como chegar': 'Getting here',
+  '+ indicações': '+ directions',
   'início': 'home',
   'Início': 'Home',
   'no Instagram': 'on Instagram',
