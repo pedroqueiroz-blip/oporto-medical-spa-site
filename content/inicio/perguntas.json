@@ -166,12 +166,12 @@
       }
     },
     {
-      "pergunta": "Falam inglês e espanhol?",
+      "pergunta": "Falam inglês?",
       "resposta": "Falamos português e inglês.",
       "automatica": "",
       "acrescento": "",
       "en": {
-        "pergunta": "Do you speak English and Spanish?",
+        "pergunta": "Do you speak English?",
         "resposta": "We speak Portuguese and English."
       }
     }
