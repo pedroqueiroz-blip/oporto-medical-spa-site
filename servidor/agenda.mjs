@@ -5,7 +5,7 @@
 import catalogo from "./gerado/catalogo.json" with { type: "json" };
 import { tratamento as lerTratamento } from "./catalogo.mjs";
 import { instanteLisboa, hojeISO } from "./datas.mjs";
-import { zohoLigado, utilizadores, eventos, criarEvento, clienteCRM } from "./zoho.mjs";
+import { zohoLigado, utilizadores, ocupacoes, criarEvento, criarMarcacao, moduloMarcacoes, clienteCRM } from "./zoho.mjs";
 import { store, STORES } from "./store.mjs";
 
 export class ErroAgenda extends Error {}
@@ -49,11 +49,13 @@ export async function guardarHora(p) {
   await (await store(STORES.reservas)).setJSON(p.numero, { dono: p.marcacao.zohoDono, inicio: ini, fim: ini + (Number(p.tratamento.duracao) || 60) * 60e3, email: p.cliente.email, ate: Date.now() + GUARDA });
 }
 
-function livre(evs, dono, data, hora, duracao) {
+// Ocupa a pessoa um evento seu (utilizador do CRM) ou uma marcação do módulo com o nome dela.
+const dela = (e, p) => (e.dono && e.dono === p.dono) || (e.nome && simples(e.nome) === simples(p.nome));
+function livre(evs, p, data, hora, duracao) {
   if (!aberto(data, hora)) return false;
   const ini = instanteLisboa(data, hora).t, fim = ini + duracao * 60e3;
   if (ini < Date.now() + ANTECEDENCIA) return false;
-  return !evs.some((e) => e.dono === dono && (e.diaInteiro ? e.dia === data : e.inicio < fim && e.fim > ini));
+  return !evs.some((e) => dela(e, p) && (e.diaInteiro ? e.dia === data : e.inicio < fim && e.fim > ini));
 }
 
 // Horas livres de cada pessoa que faz o tratamento, dia a dia: { fonte, livres: { ana: { "2026-10-27": ["09:00"] } } }
@@ -67,11 +69,11 @@ export async function disponibilidade({ tratamento: id, de, dias = 14 }) {
   const comAgenda = equipa.filter((p) => p.dono);
   if (!comAgenda.length) return { fonte: "simulada", aviso: "Ninguém da equipa deste tratamento está ligado a um utilizador do Zoho CRM." };
   const datas = Array.from({ length: n }, (_, i) => somarDias(inicio, i));
-  const evs = [...await eventos(instanteLisboa(datas[0], "00:00").iso, instanteLisboa(datas.at(-1), "23:59").iso), ...await guardadas()];
+  const evs = [...await ocupacoes(instanteLisboa(datas[0], "00:00").iso, instanteLisboa(datas.at(-1), "23:59").iso), ...await guardadas()];
   const livres = {};
   for (const p of comAgenda) {
     livres[p.id] = {};
-    for (const d of datas) livres[p.id][d] = HORAS.filter((h) => livre(evs, p.dono, d, h, t.duracao));
+    for (const d of datas) livres[p.id][d] = HORAS.filter((h) => livre(evs, p, d, h, t.duracao));
   }
   return { fonte: "zoho", livres, semAgenda: equipa.filter((p) => !p.dono).map((p) => p.nome) };
 }
@@ -83,8 +85,8 @@ export async function confirmarHora(p, { terapeutaId, qualquer }) {
   const equipa = (await equipaCRM()).filter((x) => x.dono && (x.faz || []).includes(p.tratamento.id));
   const candidatos = qualquer || !terapeutaId ? equipa : equipa.filter((x) => x.id === terapeutaId);
   if (!candidatos.length) throw new ErroAgenda("Esta pessoa não tem agenda online para este tratamento. Escolha outra ou «Sem preferência».");
-  const evs = [...await eventos(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso), ...await guardadas(p.cliente.email)];
-  const escolhida = candidatos.find((x) => livre(evs, x.dono, data, hora, dur));
+  const evs = [...await ocupacoes(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso), ...await guardadas(p.cliente.email)];
+  const escolhida = candidatos.find((x) => livre(evs, x, data, hora, dur));
   if (!escolhida) throw new ErroAgenda("Esta hora acabou de ser ocupada. Escolha outra, por favor.");
   p.marcacao.terapeuta = escolhida.nome;
   p.marcacao.terapeutaId = escolhida.id;
@@ -96,14 +98,15 @@ export async function marcarNoCRM(p) {
   if (p.tipo !== "marcacao" || p.zoho?.evento || !(await zohoLigado())) return;
   const { data, hora } = p.marcacao, dur = Number(p.tratamento.duracao) || 60;
   const cliente = await clienteCRM(p.cliente);
-  const evento = await criarEvento({
+  const mm = await moduloMarcacoes();
+  const evento = await (mm ? (x) => criarMarcacao(mm, x) : criarEvento)({
     titulo: `${p.tratamento.nome} · ${p.cliente.nome}`,
     inicio: instanteLisboa(data, hora).iso, fim: instanteLisboa(data, hora, dur).iso,
-    dono: p.marcacao.zohoDono, cliente: cliente.id, tratamento: p.tratamento.nome,
-    descricao: [`Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
+    dono: p.marcacao.zohoDono, terapeuta: p.marcacao.terapeuta, cliente: cliente.id, tratamento: p.tratamento.nome, semPagamento: !(Number(p.total) > 0),
+    descricao: [mm ? "Origem online" : null, `Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
       `Email: ${p.cliente.email}`, p.cliente.telefone && `Telemóvel: ${p.cliente.telefone}`, p.cliente.nif && `NIF: ${p.cliente.nif}`, cliente.nota].filter(Boolean).join("\n"),
   });
-  p.zoho = { cliente: cliente.id, clienteNovo: cliente.novo, evento, nota: cliente.nota || "", em: new Date().toISOString() };
+  p.zoho = { cliente: cliente.id, clienteNovo: cliente.novo, evento, modulo: mm?.modulo || "Events", nota: cliente.nota || "", em: new Date().toISOString() };
   await (await store(STORES.reservas)).delete(p.numero).catch(() => {});
 }
 

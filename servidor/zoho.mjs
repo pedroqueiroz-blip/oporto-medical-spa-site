@@ -164,6 +164,110 @@ export async function criarEvento({ titulo, inicio, fim, dono, cliente, descrica
   return criado(j);
 }
 
+/* ---------- Módulo das marcações (Agenda do Zoho → «Tratamentos») ---------- */
+
+// O SPA marca no módulo «Tratamentos» (Pedro, 27/10/2026): cada registo tem tratamento, terapeuta, estado,
+// pagamento, início e fim. O módulo e os campos encontram-se pelos nomes nos metadados do CRM (ou
+// ZOHO_MODULO_MARCACOES) e ficam guardados um dia; a verificação volta a procurá-los. Sem o módulo,
+// as marcações continuam como eventos (Reuniões).
+const CANCELADA = /cancel|anulad|desmarc|falt/;
+const resumo = (f) => ({ api: f.api_name, rotulo: f.field_label, tipo: f.data_type, valores: (f.pick_list_values || []).map((v) => v.display_value), modulo: f.lookup?.module?.api_name || "" });
+function mapear(campos) {
+  const r = campos.map(resumo), por = (re) => r.find((f) => re.test(simples(f.rotulo)));
+  const datas = r.filter((f) => f.tipo === "datetime");
+  const fim = datas.find((f) => /^(fim|termino|end|ate)/.test(simples(f.rotulo)));
+  const inicio = datas.find((f) => f !== fim && /inicio|^data|^hora|start/.test(simples(f.rotulo))) || datas.find((f) => f !== fim);
+  return {
+    nome: r.find((f) => f.api === "Name"), inicio, fim,
+    tratamento: por(/^tratamento/), terapeuta: por(/^terapeuta|^profissiona/),
+    estado: por(/^estado/), pagamento: por(/^pagamento/), descricao: por(/^descri/),
+    cliente: r.find((f) => f.tipo === "lookup" && f.modulo === "Contacts"),
+    origem: r.find((f) => f.api === "Origem_Marcacao"),
+  };
+}
+async function descobrirMarcacoes() {
+  const out = { em: new Date().toISOString(), modulo: null };
+  const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+  const pedido = process.env.ZOHO_MODULO_MARCACOES;
+  const m = mods.find((x) => pedido ? x.api_name === pedido : x.api_name !== "Products" && (simples(x.plural_label) === "tratamentos" || simples(x.singular_label) === "tratamento"));
+  if (!m) return out;
+  const campos = (await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || [];
+  return { ...out, modulo: m.api_name, nomeModulo: m.plural_label || m.api_name, campos: mapear(campos), todos: campos.map(resumo) };
+}
+export async function moduloMarcacoes() {
+  const g = await gaveta(), cfg = (await g.get("config", { type: "json" })) || {};
+  let mm = cfg.marcacoes;
+  if (!mm || Date.now() - Date.parse(mm.em) > 864e5) {
+    mm = await descobrirMarcacoes();
+    await g.setJSON("config", { ...((await g.get("config", { type: "json" })) || {}), marcacoes: mm });
+  }
+  return mm.modulo && mm.campos?.inicio && mm.campos?.terapeuta ? mm : null;
+}
+
+// Valor de um campo: lista de escolha (valor com o mesmo nome), utilizador, ligação a outro módulo
+// (registo com o mesmo nome) ou texto. Sem correspondência, o campo fica por preencher.
+async function valorCampo(f, texto, utilizador) {
+  if (!f || texto == null) return undefined;
+  if (f.tipo === "picklist" || f.tipo === "multiselectpicklist") {
+    const v = f.valores.find((x) => simples(x) === simples(texto));
+    return v === undefined ? undefined : f.tipo === "picklist" ? v : [v];
+  }
+  if (f.tipo === "userlookup" || f.tipo === "ownerlookup") return utilizador ? { id: utilizador } : undefined;
+  if (f.tipo === "lookup" && f.modulo) {
+    const j = await crm("GET", `/${f.modulo}/search?word=${encodeURIComponent(texto)}`);
+    const r = (j?.data || []).find((x) => Object.values(x).some((v) => typeof v === "string" && simples(v) === simples(texto)));
+    return r ? { id: r.id } : undefined;
+  }
+  return ["text", "textarea"].includes(f.tipo) ? texto : undefined;
+}
+// Primeiro valor da lista que case com uma das expressões (por ordem), ou o texto para campos de texto.
+const escolher = (f, texto, ...res) => {
+  if (!f) return undefined;
+  if (!["picklist", "multiselectpicklist"].includes(f.tipo)) return texto;
+  for (const re of res) { const v = f.valores.find((x) => re.test(simples(x))); if (v) return v; }
+  return undefined;
+};
+
+export async function criarMarcacao(mm, { titulo, inicio, fim, dono, terapeuta, cliente, tratamento, descricao, semPagamento }) {
+  const c = mm.campos, d = {};
+  const por = async (f, v) => { const x = await v; if (f && x !== undefined) d[f.api] = x; };
+  if (c.nome) d[c.nome.api] = titulo;
+  d[c.inicio.api] = inicio;
+  if (c.fim) d[c.fim.api] = fim;
+  await por(c.tratamento, valorCampo(c.tratamento, tratamento).catch(() => undefined));
+  await por(c.terapeuta, valorCampo(c.terapeuta, terapeuta, dono).catch(() => undefined));
+  await por(c.estado, escolher(c.estado, "Agendado", /^agendad/, /^marcad/, /^confirmad/));
+  await por(c.pagamento, semPagamento ? escolher(c.pagamento, "Voucher", /voucher|oferta|vip/, /^pag[oa]$/) : escolher(c.pagamento, "Pago", /^pag[oa]$/, /^pag[oa] /));
+  await por(c.descricao, ["text", "textarea"].includes(c.descricao?.tipo) ? descricao : undefined);
+  await por(c.cliente, cliente ? { id: cliente } : undefined);
+  await por(c.origem, escolher(c.origem, "Online", /^online$/));
+  return criado(await crm("POST", `/${mm.modulo}`, { data: [d] }));
+}
+
+// Marcações do módulo entre duas datas, com a terapeuta (utilizador ou nome); as canceladas não contam.
+export async function marcacoesModulo(mm, de, ate) {
+  const c = mm.campos, cols = [c.inicio, c.fim, c.terapeuta, c.estado].filter(Boolean).map((f) => f.api);
+  const out = [];
+  for (let offset = 0; offset < 2000; offset += 200) {
+    const q = `select ${cols.join(", ")} from ${mm.modulo} where ${c.inicio.api} between '${de}' and '${ate}' order by ${c.inicio.api} limit ${offset}, 200`;
+    const j = await crm("POST", "/coql", { select_query: q });
+    for (const r of j?.data || []) {
+      if (c.estado && CANCELADA.test(simples(r[c.estado.api]))) continue;
+      const t = [].concat(r[c.terapeuta.api] ?? [])[0];
+      const inicio = Date.parse(r[c.inicio.api]), fim = c.fim && r[c.fim.api] ? Date.parse(r[c.fim.api]) : inicio + 60 * 60e3;
+      out.push({ dono: c.terapeuta.tipo === "userlookup" ? t?.id : null, nome: typeof t === "object" ? t?.name || "" : String(t || ""), inicio, fim, diaInteiro: false, dia: String(r[c.inicio.api]).slice(0, 10) });
+    }
+    if (!j?.info?.more_records) break;
+  }
+  return out;
+}
+
+// Tudo o que ocupa a agenda: eventos (Reuniões, por responsável) e marcações do módulo «Tratamentos».
+export async function ocupacoes(de, ate) {
+  const mm = await moduloMarcacoes();
+  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate) : [])];
+}
+
 /* ---------- Verificação pela API de metadados ---------- */
 
 // Confere no CRM real o que a integração precisa: módulos, campo do NIF, campos da agenda, utilizadores
@@ -241,6 +345,24 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
     const us = await utilizadores().catch(() => []);
     add(true, "Leitura da agenda", `${evs.length} eventos nos próximos 14 dias. Por responsável: ${Object.entries(donos).map(([id, n]) => `${us.find((u) => u.id === id)?.nome || id}: ${n}`).join(", ") || "nenhum"}.`);
   } catch (e) { add(false, "Leitura da agenda", e.message); }
+
+  // Módulo das marcações («Tratamentos»)
+  try {
+    const mm = guardado.marcacoes = await descobrirMarcacoes();
+    if (!mm.modulo) add(false, "Módulo das marcações (Tratamentos)", "Não há um módulo «Tratamentos»: as marcações vão para Reuniões. Se tiver outro nome, indique-o em ZOHO_MODULO_MARCACOES no Netlify.");
+    else {
+      const c = mm.campos, txt = (f) => `«${f.rotulo}» (${f.api}, ${f.tipo}${f.valores.length ? `: ${f.valores.join(" / ")}` : ""}${f.modulo ? ` → ${f.modulo}` : ""})`;
+      const ok = Boolean(c.inicio && c.terapeuta);
+      add(ok, `Módulo das marcações (${mm.nomeModulo})`, ok ? `As marcações do site são criadas em ${mm.modulo} e as horas ocupadas também se leem daqui.` : "Faltam os campos de início e/ou terapeuta: as marcações continuam em Reuniões.");
+      const nomes = { inicio: "Início", fim: "Fim", tratamento: "Tratamento", terapeuta: "Terapeuta", estado: "Estado (Agendado)", pagamento: "Pagamento (Pago)", descricao: "Descrição", cliente: "Cliente (Contactos)", origem: "Origem_Marcacao (Online)" };
+      for (const [k, n] of Object.entries(nomes)) add(Boolean(c[k]) || ["fim", "descricao", "origem"].includes(k), `${mm.nomeModulo}: ${n}`, c[k] ? txt(c[k]) : "Campo não encontrado.");
+      if (c.tratamento?.valores.length) {
+        const falta = tratamentos.filter((t) => !c.tratamento.valores.some((v) => simples(v) === simples(t.nome)));
+        if (falta.length) add(false, `${mm.nomeModulo}: tratamentos sem valor igual na lista`, `${falta.map((t) => t.nome).join(", ")}. Acrescente-os à lista com o mesmo nome do site; até lá, nessas o tratamento fica só no nome e na descrição.`);
+      }
+      add(true, `${mm.nomeModulo}: todos os campos`, mm.todos.map(txt).join("; "));
+    }
+  } catch (e) { add(false, "Módulo das marcações (Tratamentos)", e.message); }
 
   // Equipa do site ↔ utilizadores do CRM
   try {
