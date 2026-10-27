@@ -20,3 +20,16 @@ export function dataPT(iso, { semana = false, ano = true } = {}) {
   const dia = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
   return `${semana ? SEMANA[dia] + ", " : ""}${d} de ${MESES[m - 1]}${ano ? ` de ${y}` : ""}`;
 }
+
+// Dia e hora de Lisboa ("2026-10-27", "10:00") → instante e ISO com o fuso certo ("2026-10-27T10:00:00+00:00").
+export function instanteLisboa(data, hora, somarMin = 0) {
+  const [y, m, d] = data.split("-").map(Number), [h, mi] = hora.split(":").map(Number);
+  const aprox = Date.UTC(y, m - 1, d, h, mi + somarMin);
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Lisbon", hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })
+    .formatToParts(new Date(aprox)).filter((x) => x.type !== "literal").map((x) => [x.type, Number(x.value)]));
+  const desvio = Math.round((Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute) - aprox) / 60e3); // 0 ou 60 minutos
+  const t = aprox - desvio * 60e3;
+  const local = new Date(aprox), z = (n) => String(n).padStart(2, "0");
+  const iso = `${local.getUTCFullYear()}-${z(local.getUTCMonth() + 1)}-${z(local.getUTCDate())}T${z(local.getUTCHours())}:${z(local.getUTCMinutes())}:00${desvio >= 0 ? "+" : "-"}${z(Math.abs(desvio) / 60 | 0)}:${z(Math.abs(desvio) % 60)}`;
+  return { t, iso };
+}

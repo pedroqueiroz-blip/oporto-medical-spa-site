@@ -99,6 +99,8 @@ const catalogo = {
   gerado: new Date().toISOString(),
   spa: { nome: m.s.nome, url: m.s.url, email: m.s.email, telefone: m.s.telefone, morada: m.addressLine || '' },
   tratamentos: dados.treatments.map((t) => ({ id: t.id, nome: t.name, grupo: t.area, duracao: t.min, preco: t.price, artigo: t.area === 'Relaxar' ? 'TPREV' : 'TREAB' })),
+  /* Equipa para a agenda (servidor/agenda.mjs): cada pessoa liga-se a um utilizador do Zoho CRM pelo nome ou pelo email */
+  equipa: m.team.map((p) => ({ id: p.id, nome: p.nome, faz: p.faz || [], zoho: p.zoho || '' })),
   /* Para avisar o Bing/IndexNow depois de cada publicação (netlify/functions/deploy-succeeded.mjs) */
   /* Campanhas de vouchers (todas as ligadas): o servidor confirma as datas e o limite no momento da compra */
   campanhas: readList('campanhas').filter((c) => c.ativa && c.so_vouchers && c.tratamento && c.preco && m.byId(c.tratamento)).map((c) => {

@@ -57,12 +57,35 @@
     while (out.length < n) { d = new Date(d.getTime() + 864e5); if (d.getDay() !== 0) out.push(d); }
     return out;
   }
-  // Disponibilidade simulada, estável para o mesmo dia e terapeuta.
-  function isTaken(day, hour, therapistId) {
+  function isoDay(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+
+  // Horas livres da agenda do Zoho CRM, por tratamento (/api/disponibilidade). Sem Zoho ligado, a resposta
+  // é { fonte: 'simulada' } e fica a disponibilidade simulada, estável para o mesmo dia e terapeuta.
+  var AGENDA = {};
+  function loadAgenda(treatment, days, done) {
+    if (AGENDA[treatment] || !window.fetch || !window.OMS_PAGAR) return;
+    AGENDA[treatment] = { loading: true };
+    var span = Math.round((days[days.length - 1] - days[0]) / 864e5) + 1;
+    fetch('/api/disponibilidade?tratamento=' + encodeURIComponent(treatment) + '&de=' + isoDay(days[0]) + '&dias=' + span)
+      .then(function (r) { return r.ok ? r.json() : { fonte: 'simulada' }; })
+      .catch(function () { return { fonte: 'simulada' }; })
+      .then(function (j) { AGENDA[treatment] = j; done(treatment); });
+  }
+  function isTaken(day, hour, therapistId, treatment) {
+    var a = AGENDA[treatment];
+    if (a && a.loading) return true;
+    if (a && a.fonte === 'zoho') return ((a.livres[therapistId] || {})[isoDay(day)] || []).indexOf(hour) < 0;
     return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && hour > '13:00');
   }
   function freeFor(day, hour, treatment) {
-    return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id); });
+    return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id, treatment); });
+  }
+
+  // NIF português: 9 dígitos com o dígito de controlo certo.
+  function nifOk(n) {
+    if (!/^\d{9}$/.test(n)) return false;
+    var soma = 0; for (var i = 0; i < 8; i++) soma += +n[i] * (9 - i);
+    var c = 11 - soma % 11; return (c >= 10 ? 0 : c) === +n[8];
   }
 
   function avatar(t, cls) {
@@ -74,7 +97,7 @@
     opts = opts || {};
     var labels = opts.labels || ['Tratamento', 'Terapeuta', 'Dia e hora', 'Confirmar'];
     var days = nextDays(12);
-    var s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '' };
+    var s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '', hasVoucher: false, vcod: '' };
 
     function canGo(i) {
       if (i === 0) return true;
@@ -126,7 +149,14 @@
 
     function slotFree(day, h) {
       if (s.therapist === 'any') return freeFor(day, h, s.treatment).length > 0;
-      return !isTaken(day, h, s.therapist);
+      return !isTaken(day, h, s.therapist, s.treatment);
+    }
+
+    function agendaNote() {
+      var a = AGENDA[s.treatment];
+      if (a && a.loading) return 'A ver as horas livres…';
+      if (a && a.fonte === 'zoho') return 'Horas livres neste momento. Encerra ao domingo.';
+      return 'Horários ilustrativos. Encerra ao domingo.';
     }
 
     function panelTime() {
@@ -140,13 +170,27 @@
       html += '</div><div class="bk-slots">' + HOURS.map(function (h) {
         var free = slotFree(s.day, h);
         return '<button type="button" class="bk-slot" data-hour="' + h + '" aria-pressed="' + (s.hour === h) + '"' + (free ? '' : ' disabled') + '>' + h + '</button>';
-      }).join('') + '</div><p class="bk-note">Horários ilustrativos. Encerra ao domingo.</p></div>';
+      }).join('') + '</div><p class="bk-note">' + agendaNote() + '</p></div>';
       return html;
     }
 
     function chosenTherapist() {
       if (s.therapist !== 'any') return byId(TEAM, s.therapist);
       var f = freeFor(s.day, s.hour, s.treatment); return f[0] || null;
+    }
+
+    // Total com o código do voucher ou VIP já validado no servidor (/api/preco); sem código, o preço do tratamento.
+    function total() { return s.conta ? s.conta.total : byId(TREATMENTS, s.treatment).price; }
+    function applyCode(focus) {
+      var code = s.vcod.trim();
+      s.conta = null; s.vmsg = '';
+      if (!code || !window.OMS_PAGAR) { render(); return; }
+      OMS_PAGAR.preco({ tipo: 'marcacao', tratamento: s.treatment, codigo: code }).then(function (c) {
+        s.conta = c; s.vmsg = c.total === 0 ? c.codigo.texto + ' aplicado: não há nada a pagar.' : c.codigo.texto + ' aplicado.';
+      }, function (e) { s.vmsg = e.message; }).then(function () {
+        render();
+        var i = focus && root.querySelector('#bk-vcod'); if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+      });
     }
 
     function panelConfirm() {
@@ -158,14 +202,19 @@
         '<div><dt>Terapeuta</dt><dd>' + esc(th ? th.name : '') + (s.therapist === 'any' ? ' <small>(atribuída)</small>' : '') + '</dd></div>' +
         '<div><dt>Dia</dt><dd>' + longDate(s.day) + '</dd></div>' +
         '<div><dt>Hora</dt><dd>' + s.hour + ' · ' + tr.min + ' min</dd></div>' +
-        '<div class="bk-summary__total"><dt>Total</dt><dd>' + eur(tr.price) + '</dd></div></dl></div>' +
+        (s.conta && s.conta.desconto ? '<div><dt>Preço</dt><dd>' + eur(s.conta.precoBase) + '</dd></div><div><dt>' + esc(s.conta.codigo.texto) + '</dt><dd>−' + eur(s.conta.desconto) + '</dd></div>' : '') +
+        '<div class="bk-summary__total"><dt>Total</dt><dd>' + eur(total()) + '</dd></div></dl></div>' +
         '<form class="bk-form" novalidate>' +
         '<label class="field"><span>Nome</span><input id="bk-name" autocomplete="name" value="' + esc(s.name) + '" required></label>' +
         '<label class="field"><span>Email</span><input id="bk-email" type="email" autocomplete="email" value="' + esc(s.email) + '" required></label>' +
-        '<label class="field"><span>Telemóvel</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '"></label>' +
-        '<label class="field field--check"><input id="bk-voucher" type="checkbox"><span>Tenho um voucher para usar</span></label>' +
-        '<p class="bk-error" role="alert" hidden>Indique o seu nome e um email válido para recebermos a marcação.</p>' +
-        '<button type="submit" class="btn btn--primary">Confirmar e pagar ' + eur(tr.price) + '</button>' +
+        '<label class="field"><span>Telemóvel</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '" required></label>' +
+        '<label class="field"><span>NIF para a fatura (opcional)</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '"></label>' +
+        '<label class="field field--check"><input id="bk-voucher" type="checkbox"' + (s.hasVoucher ? ' checked' : '') + '><span>Tenho um voucher para usar</span></label>' +
+        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>Código do voucher ou VIP</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
+          '<button type="button" class="btn btn--ghost" data-vapply>Aplicar</button></div>' +
+          (s.vmsg ? '<p class="' + (s.conta ? 'bk-note' : 'bk-error') + '" role="status">' + esc(s.vmsg) + '</p>' : '') : '') +
+        '<p class="bk-error" role="alert" hidden>Indique o seu nome, um email válido e o telemóvel para recebermos a marcação. O NIF, se o indicar, tem 9 dígitos.</p>' +
+        '<button type="submit" class="btn btn--primary"' + (s.sending ? ' disabled' : '') + '>' + (s.sending ? 'Um momento…' : total() === 0 ? 'Confirmar marcação' : 'Confirmar e pagar ' + eur(total())) + '</button>' +
         '<p class="bk-note">Pode cancelar ou alterar sem custos até 24 horas antes.</p></form></div>';
     }
 
@@ -190,6 +239,7 @@
         nav = '<div class="bk-actions"><button type="button" class="btn btn--ghost" data-go="2">Voltar</button><span></span></div>';
       }
       root.innerHTML = '<div class="bk">' + (s.done ? '' : stepsBar()) + body + nav + '</div>';
+      if (s.treatment) loadAgenda(s.treatment, days, function (t) { if (s.treatment === t && !s.done && s.step === 2) render(); });
     }
 
     root.addEventListener('click', function (e) {
@@ -199,6 +249,7 @@
         g.classList.toggle('is-open', on); b.setAttribute('aria-expanded', on);
         s.openAreas = s.openAreas || {}; s.openAreas[b.getAttribute('data-area')] = on; return;
       }
+      if (b.hasAttribute('data-vapply')) { applyCode(true); return; }
       if (b.hasAttribute('data-go')) { s.step = +b.getAttribute('data-go'); render(); return; }
       if (b.hasAttribute('data-treat')) {
         s.treatment = b.getAttribute('data-treat');
@@ -208,24 +259,41 @@
       if (b.hasAttribute('data-ther')) { s.therapist = b.getAttribute('data-ther'); s.hour = null; s.step = 2; render(); return; }
       if (b.hasAttribute('data-day')) { s.day = days[+b.getAttribute('data-day')]; s.hour = null; render(); return; }
       if (b.hasAttribute('data-hour')) { s.hour = b.getAttribute('data-hour'); s.step = 3; render(); return; }
-      if (b.hasAttribute('data-reset')) { s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '' }; render(); }
+      if (b.hasAttribute('data-reset')) { s = { step: 0, treatment: null, therapist: null, day: days[0], hour: null, done: false, name: '', email: '', phone: '', nif: '', hasVoucher: false, vcod: '' }; render(); }
     });
     root.addEventListener('input', function (e) {
       if (e.target.id === 'bk-name') s.name = e.target.value;
       if (e.target.id === 'bk-email') s.email = e.target.value;
       if (e.target.id === 'bk-phone') s.phone = e.target.value;
+      if (e.target.id === 'bk-nif') s.nif = e.target.value.replace(/\D/g, '');
+      if (e.target.id === 'bk-vcod') { s.vcod = e.target.value; if (s.conta) { s.conta = null; s.vmsg = ''; } }
+    });
+    // «Tenho um voucher para usar» mostra o campo para o código.
+    root.addEventListener('change', function (e) {
+      if (e.target.id !== 'bk-voucher') return;
+      s.hasVoucher = e.target.checked;
+      if (!s.hasVoucher) { s.conta = null; s.vmsg = ''; }
+      render();
+      var c = root.querySelector(s.hasVoucher ? '#bk-vcod' : '#bk-voucher'); if (c) c.focus();
     });
     root.addEventListener('submit', function (e) {
       e.preventDefault();
-      var ok = s.name.trim() && /.+@.+\..+/.test(s.email);
+      var ok = s.name.trim() && /.+@.+\..+/.test(s.email) && s.phone.replace(/\D/g, '').length >= 9 && (!s.nif || nifOk(s.nif));
       if (!ok) { root.querySelector('.bk-error').hidden = false; return; }
       // Pagamento (public/pagar.js): código, meio de pagamento e confirmação no servidor
       if (window.OMS_PAGAR) {
         var tr = byId(TREATMENTS, s.treatment), th = chosenTherapist(), d = s.day;
-        var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-        var voucher = root.querySelector('#bk-voucher');
-        OMS_PAGAR.abrir(root, { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', data: iso, hora: s.hour,
-          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone }, { voltar: render, codigo: !!(voucher && voucher.checked) });
+        var iso = isoDay(d);
+        var dados = { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
+          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif, codigo: s.conta ? s.vcod.trim() : '' };
+        // Código por validar: valida primeiro. Voucher ou VIP que deixa a 0 €: confirma logo, sem passo de pagamento.
+        if (s.hasVoucher && s.vcod.trim() && !s.conta) { applyCode(false); return; }
+        if (s.conta && s.conta.total === 0) {
+          s.sending = true; render();
+          OMS_PAGAR.enviar(root, dados).catch(function (err) { s.sending = false; s.conta = null; s.vmsg = err.message; render(); });
+          return;
+        }
+        OMS_PAGAR.abrir(root, dados, { voltar: render });
         return;
       }
       s.done = true; render();
@@ -316,7 +384,16 @@
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
           var tr = cur();
-          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
+          var dados = { tipo: 'marcacao', tratamento: tr.id, nomeTratamento: tr.name, terapeuta: th ? th.name : '', terapeutaId: th ? th.id : '', qualquer: s.therapist === 'any', data: iso, hora: s.hour,
+          marcacao: longDate(d) + ', ' + s.hour, nome: s.name, email: s.email, telefone: s.phone, nif: s.nif, codigo: s.conta ? s.vcod.trim() : '' };
+        // Código por validar: valida primeiro. Voucher ou VIP que deixa a 0 €: confirma logo, sem passo de pagamento.
+        if (s.hasVoucher && s.vcod.trim() && !s.conta) { applyCode(false); return; }
+        if (s.conta && s.conta.total === 0) {
+          s.sending = true; render();
+          OMS_PAGAR.enviar(root, dados).catch(function (err) { s.sending = false; s.conta = null; s.vmsg = err.message; render(); });
+          return;
+        }
+        OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;

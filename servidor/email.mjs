@@ -94,6 +94,8 @@ export const emailInterno = (p, problema) => enviar({
     p.voucher && ["Entrega", p.voucher.formato === "caixa" ? "Caixa oferta, levanta no SPA (preparar a caixa)" : "Digital, por email"],
     ["Cliente", `${esc(p.cliente.nome)} · ${esc(p.cliente.email)} · ${esc(p.cliente.telefone)}${p.cliente.nif ? ` · NIF ${esc(p.cliente.nif)}` : ""}`],
     ["Valor", valorPago(p)], p.fatura?.numero && ["Fatura", esc(p.fatura.numero)], p.moloni?.erro && ["Moloni", esc(p.moloni.erro)],
+    p.zoho?.evento && ["Zoho CRM", `Na agenda${p.zoho.clienteNovo ? " · ficha de cliente nova" : " · cliente já existente"}${p.zoho.nota ? ` · ${esc(p.zoho.nota)}` : ""}`],
+    p.zoho?.erro && ["Zoho CRM", `<span style="color:#a33">Não ficou na agenda: ${esc(p.zoho.erro)}. Marcar à mão.</span>`],
   ])}`),
 });
 

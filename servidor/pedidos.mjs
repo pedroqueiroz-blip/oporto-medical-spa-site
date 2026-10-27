@@ -98,6 +98,8 @@ export async function criar(corpo) {
     const data = limpar(corpo.data, 10), hora = limpar(corpo.hora, 5);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || data < hojeISO()) throw new ErroCliente("Escolha o dia da marcação.");
     if (!/^\d{2}:\d{2}$/.test(hora)) throw new ErroCliente("Escolha a hora da marcação.");
+    // Marcações: nome, email e telemóvel obrigatórios (Pedro, 27/10/2026). O NIF é opcional, só para a fatura.
+    if (!cliente.telefone.replace(/\D/g, "")) throw new ErroCliente("Indique o seu telemóvel.");
     p.marcacao = { data, hora, terapeuta: limpar(corpo.terapeuta, 80) };
   } else {
     // Entrega: digital (só o email) ou caixa oferta para levantar no spa, sem custo extra. O código segue sempre por email.
@@ -109,7 +111,7 @@ export async function criar(corpo) {
 // O que o browser pode ver de um pedido (na página de pagamento).
 export const publico = (p) => ({
   numero: p.numero, tipo: p.tipo, estado: p.estado, total: p.total, tratamento: p.tratamento.nome,
-  marcacao: p.marcacao || null,
+  marcacao: p.marcacao ? { data: p.marcacao.data, hora: p.marcacao.hora, terapeuta: p.marcacao.terapeuta } : null,
   metodo: p.pagamento?.metodo || null,
   multibanco: p.pagamento?.multibanco || null,
   telemovel: p.pagamento?.telemovel ? p.pagamento.telemovel.replace(/^(\d{3})\d{3}/, "$1 ***") : null,
