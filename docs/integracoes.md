@@ -15,7 +15,7 @@ euPago ── notificação ──> /api/eupago-notificacao
        ├─ Moloni ON             fatura-recibo na série SPA, fechada e enviada ao cliente
        ├─ email ao cliente      confirmação da marcação, ou o voucher com o código
        ├─ email à equipa        aviso de cada marcação ou voucher (EMAIL_RESERVAS ou o email do site)
-       └─ Zoho (fase seguinte)  cria a marcação na agenda
+       └─ Zoho CRM              ficha do cliente (NIF/email) e evento na agenda da terapeuta
 Newsletter (Netlify Forms) ──> submission-created: código de 10% por email
 ```
 
@@ -87,7 +87,10 @@ nunca no repositório. Depois de as criar, é preciso publicar de novo (*Deploys
 | `BACKOFFICE_PASSWORD`, `BACKOFFICE_GITHUB_TOKEN` | Entrada no backoffice (/admin) com palavra-passe (ver README) |
 | `BUILD_HOOK_URL` | Reconstrução diária do site, para as campanhas mudarem nas datas (ver README) |
 | `GOOGLE_PLACES_KEY` | Avaliações do Google (nota, número e as mais recentes) em cada build, pela Places API (New). Sem ela ficam as do backoffice |
-| `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | Agenda (fase seguinte) |
+| `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET` | Ligação ao Zoho CRM (agenda e clientes). Depois de publicar, abrir `/api/zoho/ligar` (ver «Agenda») |
+| `ZOHO_CAMPO_NIF` | Opcional: nome API do campo do NIF nos Contactos do CRM (por omissão `NIF`) |
+| `ZOHO_MODULO_AGENDA` | Opcional: módulo da agenda no CRM (por omissão `Events`, as Reuniões) |
+| `ZOHO_REFRESH_TOKEN` | Opcional: chave de renovação gerada à mão, em vez da ligação por `/api/zoho/ligar` |
 
 Na euPago, no canal: *Receber notificação para um URL* → `https://www.oportomedicalspa.com/api/eupago-notificacao`.
 
@@ -98,8 +101,44 @@ A página `/admin-verificar` (palavra-passe do backoffice) confirma tudo isto no
 
 Enquanto a euPago estiver em modo de teste, as faturas ficam sempre em rascunho no Moloni ON.
 
-## Agenda
+## Dados do cliente nas marcações (Pedro, 27/10/2026)
 
-A disponibilidade em `public/prototype.js` ainda é simulada: as marcações chegam por email à equipa.
-Quando a agenda Zoho entrar, as horas livres passam a vir de `/api/disponibilidade` e cada pedido pago cria a marcação no Zoho.
-O **código** de cada tratamento no backoffice (`oil`, `fisio`, ...) é a chave comum para o serviço na agenda.
+- **Obrigatórios:** nome, email e telemóvel. O **NIF é opcional**, só para a fatura (com NIF, cliente próprio no Moloni ON).
+- No Zoho CRM o cliente procura-se pelo NIF, quando o há, e senão pelo email.
+- «Tenho um voucher para usar» mostra o campo para o código (voucher `OMS-XXXX-XXXX`, `VIP` ou o código de 10% da newsletter).
+  O código valida-se logo (`/api/preco`) e o total atualiza-se; a 0 € a marcação confirma-se sem passo de pagamento.
+
+## Agenda (Zoho CRM, conta zoho.eu)
+
+Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
+
+- **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
+  uma hora está livre quando ela não tem nenhum evento no CRM que se sobreponha à duração do tratamento
+  (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo e ao sábado à tarde, e nunca a menos de 1 hora.
+- **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
+  do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
+- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
+- **Só MB WAY ou cartão** nas marcações (Pedro, 27/10/2026): confirmam na hora, e a marcação entra logo no CRM. O Multibanco fica para os vouchers.
+- Enquanto o pagamento não chega, a hora fica **guardada 10 minutos** (Netlify Blobs `reservas`): não aparece livre a mais ninguém.
+  Pago, passa a evento no CRM; sem pagamento, volta a ficar livre.
+- **Depois de pago** (ou a 0 €): o cliente procura-se nos Contactos pelo **NIF** e, se não houver, pelo **email**
+  (uma ficha sem NIF recebe-o); sem ficha, cria-se uma. O email de uma ficha existente nunca muda: uma diferença fica como nota
+  no evento e no aviso à equipa. Cria-se o evento na agenda da terapeuta, ligado à ficha, com o n.º do pedido, valor, email, telemóvel e NIF.
+- Uma falha no CRM não trava o pagamento: o aviso à equipa diz «Não ficou na agenda… Marcar à mão».
+
+Sem `ZOHO_CLIENT_ID`/`ZOHO_CLIENT_SECRET`, ou antes de ligar, `/api/disponibilidade` responde `{ fonte: "simulada" }`, a agenda
+do site fica simulada e as marcações chegam só por email.
+
+### Ligar (uma vez)
+
+1. Em [api-console.zoho.eu](https://api-console.zoho.eu): *Add Client → Server-based Applications*. Redirect URIs: `https://<domínio>/api/zoho/retorno`
+   para cada endereço onde se vai ligar (o domínio do site e, para testar, o da pré-visualização).
+2. Pôr `ZOHO_CLIENT_ID` e `ZOHO_CLIENT_SECRET` no Netlify e publicar de novo.
+3. Abrir `https://<domínio>/api/zoho/ligar`, escrever a palavra-passe do backoffice (`BACKOFFICE_PASSWORD`) e aceitar no Zoho.
+   A chave de renovação fica no Netlify Blobs (`zoho`). Permissões pedidas: `ZohoCRM.modules.ALL, ZohoCRM.users.READ, ZohoCRM.coql.READ, ZohoCRM.settings.modules.READ, ZohoCRM.settings.fields.READ`.
+
+4. Abrir `https://<domínio>/api/zoho/verificar` (mesma palavra-passe): confere pela API de metadados os módulos, o campo do NIF
+   nos Contactos, os campos da agenda, a leitura dos eventos e o utilizador do CRM de cada pessoa da equipa. Se o campo do NIF
+   tiver outro nome e houver um só candidato (NIF, contribuinte, fiscal…), o site passa a usá-lo; senão, indica-se em `ZOHO_CAMPO_NIF`.
+
+O **código** de cada tratamento no backoffice (`oil`, `fisio`, ...) vai no título do evento pelo nome do tratamento.

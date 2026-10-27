@@ -68,7 +68,7 @@
 
   function abrir(root, pedido, opts) {
     opts = opts || {};
-    var st = { codigo: pedido.codigo || '', conta: null, metodo: 'mb_way', telemovel: pedido.telefone || '', nif: '', nome: pedido.nome || '', email: pedido.email || '', telefone: pedido.telefone || '', aEnviar: false };
+    var st = { codigo: pedido.codigo || '', conta: null, metodo: 'mb_way', telemovel: pedido.telefone || '', nif: pedido.nif || '', nome: pedido.nome || '', email: pedido.email || '', telefone: pedido.telefone || '', aEnviar: false };
     var pedeDados = !(pedido.nome && pedido.email);
 
     function total() { return st.conta ? st.conta.total : null; }
@@ -89,11 +89,11 @@
         '<button type="button" class="btn btn--ghost" data-aplicar>Aplicar</button></div>') +
         (gratis ? '' :
           '<div class="vc-row"><p class="vc-label">Como quer pagar</p><div class="vc-seg" role="group">' +
-          [['mb_way', 'MB WAY'], ['multibanco', 'Multibanco'], ['card', 'Cartão']].map(function (m) {
+          [['mb_way', 'MB WAY'], ['multibanco', 'Multibanco'], ['card', 'Cartão']].filter(function (m) { return pedido.tipo !== 'marcacao' || m[0] !== 'multibanco'; }).map(function (m) {
             return '<button type="button" data-metodo="' + m[0] + '" aria-pressed="' + (st.metodo === m[0]) + '">' + m[1] + '</button>';
           }).join('') + '</div></div>' +
           (st.metodo === 'mb_way' ? '<label class="field"><span>Telemóvel MB WAY</span><input id="pg-tel" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(st.telemovel) + '"></label>' : '') +
-          '<label class="field"><span>NIF na fatura (opcional)</span><input id="pg-nif" inputmode="numeric" maxlength="9" value="' + esc(st.nif) + '"></label>') +
+          (pedido.tipo === 'marcacao' ? '' : '<label class="field"><span>NIF na fatura (opcional)</span><input id="pg-nif" inputmode="numeric" maxlength="9" value="' + esc(st.nif) + '"></label>')) +
         '<p class="bk-note pg-aceito">Ao ' + (gratis ? 'confirmar' : 'pagar') + ', aceita os <a href="/termos/" target="_blank" rel="noopener">Termos e Condições</a> e a <a href="/privacidade/" target="_blank" rel="noopener">Política de Privacidade</a>.</p>' +
         '<p class="bk-error" role="alert"' + (erro ? '' : ' hidden') + '>' + esc(erro || '') + '</p>' +
         '<button type="submit" class="btn btn--primary"' + (t == null || st.aEnviar ? ' disabled' : '') + '>' +
@@ -137,17 +137,22 @@
       for (var k in pedido) dados[k] = pedido[k];
       dados.nome = st.nome; dados.email = st.email; dados.telefone = st.telefone || st.telemovel;
       dados.codigo = st.codigo.trim(); dados.metodo = st.metodo; dados.telemovel = st.telemovel; dados.nif = st.nif;
-      api('/pagamento', dados).then(function (p) {
-        if (p.url) { location.href = p.url; return; }
-        if (p.estado === 'confirmado' || p.estado === 'pago') return feito(root, p);
-        if (p.metodo === 'multibanco') return multibanco(root, p);
-        esperar(root, p.numero, p.token, p);
-      }).catch(function (err) { st.aEnviar = false; render(err.message); });
+      enviar(root, dados).catch(function (err) { st.aEnviar = false; render(err.message); });
     };
     ligar(root);
 
     render();
     calcular(st.codigo.trim(), opts.codigo);
+  }
+
+  /* Cria o pedido e segue para o resultado: cartão, MB WAY à espera, Multibanco ou já confirmado (0 €). */
+  function enviar(root, dados) {
+    return api('/pagamento', dados).then(function (p) {
+      if (p.url) { location.href = p.url; return; }
+      if (p.estado === 'confirmado' || p.estado === 'pago') return feito(root, p);
+      if (p.metodo === 'multibanco') return multibanco(root, p);
+      esperar(root, p.numero, p.token, p);
+    });
   }
 
   /* Página /pagamento/: regresso do pagamento com cartão. */
@@ -163,7 +168,7 @@
     }).catch(function (e) { root.innerHTML = '<div class="bk-panel"><p class="bk-note">' + esc(e.message) + '</p></div>'; });
   }
 
-  window.OMS_PAGAR = { abrir: abrir, estado: estado };
+  window.OMS_PAGAR = { abrir: abrir, enviar: enviar, preco: function (dados) { return api('/preco', dados); }, estado: estado };
 
   var pg = document.getElementById('pagamento-estado');
   if (pg) {

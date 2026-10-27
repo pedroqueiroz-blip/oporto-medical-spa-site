@@ -5,6 +5,7 @@ import { gastarCodigo, criarVoucher } from "./codigos.mjs";
 import { validadeVoucher } from "./datas.mjs";
 import { emitirFatura } from "./moloni.mjs";
 import * as M from "./email.mjs";
+import { marcarNoCRM } from "./agenda.mjs";
 
 const METODOS = ["mb_way", "multibanco", "card"];
 
@@ -15,6 +16,8 @@ export async function pagar(p, { metodo, telemovel, base }) {
     return { estado: p.estado };
   }
   if (!METODOS.includes(metodo)) throw new ErroCliente("Escolha como quer pagar.");
+  // Marcações só com pagamento na hora (Pedro, 27/10/2026): a hora fica registada logo que o pagamento chega.
+  if (p.tipo === "marcacao" && metodo === "multibanco") throw new ErroCliente("As marcações pagam-se por MB WAY ou cartão, para ficarem confirmadas na hora.");
   const tel = metodo === "mb_way" ? E.telemovelPT(telemovel || p.cliente.telefone) : "";
   if (metodo === "mb_way" && !tel) throw new ErroCliente("Indique um telemóvel português com 9 dígitos para o MB WAY.");
   const pagina = `${base}/pagamento/?n=${p.numero}&t=${p.token}`;
@@ -78,6 +81,9 @@ export async function concluir(p, por) {
   }
   await gravar(p);
   if (p.total > 0) await emitirFatura(p, { guardar: gravar });
+  // Marcação na agenda do Zoho CRM; uma falha não trava o resto e vai no aviso à equipa.
+  await marcarNoCRM(p).catch((e) => { console.error("Zoho CRM", p.numero, e.message); p.zoho = { ...(p.zoho || {}), erro: e.message }; });
+  await gravar(p);
   await registarEmail(p, "cliente", () => (p.tipo === "voucher" ? M.emailVoucher(p) : M.emailMarcacao(p)));
   await registarEmail(p, "interno", () => M.emailInterno(p));
 }

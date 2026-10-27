@@ -20,9 +20,10 @@ const r2 = (v) => Math.round(v * 100) / 100;
 const esc = (s) => String(s).replace(/&/g, "&amp;");
 const servidor = http.createServer(async (req, res) => {
   let body = ""; for await (const c of req) body += c;
-  const j = body ? JSON.parse(body) : {};
+  let j = {}; try { j = body ? JSON.parse(body) : {}; } catch { j = Object.fromEntries(new URLSearchParams(body)); }
   res.setHeader("Content-Type", "application/json");
   const out = (x) => res.end(JSON.stringify(x));
+  if (req.url.startsWith("/zoho")) return zoho(req, body, j, res, out);
   if (req.url.startsWith("/resend")) { S.emails.push(j); return out({ id: "e" + S.emails.length }); }
   if (req.url === "/eupago/clientes/rest_api/multibanco/create") { S.mb.push(j); return out({ sucesso: true, entidade: "12345", referencia: "123456789", valor: j.valor, data_fim: j.data_fim }); }
   if (req.url === "/eupago/api/v1.02/mbway/create") { S.mbway.push(j); return out({ transactionStatus: "Success", transactionID: "mw" + S.mbway.length, reference: "r1" }); }
@@ -53,6 +54,37 @@ const servidor = http.createServer(async (req, res) => {
   }
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
+// Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false };
+function zoho(req, body, j, res, out) {
+  const u = new URL(req.url, B);
+  if (u.pathname === "/zoho/contas/oauth/v2/token") {
+    Z.tokens.push(j);
+    if (j.grant_type === "authorization_code") return out(j.code === "bom" ? { access_token: "a1", refresh_token: "r1", expires_in: 3600, api_domain: `${B}/zoho/api` } : { error: "invalid_code" });
+    return out({ access_token: "a2", expires_in: 3600 });
+  }
+  const cam = u.pathname.replace("/zoho/api/crm/v6", "");
+  if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
+  if (cam === "/users") return out({ users: Z.users });
+  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }] });
+  if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
+    ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
+    : ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" })) });
+  if (cam === "/coql") return out({ data: Z.eventos, info: { more_records: false } });
+  if (cam === "/Contacts/search") {
+    const [, campo, nif] = u.searchParams.get("criteria")?.match(/\((\w+):equals:(\d+)\)/) || [], email = u.searchParams.get("email");
+    const r = Z.contactos.filter((c) => (nif && c[campo] === nif) || (email && c.Email === email));
+    if (!r.length) { res.statusCode = 204; return res.end(); }
+    return out({ data: r });
+  }
+  if (cam === "/Contacts" && req.method === "POST") { const c = { id: "c" + (Z.contactos.length + 1), ...j.data[0] }; Z.contactos.push(c); Z.criados.push(c); return out({ data: [{ status: "success", details: { id: c.id } }] }); }
+  if (cam === "/Contacts" && req.method === "PUT") { Object.assign(Z.contactos.find((c) => c.id === j.data[0].id), j.data[0]); return out({ data: [{ status: "success", details: { id: j.data[0].id } }] }); }
+  if (cam === "/Events" && req.method === "POST") {
+    if (Z.falhaEvento) return out({ data: [{ status: "error", message: "required field not found" }] });
+    const e = { id: "e" + (Z.eventos.length + 1), ...j.data[0] }; Z.eventos.push(e); return out({ data: [{ status: "success", details: { id: e.id } }] });
+  }
+  res.statusCode = 404; out({ erro: "zoho desconhecido " + cam });
+}
 await new Promise((r) => servidor.listen(PORTA, r));
 
 const api = (await import("../netlify/functions/api.mjs")).default;
@@ -63,6 +95,7 @@ const pedir = async (rota, dados, metodo = "POST") => {
   return { status: r.status, j: await r.json() };
 };
 const notificar = (p, extra = {}) => pedir(`/api/eupago-notificacao?${new URLSearchParams({ chave_api: "demo-chave-teste", identificador: p.numero, valor: String(p.total), transacao: "t-" + p.numero, mp: "MW:PT", ...extra })}`, null, "GET");
+const marcar = (d) => pedir("/api/pagamento", d);
 const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tratamentos.find((t) => t.grupo !== "Relaxar");
 const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
 const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
@@ -73,7 +106,7 @@ try {
   ok(validadeVoucher(new Date("2026-10-22T12:00:00Z")) === "2027-10-31" && validadeVoucher(new Date("2026-02-10T12:00:00Z")) === "2027-02-28" && validadeVoucher(new Date("2026-06-30T23:30:00Z")) === "2027-07-31", "validade do voucher: fim do mês, 12 meses depois (fuso de Lisboa)");
 
   // 1) Marcação de fisioterapia (TREAB) por MB WAY
-  let r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", terapeuta: "Ana", ...cliente, metodo: "mb_way" });
+  let r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", terapeuta: "Ana", ...cliente, metodo: "mb_way" });
   ok(r.status === 200 && r.j.estado === "aguarda_pagamento" && r.j.total === outro.preco, `marcação ${outro.nome}: MB WAY pedido por ${r.j.total} € (preço do site)`);
   ok(S.mbway[0].payment.customerPhone === "912345678" && S.mbway[0].payment.amount.value === outro.preco, "MB WAY com o telemóvel e o valor certos");
   const p1 = r.j;
@@ -93,7 +126,7 @@ try {
   ok(d1.dados.products[0].price === outro.preco && d1.totalValue === outro.preco && d1.dados.payments[0].paymentMethodId === 3, "valor da fatura = valor pago, meio MB WAY");
   ok(d1.dados.customerId === 1, "sem NIF: Consumidor final");
   ok(S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome), "fatura enviada com o texto da terapêutica de reabilitação");
-  const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt");
+  const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && !e.subject.includes("código"));
   ok(e1 && e1.html.includes("Iniciará de seguida a sua terapêutica de reabilitação: " + esc(outro.nome)) && e1.subject.includes("Marcação confirmada"), "email de confirmação com o texto do Pedro (reabilitação)");
   ok(S.emails.some((e) => e.to[0] === cat.spa.email && e.subject.includes(p1.numero)), "aviso à equipa por email");
   await notificar(p1);
@@ -109,21 +142,22 @@ try {
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: codigo.toLowerCase() });
   const com10 = r2(relax.preco * 0.9);
   ok(r.j.total === com10 && r.j.codigo.tipo === "newsletter", `preço com o código: ${relax.preco} € → ${r.j.total} €`);
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "15:00", nome: "Rui", email: "rui@exemplo.pt", telefone: "915000000", nif: "506651940", codigo, metodo: "multibanco" });
+  ok(r.status === 400 && /MB WAY ou cartão/.test(r.j.erro), "marcações não se pagam por Multibanco (só MB WAY ou cartão, que confirmam na hora)");
+  r = await pedir("/api/pagamento", { tipo: "voucher", tratamento: relax.id, nome: "Rui", email: "rui@exemplo.pt", nif: "506651940", codigo, metodo: "multibanco" });
   const p2 = r.j;
-  ok(p2.total === com10 && p2.multibanco?.referencia === "123456789" && S.mb[0].valor === com10, "referência Multibanco com o valor já com desconto");
+  ok(p2.total === com10 && p2.multibanco?.referencia === "123456789" && S.mb[0].valor === com10, "voucher por Multibanco: referência com o valor já com desconto");
   ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.subject.startsWith("Dados para pagamento") && e.html.includes("123 456 789")), "email com a referência Multibanco");
   await notificar(p2, { mp: "PC:PT" });
   const d2 = Object.values(S.docs)[1];
   ok(d2.dados.products[0].productId === 102 && d2.dados.products[0].price === com10 && d2.totalValue === com10, "fatura TPREV com o valor já com o desconto");
   ok(d2.dados.customerId === 50 && d2.dados.payments[0].paymentMethodId === 4, "com NIF: cliente criado no Moloni ON; meio Multibanco");
-  ok(S.emails.some((e) => e.to[0] === "rui@exemplo.pt" && e.html.includes("cuidar da sua saúde e bem-estar. Iniciará de seguida a sua terapêutica de prevenção: " + esc(relax.nome))), "email com o texto da terapêutica de prevenção");
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo });
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "código de boas-vindas só serve uma vez");
 
   // 3) Código VIP: massagem a 0 €, sem pagamento nem fatura
   const docsAntes = Object.keys(S.docs).length, eupagoAntes = S.mb.length + S.mbway.length + S.cartao.length;
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "11:00", nome: "Cliente VIP", email: "vip@exemplo.pt", codigo: " vip " });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "11:00", nome: "Cliente VIP", email: "vip@exemplo.pt", telefone: "915000001", codigo: " vip " });
   ok(r.j.estado === "confirmado" && r.j.total === 0, "código VIP: marcação confirmada a 0 €");
   ok(Object.keys(S.docs).length === docsAntes && S.mb.length + S.mbway.length + S.cartao.length === eupagoAntes, "VIP: sem pagamento na euPago e sem fatura");
   ok(S.emails.some((e) => e.to[0] === "vip@exemplo.pt" && e.html.includes("terapêutica de prevenção") && e.html.includes("Sem custos")), "VIP: email de confirmação na mesma");
@@ -146,7 +180,7 @@ try {
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: outro.id, codigo: vcod });
   ok(r.status === 400 && r.j.erro.includes(relax.nome), "voucher só para o tratamento dele");
   const docs5 = Object.keys(S.docs).length;
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "17:00", nome: "Maria", email: "maria@exemplo.pt", codigo: vcod });
+  r = await marcar({ tipo: "marcacao", tratamento: relax.id, data: amanha, hora: "17:00", nome: "Maria", email: "maria@exemplo.pt", telefone: "915000002", codigo: vcod });
   ok(r.j.estado === "confirmado" && r.j.total === 0 && Object.keys(S.docs).length === docs5, "marcação com o voucher: 0 €, sem segunda fatura");
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: vcod });
   ok(r.status === 400 && /já foi usado/.test(r.j.erro), "voucher só serve uma vez");
@@ -160,18 +194,23 @@ try {
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.html.includes("Caixa oferta, levanta no SPA")), "caixa oferta: a equipa é avisada para preparar a caixa");
 
   // 5) Validações
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
+  r = await marcar({ tipo: "marcacao", tratamento: "nao-existe", data: amanha, hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "tratamento desconhecido é recusado");
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "123", metodo: "mb_way" });
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "123", metodo: "mb_way" });
   ok(r.status === 400 && /telemóvel/.test(r.j.erro), "MB WAY sem telemóvel válido é recusado");
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, nif: "123456788", metodo: "card" });
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, nif: "123456788", metodo: "card" });
   ok(r.status === 400 && /NIF/.test(r.j.erro), "NIF inválido é recusado");
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: "2020-01-01", hora: "10:00", ...cliente, metodo: "card" });
+  // Dados obrigatórios nas marcações: nome, email e telemóvel; o NIF é opcional
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "", metodo: "card" });
+  ok(r.status === 400 && /telemóvel/.test(r.j.erro), "marcação sem telemóvel é recusada");
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "09:00", ...cliente, metodo: "card" });
+  ok(r.status === 200, "marcação sem NIF é aceite (o NIF só serve para a fatura)");
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: "2020-01-01", hora: "10:00", ...cliente, metodo: "card" });
   ok(r.status === 400, "dia no passado é recusado");
 
   // 6) Artigo sem isenção no Moloni ON: a fatura fica por emitir com o erro guardado
   S.artigos.TREAB = null;
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "12:00", ...cliente, metodo: "mb_way" });
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "12:00", ...cliente, metodo: "mb_way" });
   await notificar(r.j);
   const { obter } = await import("../servidor/pedidos.mjs");
   const p6 = await obter(r.j.numero);
@@ -180,7 +219,7 @@ try {
   // 7) euPago em modo de teste: a fatura fica só em rascunho
   S.artigos.TREAB = "M10";
   process.env.EUPAGO_MODO = "teste";
-  r = await pedir("/api/pagamento", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "13:00", ...cliente, metodo: "mb_way" });
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "13:00", ...cliente, metodo: "mb_way" });
   await notificar(r.j);
   ok(Object.values(S.docs).at(-1).status === 0, "modo de teste: só rascunho no Moloni ON");
 
@@ -206,6 +245,73 @@ try {
   ok(Object.values(S.docs).at(-1).dados.products[0].price === 11, "fatura com o preço de campanha");
   r = await pedir("/api/preco", { tipo: "voucher", tratamento: relax.id, campanha: "teste-ja" });
   ok(r.status === 400 && /esgotaram/.test(r.j.erro), "depois do limite, a campanha esgota");
+
+  // 9) Agenda no Zoho CRM
+  r = await pedir("/api/disponibilidade?tratamento=" + outro.id, null, "GET");
+  ok(r.j.fonte === "simulada", "sem Zoho ligado, a agenda fica simulada");
+  Object.assign(process.env, { ZOHO_CLIENT_ID: "cid", ZOHO_CLIENT_SECRET: "seg", ZOHO_ACCOUNTS_BASE: `${B}/zoho/contas`, BACKOFFICE_PASSWORD: "senha-certa" });
+  const pagina = async (rota, init) => { const x = await api(new Request("https://oms.exemplo" + rota, init)); return { status: x.status, local: x.headers.get("location"), txt: await x.text() }; };
+  let pg = await pagina("/api/zoho/ligar");
+  ok(pg.status === 200 && pg.txt.includes("Palavra-passe"), "página para ligar ao Zoho pede a palavra-passe");
+  const form = (senha) => ({ method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "senha=" + senha });
+  pg = await pagina("/api/zoho/ligar", form("errada"));
+  ok(pg.status === 401, "palavra-passe errada não liga");
+  pg = await pagina("/api/zoho/ligar", form("senha-certa"));
+  const aut = new URL(pg.local);
+  ok(pg.status === 302 && aut.origin + aut.pathname === `${B}/zoho/contas/oauth/v2/auth` && aut.searchParams.get("redirect_uri") === "https://oms.exemplo/api/zoho/retorno" && aut.searchParams.get("access_type") === "offline", "com a palavra-passe, segue para a autorização no Zoho");
+  pg = await pagina("/api/zoho/retorno?code=bom&state=inventado");
+  ok(pg.status === 400, "regresso com state desconhecido é recusado");
+  pg = await pagina(`/api/zoho/retorno?code=bom&state=${aut.searchParams.get("state")}`);
+  ok(pg.status === 200 && pg.txt.includes("ligado") && Z.tokens.at(-1).redirect_uri === "https://oms.exemplo/api/zoho/retorno", "regresso do Zoho guarda a ligação");
+  pg = await pagina(`/api/zoho/retorno?code=bom&state=${aut.searchParams.get("state")}`);
+  ok(pg.status === 400, "o mesmo state não serve duas vezes");
+
+  pg = await pagina("/api/zoho/verificar", form("errada"));
+  ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
+  pg = await pagina("/api/zoho/verificar", form("senha-certa"));
+  ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Módulo da agenda (Events)") && pg.txt.includes("✓ Terapeuta: Luísa Pinto") && pg.txt.includes("✗ Terapeuta:"), "verificação pelos metadados: encontra o campo do NIF, a agenda e quem falta ligar");
+
+  // Dia útil daqui a 3+ dias; a Luísa (ligada ao utilizador u1 pelo nome) tem um evento às 10:00
+  let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
+  const D = dia.toISOString().slice(0, 10);
+  const { instanteLisboa } = await import("../servidor/datas.mjs");
+  Z.eventos.push({ Owner: { id: "u1" }, Start_DateTime: instanteLisboa(D, "10:00").iso, End_DateTime: instanteLisboa(D, "11:00").iso, All_day: false });
+  const luisa = cat.equipa.find((p) => p.nome === "Luísa Pinto");
+  const tz = cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60 && t.grupo !== "Relaxar") || cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60);
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
+  const livresL = r.j.livres?.[luisa.id]?.[D] || [];
+  ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm do CRM (${livresL.length} livres; 10:00 ocupada)`);
+  ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não tem utilizador no CRM fica fora da agenda online");
+  const zc = { nome: "Carla Nova", email: "carla@exemplo.pt", telefone: "913000000", nif: "123456789" };
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "10:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
+  ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no CRM é recusada antes de pagar");
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
+  ok(r.status === 200 && r.j.marcacao.terapeuta === "Luísa Pinto" && !("zohoDono" in r.j.marcacao), "«Sem preferência» fica com quem está livre no CRM");
+  const guardada = r.j;
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, nome: "Outra Pessoa", email: "outra@exemplo.pt", telefone: "916000000", nif: "506651940", metodo: "mb_way" });
+  ok(r.status === 400 && /ocupada/.test(r.j.erro), "enquanto o MB WAY não chega, a hora fica guardada para quem a escolheu");
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
+  ok(!r.j.livres[luisa.id][D].includes("11:00"), "a hora guardada não aparece livre no site");
+  r = { j: guardada };
+  await notificar(r.j);
+  const evz = Z.eventos.at(-1);
+  ok(Z.criados.length === 1 && Z.criados[0].Contribuinte === "123456789" && Z.criados[0].Email === "carla@exemplo.pt" && Z.criados[0].Last_Name === "Nova", "cliente novo: ficha criada no CRM com o NIF (no campo encontrado na verificação)");
+  ok(evz.Owner.id === "u1" && evz.Who_Id.id === Z.criados[0].id && evz.Start_DateTime === instanteLisboa(D, "11:00").iso && evz.End_DateTime === instanteLisboa(D, "11:00", tz.duracao).iso && evz.Description.includes(r.j.numero), "marcação paga entra na agenda da Luísa, ligada à ficha");
+  ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("ficha de cliente nova")), "aviso à equipa diz que ficou na agenda");
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "11:00", qualquer: true, ...zc, metodo: "mb_way" });
+  ok(r.status === 400 && /ocupada/.test(r.j.erro), "a mesma hora já não se pode marcar");
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "15:00", qualquer: true, ...zc, email: "carla.outro@exemplo.pt", metodo: "mb_way" });
+  await notificar(r.j);
+  ok(Z.criados.length === 1 && Z.eventos.at(-1).Who_Id.id === Z.criados[0].id && Z.eventos.at(-1).Description.includes("diferente"), "cliente existente reconhecido pelo NIF: sem ficha duplicada, com nota do email diferente");
+  Z.contactos.push({ id: "c-antigo", Last_Name: "Antiga", Email: "antiga@exemplo.pt" });
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "16:00", qualquer: true, nome: "Rita Antiga", email: "antiga@exemplo.pt", telefone: "914000000", nif: "506651940", metodo: "mb_way" });
+  await notificar(r.j);
+  ok(Z.criados.length === 1 && Z.contactos.find((c) => c.id === "c-antigo").Contribuinte === "506651940" && Z.eventos.at(-1).Who_Id.id === "c-antigo", "ficha sem NIF encontrada pelo email recebe o NIF");
+  Z.falhaEvento = true;
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "17:00", qualquer: true, ...zc, metodo: "mb_way" });
+  await notificar(r.j);
+  const pz = await obter(r.j.numero);
+  ok(pz.estado === "pago" && /required/.test(pz.zoho.erro) && S.emails.some((e) => e.subject.includes(pz.numero) && e.html.includes("Marcar à mão")), "falha no CRM não trava o pagamento e a equipa é avisada");
 
   console.log("\nTudo certo.");
 } finally {
