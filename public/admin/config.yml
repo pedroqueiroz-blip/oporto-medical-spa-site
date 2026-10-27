@@ -246,6 +246,7 @@ collections:
           - { name: etiqueta, label: Etiqueta, widget: string }
           - { name: titulo, label: Título, widget: string }
           - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+          - { name: referencia, label: Ponto de referência (primeira linha das indicações), widget: string, required: false, hint: 'Aparece primeiro quando se carrega em «+ indicações». Ex.: «Fica praticamente ao lado do Pingo Doce Ramalde». Deixe vazio para não mostrar.' }
           - { name: texto, label: Estacionamento e transportes, widget: text, required: false, hint: *texto_hint }
       - name: google
         label: Google e partilhas
