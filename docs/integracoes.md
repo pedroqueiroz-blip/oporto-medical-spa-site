@@ -128,7 +128,7 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
 - **Módulo «Tratamentos»** (Pedro, 27/10/2026): o SPA marca no módulo «Tratamentos» da Agenda do Zoho. Quando existe
   (ou o indicado em `ZOHO_MODULO_MARCACOES`), a marcação paga cria lá um registo com Tratamento (valor da lista com o mesmo nome),
   Terapeuta, Estado = Agendado, Pagamento = Pago (ou Voucher a 0 €), Início, Fim, Cliente, Origem_Marcacao = Online e
-  a descrição a começar por «Origem online». As horas ocupadas somam os eventos de cada terapeuta e os registos do módulo
+  a descrição a começar pelo n.º da marcação que o cliente recebe («OMS-261027-DBBD · Origem online»). As horas ocupadas somam os eventos de cada terapeuta e os registos do módulo
   com essa terapeuta (os cancelados não contam). Os campos encontram-se pelos nomes; `/api/zoho/verificar` mostra a correspondência.
 
 Sem `ZOHO_CLIENT_ID`/`ZOHO_CLIENT_SECRET`, ou antes de ligar, `/api/disponibilidade` responde `{ fonte: "simulada" }`, a agenda

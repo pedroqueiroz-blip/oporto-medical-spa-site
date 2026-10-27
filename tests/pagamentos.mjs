@@ -360,7 +360,7 @@ try {
   await notificar(r.j);
   const mz = Z.marcacoes.at(-1);
   ok(Z.eventos.length === nEv2 && mz.Tratamento === tz.nome && mz.Terapeuta.id === "u1" && mz.Estado === "Agendado" && mz.Pagamento === "Pago" && mz.Origem_Marcacao === "Online"
-    && mz.Inicio === instanteLisboa(D, "18:00").iso && mz.Fim === instanteLisboa(D, "18:00", tz.duracao).iso && mz.Cliente.id && mz.Descricao.startsWith("Origem online"), "marcação paga criada no módulo Tratamentos com tratamento, terapeuta, estado, pagamento e origem");
+    && mz.Inicio === instanteLisboa(D, "18:00").iso && mz.Fim === instanteLisboa(D, "18:00", tz.duracao).iso && mz.Cliente.id && mz.Descricao.startsWith(r.j.numero + " · Origem online"), "marcação paga criada no módulo Tratamentos com tratamento, terapeuta, estado, pagamento e origem");
 
   console.log("\nTudo certo.");
 } finally {

@@ -103,7 +103,7 @@ export async function marcarNoCRM(p) {
     titulo: `${p.tratamento.nome} · ${p.cliente.nome}`,
     inicio: instanteLisboa(data, hora).iso, fim: instanteLisboa(data, hora, dur).iso,
     dono: p.marcacao.zohoDono, terapeuta: p.marcacao.terapeuta, cliente: cliente.id, tratamento: p.tratamento.nome, semPagamento: !(Number(p.total) > 0),
-    descricao: [mm ? "Origem online" : null, `Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
+    descricao: [mm ? `${p.numero} · Origem online` : `Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
       `Email: ${p.cliente.email}`, p.cliente.telefone && `Telemóvel: ${p.cliente.telefone}`, p.cliente.nif && `NIF: ${p.cliente.nif}`, cliente.nota].filter(Boolean).join("\n"),
   });
   p.zoho = { cliente: cliente.id, clienteNovo: cliente.novo, evento, modulo: mm?.modulo || "Events", nota: cliente.nota || "", em: new Date().toISOString() };
