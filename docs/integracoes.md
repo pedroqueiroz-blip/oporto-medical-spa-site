@@ -113,7 +113,7 @@ Enquanto a euPago estiver em modo de teste, as faturas ficam sempre em rascunho 
 Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
 
 - **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
-  uma hora está livre quando ela não tem nenhum evento no CRM que se sobreponha à duração do tratamento
+  uma hora está livre quando ela não tem nenhuma marcação no módulo Tratamentos (nem evento em Reuniões) que se sobreponha à duração do tratamento
   (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo e ao sábado à tarde, e nunca a menos de 1 hora.
 - **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
   do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
@@ -131,7 +131,8 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
   Especialidade = Spa, Valor, Preferência pela terapeuta, Cliente, Origem_Marcacao = Online e Notas da Sessão a começar pelo
   n.º da marcação que o cliente recebe («OMS-261027-DBBD · Origem online»). As horas ocupadas somam os eventos de cada terapeuta e
   os registos do módulo com o nome dela (os cancelados não contam). Os campos encontram-se pelos nomes (nunca os do sistema, como
-  a hora de criação); sem data, profissional ou nome, as marcações continuam em Reuniões. `/api/zoho/verificar` mostra a correspondência.
+  a hora de criação). As marcações vão **só** para este módulo: sem ele pronto, a agenda do site fica simulada e uma marcação paga
+  não entra no Zoho (a equipa recebe «Marcar à mão»). Tem agenda online quem está numa das listas de profissionais com o mesmo nome do site. `/api/zoho/verificar` mostra a correspondência.
 
 Sem `ZOHO_CLIENT_ID`/`ZOHO_CLIENT_SECRET`, ou antes de ligar, `/api/disponibilidade` responde `{ fonte: "simulada" }`, a agenda
 do site fica simulada e as marcações chegam só por email.

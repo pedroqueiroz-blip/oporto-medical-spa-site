@@ -8,33 +8,16 @@ import { store, STORES } from "./store.mjs";
 const CONTAS = () => (process.env.ZOHO_ACCOUNTS_BASE || "https://accounts.zoho.eu").replace(/\/$/, "");
 export const ESCOPOS = "ZohoCRM.modules.ALL,ZohoCRM.users.READ,ZohoCRM.coql.READ,ZohoCRM.settings.modules.READ,ZohoCRM.settings.fields.READ";
 
-// Campo do NIF, módulo da agenda e campo do tratamento: variável no Netlify, senão o que a verificação
+// Campo do NIF e módulo da agenda (Reuniões, só para ler horas ocupadas): variável no Netlify, senão o que a verificação
 // (/api/zoho/verificar) encontrou nos metadados do CRM, senão os nomes habituais.
 async function configuracao() {
   const g = (await (await gaveta()).get("config", { type: "json" })) || {};
   return {
     campoNif: process.env.ZOHO_CAMPO_NIF || g.campoNif || "NIF", moduloAgenda: process.env.ZOHO_MODULO_AGENDA || g.moduloAgenda || "Events",
-    tratamento: g.tratamento?.campo && (!process.env.ZOHO_CAMPO_TRATAMENTO || process.env.ZOHO_CAMPO_TRATAMENTO === g.tratamento.campo) ? g.tratamento : null,
   };
 }
 
 const simples = (x) => String(x || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
-
-// Valor do campo do tratamento na agenda: lista de escolha (valor com o mesmo nome), texto, ou ligação a
-// um registo de outro módulo (p. ex. Produtos) com o mesmo nome. Sem correspondência, fica só no título.
-async function valorTratamento(cfg, nome) {
-  if (!cfg) return undefined;
-  if (cfg.tipo === "picklist" || cfg.tipo === "multiselectpicklist") {
-    const v = (cfg.valores || []).find((x) => simples(x) === simples(nome));
-    return v === undefined ? undefined : cfg.tipo === "picklist" ? v : [v];
-  }
-  if (cfg.tipo === "lookup" && cfg.modulo) {
-    const j = await crm("GET", `/${cfg.modulo}/search?word=${encodeURIComponent(nome)}`);
-    const r = (j?.data || []).find((x) => Object.values(x).some((v) => typeof v === "string" && simples(v) === simples(nome)));
-    return r ? { id: r.id } : undefined;
-  }
-  return ["text", "textarea"].includes(cfg.tipo) ? nome : undefined;
-}
 
 export const zohoConfigurado = () => Boolean(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET);
 const gaveta = () => store(STORES.zoho);
@@ -152,24 +135,12 @@ export async function eventos(de, ate) {
   return out;
 }
 
-export async function criarEvento({ titulo, inicio, fim, dono, cliente, descricao, tratamento }) {
-  const cfg = await configuracao();
-  const trat = tratamento ? await valorTratamento(cfg.tratamento, tratamento).catch(() => undefined) : undefined;
-  const j = await crm("POST", `/${cfg.moduloAgenda}`, { data: [{
-    Event_Title: titulo, Start_DateTime: inicio, End_DateTime: fim, Description: descricao, Origem_Marcacao: "Online",
-    ...(dono ? { Owner: { id: dono } } : {}),
-    ...(cliente ? { Who_Id: { id: cliente } } : {}),
-    ...(trat !== undefined ? { [cfg.tratamento.campo]: trat } : {}),
-  }] });
-  return criado(j);
-}
-
 /* ---------- Módulo das marcações (Agenda do Zoho → «Tratamentos») ---------- */
 
 // O SPA marca no módulo «Tratamentos» (Pedro, 27/10/2026): cada registo tem tratamento, terapeuta, estado,
 // pagamento, início e fim. O módulo e os campos encontram-se pelos nomes nos metadados do CRM (ou
-// ZOHO_MODULO_MARCACOES) e ficam guardados um dia; a verificação volta a procurá-los. Sem o módulo,
-// as marcações continuam como eventos (Reuniões).
+// ZOHO_MODULO_MARCACOES) e ficam guardados um dia; a verificação volta a procurá-los. As marcações vão só
+// para este módulo: sem ele pronto, não entram no Zoho e a equipa é avisada para marcar à mão.
 const CANCELADA = /cancel|anulad|desmarc|falt/;
 const SISTEMA = /^(Created|Modified|Last_Activity|Last_Enriched|Unsubscribed)_(Time|By)$|^(Owner|Tag|Record_Image|Locked__s)$/;
 const resumo = (f) => ({ api: f.api_name, rotulo: f.field_label, tipo: f.data_type, valores: (f.pick_list_values || []).map((v) => v.display_value), modulo: f.lookup?.module?.api_name || "" });
@@ -200,7 +171,7 @@ async function descobrirMarcacoes() {
   const campos = (await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || [];
   return { ...out, modulo: m.api_name, nomeModulo: m.plural_label || m.api_name, campos: mapear(campos), todos: campos.map(resumo) };
 }
-// Só se marca no módulo quando se sabe onde vão o início, a terapeuta e o tratamento; senão, Reuniões.
+// O módulo está pronto quando se sabe onde vão o início, a terapeuta e o tratamento.
 const completo = (mm) => Boolean(mm?.modulo && mm.campos?.inicio && mm.campos?.terapeutas?.length && (mm.campos.tratamento || mm.campos.nome));
 export async function moduloMarcacoes() {
   const g = await gaveta(), cfg = (await g.get("config", { type: "json" })) || {};
@@ -323,36 +294,14 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
     }
   } catch (e) { add(false, "Campo do NIF nos Contactos", e.message); }
 
-  // Módulo da agenda e os campos usados
+  // Reuniões: só se leem, para as horas ocupadas de quem é utilizador do CRM (bloqueios, ausências…)
   const agenda = process.env.ZOHO_MODULO_AGENDA || guardado.moduloAgenda || "Events";
-  if (!temModulo(agenda)) add(false, "Módulo da agenda", `Não existe «${agenda}». Indique o módulo certo em ZOHO_MODULO_AGENDA no Netlify.`);
+  if (!temModulo(agenda)) add(false, "Reuniões (horas ocupadas)", `Não existe «${agenda}». Indique o módulo certo em ZOHO_MODULO_AGENDA no Netlify.`);
   else try {
     const campos = (await crm("GET", `/settings/fields?module=${agenda}`))?.fields || [];
-    const faltam = ["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].filter((n) => !campos.some((f) => f.api_name === n));
-    add(!faltam.length, `Módulo da agenda (${agenda})`, faltam.length ? `Faltam os campos ${faltam.join(", ")}.` : "Título, início, fim, responsável e contacto disponíveis.");
-    // Campos próprios da agenda (onde pode estar a terapeuta de cada marcação)
-    const proprios = campos.filter((f) => f.custom_field || ["picklist", "multiselectpicklist", "lookup", "userlookup", "ownerlookup"].includes(f.data_type));
-    // As marcações do site gravam Origem_Marcacao = «Online» (pedido do SPA).
-    const origem = campos.find((f) => f.api_name === "Origem_Marcacao");
-    const valoresOrigem = (origem?.pick_list_values || []).map((v) => v.display_value);
-    add(Boolean(origem) && (!valoresOrigem.length || valoresOrigem.includes("Online")), "Origem da marcação", !origem ? "A agenda não tem o campo Origem_Marcacao." : valoresOrigem.length && !valoresOrigem.includes("Online") ? `A lista de «${origem.field_label}» não tem o valor «Online» (tem: ${valoresOrigem.join(" / ")}).` : `As marcações do site ficam com «${origem.field_label}» = Online.`);
-    // Campo do tratamento: ZOHO_CAMPO_TRATAMENTO no Netlify, senão um único campo com nome parecido.
-    const pedido = process.env.ZOHO_CAMPO_TRATAMENTO;
-    const cand = pedido ? campos.filter((f) => f.api_name === pedido) : campos.filter((f) => /tratamento|servi[cç]o|treatment|service/i.test(`${f.api_name} ${f.field_label}`));
-    if (cand.length === 1) {
-      const f = cand[0], valores = (f.pick_list_values || []).map((v) => v.display_value);
-      guardado.tratamento = { campo: f.api_name, tipo: f.data_type, valores, modulo: f.lookup?.module?.api_name || "" };
-      const semValor = ["picklist", "multiselectpicklist"].includes(f.data_type) ? tratamentos.filter((t) => !valores.some((v) => simples(v) === simples(t.nome))) : [];
-      add(!semValor.length, "Tratamento nas marcações", `As marcações do site preenchem «${f.field_label}» (${f.api_name}, ${f.data_type}${guardado.tratamento.modulo ? ` → ${guardado.tratamento.modulo}` : ""}) com o nome do tratamento.`
-        + (semValor.length ? ` Sem valor igual na lista: ${semValor.map((t) => t.nome).join(", ")}. Acrescente-os à lista no Zoho (com o mesmo nome do site); até lá, nessas o tratamento fica só no título.` : ""));
-    } else {
-      delete guardado.tratamento;
-      add(false, "Tratamento nas marcações", cand.length
-        ? `Há vários campos possíveis: ${cand.map((f) => `«${f.field_label}» (${f.api_name})`).join(", ")}. Indique o certo em ZOHO_CAMPO_TRATAMENTO no Netlify.`
-        : pedido ? `Não há o campo «${pedido}» na agenda.` : `A agenda não tem um campo «Tratamento»: o tratamento fica só no título e na descrição. Para o ter num campo próprio, crie em Reuniões um campo «Tratamento» (lista de escolha com os nomes do site, ou texto) e verifique de novo.`);
-    }
-    if (proprios.length) add(true, `Campos da agenda que podem indicar a terapeuta`, proprios.map((f) => `«${f.field_label}» (${f.api_name}, ${f.data_type}${f.pick_list_values?.length ? `: ${f.pick_list_values.map((v) => v.display_value).join(" / ")}` : ""}${f.lookup?.module?.api_name ? ` → ${f.lookup.module.api_name}` : ""})`).join("; "));
-  } catch (e) { add(false, `Módulo da agenda (${agenda})`, e.message); }
+    const faltam = ["Start_DateTime", "End_DateTime", "Owner"].filter((n) => !campos.some((f) => f.api_name === n));
+    add(!faltam.length, `Reuniões (${agenda}), para horas ocupadas`, faltam.length ? `Faltam os campos ${faltam.join(", ")}.` : "Os eventos de cada terapeuta (utilizador do CRM) também ocupam a hora.");
+  } catch (e) { add(false, `Reuniões (${agenda})`, e.message); }
 
   // Eventos dos próximos 14 dias (confirma a leitura por COQL)
   try {
@@ -368,11 +317,11 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
   // Módulo das marcações («Tratamentos»)
   try {
     const mm = guardado.marcacoes = await descobrirMarcacoes();
-    if (!mm.modulo) add(false, "Módulo das marcações (Tratamentos)", "Não há um módulo «Tratamentos»: as marcações vão para Reuniões. Se tiver outro nome, indique-o em ZOHO_MODULO_MARCACOES no Netlify.");
+    if (!mm.modulo) add(false, "Módulo das marcações (Tratamentos)", "Não há um módulo «Tratamentos»: as marcações do site não entram no Zoho. Se tiver outro nome, indique-o em ZOHO_MODULO_MARCACOES no Netlify.");
     else {
       const c = mm.campos, txt = (f) => `«${f.rotulo}» (${f.api}, ${f.tipo}${f.valores.length ? `: ${f.valores.join(" / ")}` : ""}${f.modulo ? ` → ${f.modulo}` : ""})`;
       const ok = completo(mm);
-      add(ok, `Módulo das marcações (${mm.nomeModulo})`, ok ? `As marcações do site são criadas em ${mm.modulo} e as horas ocupadas também se leem daqui.` : "Falta saber o campo do início, da terapeuta ou do tratamento (abaixo): até lá, as marcações continuam em Reuniões, como antes.");
+      add(ok, `Módulo das marcações (${mm.nomeModulo})`, ok ? `As marcações do site são criadas em ${mm.modulo} e as horas ocupadas também se leem daqui.` : "Falta saber o campo do início, da terapeuta ou do tratamento (abaixo): até lá, as marcações do site não entram no Zoho (a equipa recebe «Marcar à mão»).");
       const nomes = { inicio: "Início", fim: "Fim", nome: "Nome (tratamento)", artigo: "Artigo (Produtos)", estado: "Estado (Agendado)", pagamento: "Pagamento (Efetuado)", descricao: "Notas (n.º da marcação)", especialidade: "Especialidade (Spa)", valor: "Valor", preferencia: "Preferência pela terapeuta", cliente: "Cliente (Contactos)", origem: "Origem_Marcacao (Online)" };
       add(Boolean(c.terapeutas?.length), `${mm.nomeModulo}: Terapeuta`, c.terapeutas?.length ? `Na lista que tiver o nome dela: ${c.terapeutas.map(txt).join("; ")}` : "Campo não encontrado.");
       const semLista = (equipa || []).filter((p) => !(c.terapeutas || []).some((f) => !f.valores.length || f.valores.some((v) => simples(v) === simples(p.nome))));
