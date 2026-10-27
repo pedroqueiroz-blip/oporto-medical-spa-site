@@ -126,7 +126,7 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
   do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
 - **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
 - **Só MB WAY ou cartão** nas marcações (Pedro, 27/10/2026): confirmam na hora, e a marcação entra logo no CRM. O Multibanco fica para os vouchers.
-- Enquanto o pagamento não chega, a hora fica **guardada 30 minutos** (Netlify Blobs `reservas`): não aparece livre a mais ninguém.
+- Enquanto o pagamento não chega, a hora fica **guardada 10 minutos** (Netlify Blobs `reservas`): não aparece livre a mais ninguém.
   Pago, passa a evento no CRM; sem pagamento, volta a ficar livre.
 - **Depois de pago** (ou a 0 €): o cliente procura-se nos Contactos pelo **NIF** e, se não houver, pelo **email**
   (uma ficha sem NIF recebe-o); sem ficha, cria-se uma. O email de uma ficha existente nunca muda: uma diferença fica como nota

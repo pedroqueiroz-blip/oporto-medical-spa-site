@@ -31,8 +31,8 @@ async function equipaCRM() {
   return lista;
 }
 
-// Horas guardadas durante o pagamento: contam como ocupadas 30 minutos ou até a marcação entrar no CRM.
-const GUARDA = 30 * 60e3;
+// Horas guardadas durante o pagamento: contam como ocupadas 10 minutos (Pedro, 27/10/2026) ou até a marcação entrar no CRM.
+const GUARDA = 10 * 60e3;
 async function guardadas(excetoEmail = "") {
   const s = await store(STORES.reservas);
   const out = [];
