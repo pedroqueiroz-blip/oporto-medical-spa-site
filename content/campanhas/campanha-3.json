@@ -14,7 +14,7 @@
   "duracao": 60,
   "imagem": "/img/uploads/massagem-ayurvedica.jpg",
   "etiqueta": "Campanha do mês",
-  "selo_em_campanha": false,
+  "selo_em_campanha": true,
   "titulo": "Massagem Manual",
   "preco_antigo": 74,
   "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular.",

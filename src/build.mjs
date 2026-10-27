@@ -80,8 +80,8 @@ write('en/payment/index.html', page(mEN, {
 const dadosDe = (mm) => ({
   treatments: mm.treatments.map((t) => {
     /* Tratamento em campanha: preço de campanha, com o normal guardado para aparecer riscado */
-    const camp = t.id === mm.campaignTreatment && mm.campaignPrice && mm.campaignPrice !== t.preco;
-    return { id: t.id, area: mm.groupName(t.grupo), name: t.nome, min: t.duracao, price: camp ? mm.campaignPrice : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
+    const camp = mm.inCampaign(t.id) && mm.campaignPrice(t.id) && mm.campaignPrice(t.id) !== t.preco;
+    return { id: t.id, area: mm.groupName(t.grupo), name: t.nome, min: t.duracao, price: camp ? mm.campaignPrice(t.id) : t.preco, oldPrice: camp ? t.preco : null, camp: !!camp, text: t.texto };
   }),
   /* Indicação de cada área, igual à do cartão em «Cuidar de si» (aparece à frente da área na agenda, no computador) */
   areaText: Object.fromEntries(((mm.inicio.casa || {}).pilares || []).filter((p) => p.titulo && p.texto).map((p) => [p.titulo, mm.text.plain(p.texto)])),
