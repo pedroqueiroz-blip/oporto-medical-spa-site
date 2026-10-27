@@ -91,6 +91,7 @@ export async function confirmarHora(p, { terapeutaId, qualquer }) {
   p.marcacao.terapeuta = escolhida.nome;
   p.marcacao.terapeutaId = escolhida.id;
   p.marcacao.zohoDono = escolhida.dono;
+  p.marcacao.preferencia = !(qualquer || !terapeutaId);
 }
 
 // Pedido pago (ou a 0 €): ficha do cliente (encontrada pelo NIF/email ou criada) e evento na agenda do CRM.
@@ -102,7 +103,7 @@ export async function marcarNoCRM(p) {
   const evento = await (mm ? (x) => criarMarcacao(mm, x) : criarEvento)({
     titulo: `${p.tratamento.nome} · ${p.cliente.nome}`,
     inicio: instanteLisboa(data, hora).iso, fim: instanteLisboa(data, hora, dur).iso,
-    dono: p.marcacao.zohoDono, terapeuta: p.marcacao.terapeuta, cliente: cliente.id, tratamento: p.tratamento.nome, semPagamento: Number(p.total) > 0 ? false : /vip/i.test(p.codigo?.texto || p.codigo?.tipo || "") ? "isento" : true,
+    dono: p.marcacao.zohoDono, terapeuta: p.marcacao.terapeuta, preferencia: p.marcacao.preferencia, cliente: cliente.id, tratamento: p.tratamento.nome, valor: p.total, semPagamento: Number(p.total) > 0 ? false : /vip/i.test(p.codigo?.texto || p.codigo?.tipo || "") ? "isento" : true,
     descricao: [mm ? `${p.numero} · Origem online` : `Marcação pelo site ${p.numero}`, `Tratamento: ${p.tratamento.nome} (${dur} min)`, `Valor: ${Number(p.total).toFixed(2)} €${p.codigo ? ` (${p.codigo.texto})` : ""}`,
       `Email: ${p.cliente.email}`, p.cliente.telefone && `Telemóvel: ${p.cliente.telefone}`, p.cliente.nif && `NIF: ${p.cliente.nif}`, cliente.nota].filter(Boolean).join("\n"),
   });

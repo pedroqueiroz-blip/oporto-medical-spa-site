@@ -55,20 +55,25 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
-const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false, camposAgenda: [], moduloTrat: false, marcacoes: [] };
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaEvento: false, camposAgenda: [], moduloTrat: false, marcacoes: [], produtos: [] };
 // Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
 const CAMPOS_TRAT = [
   { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" },
-  { api_name: "Name", field_label: "Nome", data_type: "text" },
-  { api_name: "Tratamento", field_label: "Tratamento", data_type: "picklist", pick_list_values: [] },
-  { api_name: "Terapeuta", field_label: "Terapeuta", data_type: "userlookup" },
-  { api_name: "Estado", field_label: "Estado", data_type: "picklist", pick_list_values: ["Agendado", "Realizado", "Cancelado"].map((v) => ({ display_value: v })) },
+  { api_name: "Name", field_label: "Nome de Tratamento", data_type: "text" },
+  { api_name: "Data_do_tratamento", field_label: "Data do tratamento", data_type: "datetime" },
   { api_name: "Pagamento", field_label: "Pagamento", data_type: "picklist", pick_list_values: ["-None-", "Efetuado", "Pendente", "Isento", "Faturado"].map((v) => ({ display_value: v })) },
-  { api_name: "Descricao", field_label: "Descrição", data_type: "textarea" },
-  { api_name: "Inicio", field_label: "Início", data_type: "datetime" },
-  { api_name: "Fim", field_label: "Fim", data_type: "datetime" },
+  { api_name: "Estado", field_label: "Estado", data_type: "picklist", pick_list_values: ["-None-", "Agendado", "Realizado", "Cancelado"].map((v) => ({ display_value: v })) },
+  { api_name: "Tipo_de_Tratamento", field_label: "Tipo de Tratamento", data_type: "picklist", pick_list_values: ["-None-", "Cavitação", "Vanquish"].map((v) => ({ display_value: v })) },
+  { api_name: "Notas_da_Sessao", field_label: "Notas da Sessao", data_type: "textarea" },
   { api_name: "Cliente", field_label: "Cliente", data_type: "lookup", lookup: { module: { api_name: "Contacts" } } },
-  { api_name: "Origem_Marcacao", field_label: "Origem da marcação", data_type: "picklist", pick_list_values: ["Telefone", "Online"].map((v) => ({ display_value: v })) },
+  { api_name: "Terapeutas", field_label: "Terapeutas", data_type: "multiselectpicklist", pick_list_values: ["Sofia Costa", "Maria Barroso"].map((v) => ({ display_value: v })) },
+  { api_name: "Hora_fim_do_tratamento", field_label: "Hora fim do tratamento", data_type: "datetime" },
+  { api_name: "Valor", field_label: "Valor", data_type: "currency" },
+  { api_name: "Especialidade", field_label: "Especialidade", data_type: "picklist", pick_list_values: ["-None-", "Nutrição", "Laser Clinic", "Spa"].map((v) => ({ display_value: v })) },
+  { api_name: "Artigo", field_label: "Artigo", data_type: "lookup", lookup: { module: { api_name: "Products" } } },
+  { api_name: "Profissionais_LC", field_label: "Profissionais LC", data_type: "multiselectpicklist", pick_list_values: ["Ana Cruz", "Luísa Pinto", "Pedro Queiroz"].map((v) => ({ display_value: v })) },
+  { api_name: "Preferencia_Terapeuta", field_label: "Preferência pela terapeuta", data_type: "boolean" },
+  { api_name: "Origem_Marcacao", field_label: "Origem da marcação", data_type: "picklist", pick_list_values: ["-None-", "Backoffice", "Online", "Google"].map((v) => ({ display_value: v })) },
 ];
 function zoho(req, body, j, res, out) {
   const u = new URL(req.url, B);
@@ -83,6 +88,7 @@ function zoho(req, body, j, res, out) {
   if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : [])] });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
   if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
+  if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
   if (cam === "/Tratamentos_SPA" && req.method === "POST") { const m = { id: "t" + (Z.marcacoes.length + 1), ...j.data[0] }; Z.marcacoes.push(m); return out({ data: [{ status: "success", details: { id: m.id } }] }); }
   if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
     ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
@@ -349,23 +355,24 @@ try {
 
   // Módulo «Tratamentos»: as marcações passam a ser criadas lá e as horas ocupadas também vêm de lá
   Z.moduloTrat = true;
-  const semTrat = CAMPOS_TRAT.splice(2, 1);
+  const semData = CAMPOS_TRAT.splice(2, 1);
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
-  ok(pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("continuam em Reuniões") && !pg.txt.includes("Created_Time, datetime)</span></p><p><b>✓ Tratamentos: Início"), "sem campo do tratamento as marcações continuam em Reuniões; a hora de criação nunca é o início");
-  CAMPOS_TRAT.splice(2, 0, ...semTrat);
-  CAMPOS_TRAT.find((f) => f.api_name === "Tratamento").pick_list_values = [{ display_value: tz.nome }];
+  ok(pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("continuam em Reuniões") && !/Início<\/b><br><span class="nota">«Hora de criação/.test(pg.txt), "sem data do tratamento as marcações continuam em Reuniões; a hora de criação nunca é o início");
+  CAMPOS_TRAT.splice(2, 0, ...semData);
+  Z.produtos.push({ id: "p1", Product_Name: tz.nome });
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
-  ok(pg.txt.includes("✓ Módulo das marcações (Tratamentos)") && pg.txt.includes("Tratamentos: Terapeuta") && pg.txt.includes("tratamentos sem valor igual"), "verificação encontra o módulo Tratamentos e os seus campos");
-  Z.marcacoes.push({ id: "t0", Terapeuta: { id: "u1", name: "Luísa Pinto" }, Estado: "Agendado", Inicio: instanteLisboa(D, "19:00").iso, Fim: instanteLisboa(D, "20:00").iso },
-    { id: "tc", Terapeuta: { id: "u1", name: "Luísa Pinto" }, Estado: "Cancelado", Inicio: instanteLisboa(D, "08:00").iso, Fim: instanteLisboa(D, "09:00").iso });
+  ok(pg.txt.includes("✓ Módulo das marcações (Tratamentos)") && pg.txt.includes("«Data do tratamento» (Data_do_tratamento") && pg.txt.includes("«Hora fim do tratamento»") && pg.txt.includes("Profissionais_LC") && pg.txt.includes("«Notas da Sessao»"), "verificação liga início, fim, terapeuta (várias listas) e notas aos campos certos");
+  Z.marcacoes.push({ id: "t0", Terapeutas: ["Sofia Costa"], Profissionais_LC: ["Luísa Pinto"], Estado: "Agendado", Data_do_tratamento: instanteLisboa(D, "19:00").iso, Hora_fim_do_tratamento: instanteLisboa(D, "20:00").iso },
+    { id: "tc", Profissionais_LC: ["Luísa Pinto"], Estado: "Cancelado", Data_do_tratamento: instanteLisboa(D, "08:00").iso, Hora_fim_do_tratamento: instanteLisboa(D, "09:00").iso });
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
   ok(!r.j.livres[luisa.id][D].includes("19:00") && r.j.livres[luisa.id][D].includes("08:00"), "marcação no módulo Tratamentos ocupa a hora da terapeuta; a cancelada não");
   const nEv2 = Z.eventos.length;
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "18:00", qualquer: true, ...zc, metodo: "mb_way" });
   await notificar(r.j);
   const mz = Z.marcacoes.at(-1);
-  ok(Z.eventos.length === nEv2 && mz.Tratamento === tz.nome && mz.Terapeuta.id === "u1" && mz.Estado === "Agendado" && mz.Pagamento === "Efetuado" && mz.Origem_Marcacao === "Online"
-    && mz.Inicio === instanteLisboa(D, "18:00").iso && mz.Fim === instanteLisboa(D, "18:00", tz.duracao).iso && mz.Cliente.id && mz.Descricao.startsWith(r.j.numero + " · Origem online"), "marcação paga criada no módulo Tratamentos com tratamento, terapeuta, estado, pagamento e origem");
+  ok(Z.eventos.length === nEv2 && mz.Name === tz.nome && mz.Artigo.id === "p1" && !mz.Terapeutas && mz.Profissionais_LC[0] === "Luísa Pinto" && mz.Estado === "Agendado" && mz.Pagamento === "Efetuado"
+    && mz.Especialidade === "Spa" && mz.Valor === tz.preco && mz.Preferencia_Terapeuta === false && mz.Origem_Marcacao === "Online" && !("Created_Time" in mz)
+    && mz.Data_do_tratamento === instanteLisboa(D, "18:00").iso && mz.Hora_fim_do_tratamento === instanteLisboa(D, "18:00", tz.duracao).iso && mz.Cliente.id && mz.Notas_da_Sessao.startsWith(r.j.numero + " · Origem online"), "marcação paga criada no módulo Tratamentos nos campos do SPA (nome, artigo, profissional, estado, pagamento, especialidade, valor, notas)");
 
   console.log("\nTudo certo.");
 } finally {
