@@ -392,6 +392,12 @@ try {
   ok(avisoZ && avisoZ.html.includes("✗ Não ficou na agenda Zoho") && avisoZ.html.includes("✓ euPago OK") && avisoZ.html.includes("Moloni") && avisoZ.html.includes("✓ Email ao cliente enviado"), "email para reservas@ com o estado: agenda, euPago, Moloni e email ao cliente");
   pg = await pagina("/api/reservas");
   ok(pg.status === 200 && pg.txt.includes("Palavra-passe") && !pg.txt.includes(pz.numero), "página de reservas pede a palavra-passe");
+  process.env.BACKOFFICE_GITHUB_TOKEN = "github_pat_sessao";
+  pg = await pagina("/api/reservas", form("github_pat_sessao"));
+  ok(pg.txt.includes(pz.numero), "com a sessão do backoffice aberta, a página de reservas entra sem pedir a palavra-passe");
+  delete process.env.BACKOFFICE_GITHUB_TOKEN;
+  pg = await pagina("/api/reservas", form("github_pat_sessao"));
+  ok(!pg.txt.includes(pz.numero), "sem a chave do backoffice definida, essa chave não serve de palavra-passe");
   pg = await pagina("/api/reservas", form("senha-certa"));
   ok(pg.txt.includes(pz.numero) && pg.txt.includes("Carla Nova") && pg.txt.includes("913000000") && pg.txt.includes("✗ Não ficou na agenda Zoho") && pg.txt.includes("✓ euPago OK") && /\d+ com erro/.test(pg.txt), "página de reservas: cliente, contactos, estado de cada passo e erros à vista");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));

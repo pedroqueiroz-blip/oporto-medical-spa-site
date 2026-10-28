@@ -20,7 +20,9 @@ const pagina = (html, status = 200, { titulo = "Ligar ao Zoho CRM", largura = 38
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(${largura}px,calc(100vw - 32px));padding:24px 0;text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
   { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer" } });
 const resumo = (t) => createHash("sha256").update(String(t)).digest();
-const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD && dada) && timingSafeEqual(resumo(dada), resumo(process.env.BACKOFFICE_PASSWORD));
+// Palavra-passe do backoffice, ou a chave da sessão já aberta no /admin (botões «Reservas» e «Verificar ligações»).
+const igual = (dada, guardada) => Boolean(guardada && dada) && timingSafeEqual(resumo(dada), resumo(guardada));
+const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD) && (igual(dada, process.env.BACKOFFICE_PASSWORD) || igual(dada, process.env.BACKOFFICE_GITHUB_TOKEN));
 
 async function corpo(req) {
   const tipo = req.headers.get("content-type") || "";
