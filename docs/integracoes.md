@@ -19,6 +19,10 @@ euPago ── notificação ──> /api/eupago-notificacao
 Newsletter (Netlify Forms) ──> submission-created: código de 10% por email
 ```
 
+O email à equipa começa por um «Estado» com ✓/✗ para cada passo (reservado na agenda Zoho, euPago, fatura Moloni,
+email ao cliente) e os erros. A página `/api/reservas` (palavra-passe do backoffice, botão «Reservas» no /admin) mostra
+os últimos 50 pedidos com cliente, contactos, valor e o mesmo estado; os que têm erro ficam a vermelho.
+
 Código: `netlify/functions/` (rotas) e `servidor/` (euPago, Moloni ON, emails, códigos, pedidos).
 Os pedidos e os códigos ficam no Netlify Blobs. Teste completo com serviços simulados: `npm test`.
 

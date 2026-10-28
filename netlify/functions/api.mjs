@@ -5,6 +5,8 @@ import { pagar, notificacao } from "../../servidor/fluxo.mjs";
 import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, ErroAgenda } from "../../servidor/agenda.mjs";
 import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
+import { estados, simbolo, ultimosPedidos } from "../../servidor/estado.mjs";
+import { dataPT } from "../../servidor/datas.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -13,9 +15,9 @@ export const config = { path: "/api/*" };
 const json = (dados, status = 200) => new Response(JSON.stringify(dados), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const pausa = (ms) => new Promise((r) => setTimeout(r, ms)); // trava tentativas de códigos em série
 
-// Página simples (ligação ao Zoho CRM), nas cores da marca.
-const pagina = (html, status = 200) => new Response(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Ligar ao Zoho CRM</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(380px,calc(100vw - 32px));text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
+// Página simples (Zoho CRM, reservas), nas cores da marca.
+const pagina = (html, status = 200, { titulo = "Ligar ao Zoho CRM", largura = 380 } = {}) => new Response(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${titulo}</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(${largura}px,calc(100vw - 32px));padding:24px 0;text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
   { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer" } });
 const resumo = (t) => createHash("sha256").update(String(t)).digest();
 const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD && dada) && timingSafeEqual(resumo(dada), resumo(process.env.BACKOFFICE_PASSWORD));
@@ -82,6 +84,33 @@ export default async (req) => {
       };
       return pagina(`<h1>Verificação do Zoho CRM</h1>${aviso ? `<p class="${aviso.startsWith("✓") ? "nota" : "erro"}">${aviso}</p>` : ""}<div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}
 <h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Últimas marcações do site</h2>${marc.length ? marc.map(linhaMarc).join("") : `<p class="nota">Ainda não há marcações.</p>`}</div>`);
+    }
+
+    // Reservas (backoffice): últimas marcações e vouchers com cliente, contactos, valor e o estado de cada passo,
+    // erros incluídos (Pedro, 28/10/2026). Protegida pela palavra-passe do backoffice.
+    if (rota === "/reservas") {
+      const form = m === "POST" ? new URLSearchParams(await req.text()) : new URLSearchParams();
+      const opc = { titulo: "Reservas · Oporto Medical Spa" };
+      if (!process.env.BACKOFFICE_PASSWORD) return pagina(`<h1>Reservas</h1><p>Falta a palavra-passe do backoffice (BACKOFFICE_PASSWORD) no Netlify, que protege esta página.</p>`, 200, opc);
+      if (!senhaCerta(form.get("senha") || "")) {
+        if (m === "POST") await pausa(1500);
+        return pagina(`<h1>Reservas</h1><p class="nota">Últimas marcações e vouchers do site, com o pagamento, a fatura e a agenda.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" autocomplete="current-password" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Entrar</button></form>`, m === "POST" ? 401 : 200, opc);
+      }
+      const e = (x) => String(x ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      const lista = await ultimosPedidos(50);
+      const cor = (ok) => (ok === false ? "#E0A58C" : ok ? "#A8C99A" : "rgba(232,220,200,.6)");
+      const cartao = (p) => {
+        const st = estados(p), erro = st.some((x) => x.ok === false);
+        const quando = p.marcacao ? `${dataPT(p.marcacao.data, { semana: true })}, ${p.marcacao.hora}` : `Voucher${p.voucher?.para ? ` para ${p.voucher.para}` : ""}`;
+        return `<div style="text-align:left;border:1px solid ${erro ? "#E0A58C" : "rgba(232,220,200,.2)"};border-radius:6px;padding:14px 16px;margin:12px 0">
+<p style="margin:0"><b>${e(quando)}</b> · ${e(p.tratamento?.nome)}${p.marcacao?.terapeuta ? ` · ${e(p.marcacao.terapeuta)}` : ""}</p>
+<p class="nota" style="margin:2px 0 8px">${e(p.numero)} · pedido a ${e(String(p.criado || "").slice(0, 16).replace("T", " "))} · ${p.total > 0 ? `${e(Number(p.total).toFixed(2))} €` : "0 €"}${p.codigo ? ` (${e(p.codigo.texto)})` : ""}</p>
+<p style="margin:0 0 8px">${e(p.cliente?.nome)} · <a href="mailto:${e(p.cliente?.email)}" style="color:inherit">${e(p.cliente?.email)}</a> · <a href="tel:${e(String(p.cliente?.telefone || "").replace(/\s/g, ""))}" style="color:inherit">${e(p.cliente?.telefone)}</a>${p.cliente?.nif ? ` · NIF ${e(p.cliente.nif)}` : ""}</p>
+${st.map((x) => `<div style="font-size:13px;color:${cor(x.ok)}">${simbolo(x.ok)} ${e(x.texto)}</div>`).join("")}</div>`;
+      };
+      const comErro = lista.filter((p) => estados(p).some((x) => x.ok === false)).length;
+      return pagina(`<h1>Reservas</h1><p class="nota">${lista.length} pedidos mais recentes${comErro ? ` · <span class="erro">${comErro} com erro (a vermelho)</span>` : " · sem erros"}. ✓ feito · ✗ erro a resolver · … a aguardar.</p>
+${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há pedidos.</p>`}`, 200, { ...opc, largura: 720 });
     }
 
     if (rota === "/zoho/retorno" && m === "GET") {

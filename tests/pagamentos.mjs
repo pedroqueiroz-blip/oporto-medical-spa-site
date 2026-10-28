@@ -386,6 +386,12 @@ try {
   await notificar(r.j);
   const pz = await obter(r.j.numero);
   ok(pz.estado === "pago" && /required/.test(pz.zoho.erro) && S.emails.some((e) => e.subject.includes(pz.numero) && e.html.includes("Marcar à mão")), "falha no CRM não trava o pagamento e a equipa é avisada");
+  const avisoZ = S.emails.find((e) => e.subject.includes(pz.numero) && e.to[0] === "reservas@oportomedicalspa.com");
+  ok(avisoZ && avisoZ.html.includes("✗ Não ficou na agenda Zoho") && avisoZ.html.includes("✓ euPago OK") && avisoZ.html.includes("Moloni") && avisoZ.html.includes("✓ Email ao cliente enviado"), "email para reservas@ com o estado: agenda, euPago, Moloni e email ao cliente");
+  pg = await pagina("/api/reservas");
+  ok(pg.status === 200 && pg.txt.includes("Palavra-passe") && !pg.txt.includes(pz.numero), "página de reservas pede a palavra-passe");
+  pg = await pagina("/api/reservas", form("senha-certa"));
+  ok(pg.txt.includes(pz.numero) && pg.txt.includes("Carla Nova") && pg.txt.includes("913000000") && pg.txt.includes("✗ Não ficou na agenda Zoho") && pg.txt.includes("✓ euPago OK") && /\d+ com erro/.test(pg.txt), "página de reservas: cliente, contactos, estado de cada passo e erros à vista");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
   Z.falhaMarcacao = false;
