@@ -1,20 +1,7 @@
 {
-  "ordem": 140,
-  "id": "rosto-hidratacao",
-  "nome": "Tratamento Rosto - Hidratação Profunda",
-  "nome_completo": "Tratamento Rosto Hidratação Profunda",
-  "grupo": "Relaxar",
-  "tipo_servico": "Tratamento de rosto",
   "texto": "Hidratação intensiva e ação antioxidante para uma pele suave, luminosa e revitalizada.",
-  "texto_massagens": "",
   "descricao_seo": "Hidratação intensiva e ação antioxidante para uma pele suave, luminosa e revitalizada.",
-  "indicado_para": "Desidratação, pele baça, falta de luminosidade",
-  "como_e": "Limpeza, sérum antioxidante e máscara hidratante",
-  "pressao": "",
-  "duracao": 60,
-  "preco": 50,
-  "visivel": true,
-  "artigo": "o",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Deep Hydration Facial",
     "nome_completo": "Deep Hydration Facial",
@@ -23,5 +10,18 @@
     "como_e": "Cleansing, antioxidant serum and hydrating mask",
     "tipo_servico": "Facial treatment",
     "descricao_seo": "Intensive hydration and antioxidant action for soft, radiant and revitalised skin."
-  }
+  },
+  "ordem": 140,
+  "nome_completo": "Tratamento Rosto Hidratação Profunda",
+  "indicado_para": "Desidratação, pele baça, falta de luminosidade",
+  "artigo": "o",
+  "preco": 50,
+  "duracao": 60,
+  "pressao": "suave",
+  "texto_massagens": "",
+  "tipo_servico": "Tratamento de rosto",
+  "visivel": true,
+  "como_e": "Limpeza, sérum antioxidante e máscara hidratante",
+  "nome": "Tratamento Rosto - Hidratação Profunda",
+  "id": "rosto-hidratacao"
 }

@@ -20,9 +20,9 @@
     ]
   },
   "ordem": 10,
-  "confirmado": false,
-  "funcao": "Fisioterapeuta e osteopata",
-  "foco": "Fisioterapia. Osteopatia. Pilates Clinico e com Aparelhos.",
+  "confirmado": true,
+  "funcao": "Fisiotetapeuta",
+  "foco": "Fisioterapia. Osteopatia. Pilates Clinico e com Aparelhos. Relaxamento.",
   "nome": "Luísa Pinto",
   "id": "luisa",
   "faz": [

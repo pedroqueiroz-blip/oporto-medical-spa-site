@@ -1,20 +1,7 @@
 {
-  "ordem": 90,
-  "id": "indian-head",
-  "nome": "Indian Head Therapy",
-  "nome_completo": "Indian Head Therapy",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem de relaxamento",
   "texto": "Massagem indiana ao couro cabeludo para aliviar tensões, stress e promover serenidade mental.",
-  "texto_massagens": "",
   "descricao_seo": "Massagem indiana ao couro cabeludo para aliviar tensões, stress e promover serenidade mental.",
-  "indicado_para": "Dores de cabeça, cansaço mental",
-  "como_e": "Toques suaves e pressões",
-  "pressao": "",
-  "duracao": 30,
-  "preco": 35,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Indian Head Therapy",
     "nome_completo": "Indian Head Therapy",
@@ -23,5 +10,18 @@
     "como_e": "Gentle touch and pressure",
     "tipo_servico": "Relaxation massage",
     "descricao_seo": "An Indian scalp massage to relieve tension and stress and promote mental calm."
-  }
+  },
+  "ordem": 90,
+  "nome_completo": "Indian Head Therapy",
+  "indicado_para": "Dores de cabeça, cansaço mental",
+  "artigo": "a",
+  "preco": 35,
+  "duracao": 30,
+  "pressao": "suave",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem de relaxamento",
+  "visivel": true,
+  "como_e": "Toques suaves e pressões",
+  "nome": "Indian Head Therapy",
+  "id": "indian-head"
 }
