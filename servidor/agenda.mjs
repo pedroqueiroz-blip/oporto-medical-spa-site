@@ -93,7 +93,7 @@ export async function disponibilidade({ tratamento: id, de, dias = 14 }) {
   return { fonte: "zoho", livres, semAgenda: equipa.filter((p) => !p.agenda).map((p) => p.nome) };
 }
 
-// Antes de pagar: confirma que a hora continua livre e escolhe a pessoa («Sem preferência» = a primeira livre).
+// Antes de pagar: confirma que a hora continua livre e escolhe a pessoa («Sem preferência» = a livre com menos marcações no dia).
 export async function confirmarHora(p, { terapeutaId, qualquer }) {
   if (p.tipo !== "marcacao" || !(await zohoLigado()) || !(await moduloPronto())) return;
   const { data, hora } = p.marcacao, dur = Number(p.tratamento.duracao) || 60;
@@ -101,7 +101,10 @@ export async function confirmarHora(p, { terapeutaId, qualquer }) {
   const candidatos = qualquer || !terapeutaId ? equipa : equipa.filter((x) => x.id === terapeutaId);
   if (!candidatos.length) throw new ErroAgenda("Esta pessoa não tem agenda online para este tratamento. Escolha outra ou «Sem preferência».");
   const evs = [...await ocupacoes(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso), ...await guardadas(p.cliente.email)];
-  const escolhida = candidatos.find((x) => livre(evs, x, data, hora, dur));
+  // «Sem preferência»: das livres a essa hora, a que tem menos marcações nesse dia; empate à sorte (Pedro, 28/10/2026).
+  const marcacoesDia = (x) => new Set(evs.filter((e) => dela(e, x)).map((e) => `${e.inicio}-${e.fim}`)).size;
+  const livres = candidatos.filter((x) => livre(evs, x, data, hora, dur)).map((x) => ({ x, n: marcacoesDia(x), sorte: Math.random() }));
+  const escolhida = livres.sort((a, b) => a.n - b.n || a.sorte - b.sorte)[0]?.x;
   if (!escolhida) throw new ErroAgenda("Esta hora acabou de ser ocupada. Escolha outra, por favor.");
   p.marcacao.terapeuta = escolhida.nome;
   p.marcacao.terapeutaId = escolhida.id;
