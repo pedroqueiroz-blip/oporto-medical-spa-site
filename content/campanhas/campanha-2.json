@@ -6,7 +6,7 @@
     "Técnicas manuais. Relaxamento profundo. Alívio de tensões",
     "Aromaterapia (óleos essenciais)"
   ],
-  "inicio": "2026-11-01",
+  "inicio": "",
   "titulo_destaque": "Aromaterapia",
   "en": {
     "etiqueta": "Offer of the month",
@@ -19,7 +19,7 @@
     ]
   },
   "ordem": 20,
-  "fim": "2026-12-31",
+  "fim": "",
   "assinatura": "Óleos quentes essenciais",
   "preco": 45,
   "duracao": 60,
