@@ -1,20 +1,7 @@
 {
-  "ordem": 20,
-  "id": "aroma",
-  "nome": "Aromaterapia",
-  "nome_completo": "Massagem Manual com Aromaterapia",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem de relaxamento",
   "texto": "Óleos essenciais e movimentos suaves para libertar tensões e recuperar a serenidade.",
-  "texto_massagens": "",
   "descricao_seo": "Óleos essenciais e movimentos suaves para libertar tensões e recuperar a serenidade.",
-  "indicado_para": "Stress, cansaço, relaxamento",
-  "como_e": "Massagem suave com óleos essenciais",
-  "pressao": "Suave",
-  "duracao": 60,
-  "preco": 65,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Aromatherapy",
     "nome_completo": "Aromatherapy Massage",
@@ -24,5 +11,18 @@
     "tipo_servico": "Relaxation massage",
     "descricao_seo": "Essential oils and gentle movements to release tension and restore serenity.",
     "pressao": "Light"
-  }
+  },
+  "ordem": 20,
+  "nome_completo": "Massagem Manual com Aromaterapia",
+  "indicado_para": "Stress, cansaço, relaxamento",
+  "artigo": "a",
+  "preco": 65,
+  "duracao": 60,
+  "pressao": "Suave a moderada",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem de relaxamento",
+  "visivel": true,
+  "como_e": "Massagem suave com óleos essenciais",
+  "nome": "Aromaterapia",
+  "id": "aroma"
 }
