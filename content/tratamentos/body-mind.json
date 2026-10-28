@@ -1,20 +1,7 @@
 {
-  "ordem": 130,
-  "id": "body-mind",
-  "nome": "Ritual Oporto Body & Mind",
-  "nome_completo": "Ritual Oporto Body & Mind (2 Massagens com Aromaterapia)",
-  "grupo": "Relaxar",
-  "tipo_servico": "Ritual de spa a dois",
   "texto": "Um momento perfeito para ser partilhado a dois.",
-  "texto_massagens": "",
   "descricao_seo": "Um momento perfeito para ser partilhado a dois.",
-  "indicado_para": "Relaxamento a dois, partilha e sintonia",
-  "como_e": "Duas massagens com aromaterapia",
-  "pressao": "",
-  "duracao": 60,
-  "preco": 110,
-  "visivel": true,
-  "artigo": "o",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Oporto Body & Mind Ritual",
     "nome_completo": "Oporto Body & Mind Ritual (2 Aromatherapy Massages)",
@@ -23,5 +10,18 @@
     "como_e": "Two aromatherapy massages",
     "tipo_servico": "Spa ritual for two",
     "descricao_seo": "A perfect moment to share for two."
-  }
+  },
+  "ordem": 130,
+  "nome_completo": "Ritual Oporto Body & Mind (2 Massagens com Aromaterapia)",
+  "indicado_para": "Relaxamento a dois, partilha e sintonia",
+  "artigo": "o",
+  "preco": 110,
+  "duracao": 60,
+  "pressao": "suave a moderada",
+  "texto_massagens": "",
+  "tipo_servico": "Ritual de spa a dois",
+  "visivel": true,
+  "como_e": "Duas massagens com aromaterapia",
+  "nome": "Ritual Oporto Body & Mind",
+  "id": "body-mind"
 }
