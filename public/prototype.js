@@ -82,7 +82,7 @@
     var a = AGENDA[treatment];
     if (a && a.loading) return true;
     if (a && a.fonte === 'zoho') return ((a.livres[therapistId] || {})[isoDay(day)] || []).indexOf(hour) < 0;
-    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && hour > '13:00');
+    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && (hour < '09:00' || hour > '13:00'));
   }
   function freeFor(day, hour, treatment) {
     return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id, treatment); });
@@ -217,7 +217,7 @@
         '<label class="field"><span>' + L('Telemóvel', 'Mobile') + '</span><input id="bk-phone" type="tel" autocomplete="tel" value="' + esc(s.phone) + '" required></label>' +
         '<label class="field"><span>' + L('NIF para a fatura (opcional)', 'Tax number (NIF) for the invoice (optional)') + '</span><input id="bk-nif" inputmode="numeric" maxlength="9" value="' + esc(s.nif) + '"></label>' +
         '<label class="field field--check"><input id="bk-voucher" type="checkbox"' + (s.hasVoucher ? ' checked' : '') + '><span>' + L('Tenho um voucher para usar', 'I have a voucher to use') + '</span></label>' +
-        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>' + L('Código do voucher ou VIP', 'Voucher or VIP code') + '</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
+        (s.hasVoucher ? '<div class="pg-codigo"><label class="field"><span>' + L('Código do voucher', 'Voucher code') + '</span><input id="bk-vcod" autocomplete="off" autocapitalize="characters" placeholder="OMS-XXXX-XXXX" value="' + esc(s.vcod) + '"></label>' +
           '<button type="button" class="btn btn--ghost" data-vapply>' + L('Aplicar', 'Apply') + '</button></div>' +
           (s.vmsg ? '<p class="' + (s.conta ? 'bk-note' : 'bk-error') + '" role="status">' + esc(s.vmsg) + '</p>' : '') : '') +
         '<p class="bk-error" role="alert" hidden>' + L('Indique o seu nome, um email válido e o telemóvel para recebermos a marcação. O NIF, se o indicar, tem 9 dígitos.', 'Please enter your name, a valid email address and your mobile number so we can take your booking. The tax number (NIF), if you give one, has 9 digits.') + '</p>' +

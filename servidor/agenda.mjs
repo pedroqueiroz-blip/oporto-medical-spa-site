@@ -10,11 +10,11 @@ import { store, STORES } from "./store.mjs";
 
 export class ErroAgenda extends Error {}
 
-// As mesmas horas que a agenda do site mostra (public/prototype.js): encerra ao domingo e ao sábado à tarde.
+// As mesmas horas que a agenda do site mostra (public/prototype.js): encerra ao domingo; ao sábado abre às 9:00 (Pedro, 27/10/2026) e fecha à tarde.
 export const HORAS = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
 const ANTECEDENCIA = 60 * 60e3; // não se marca para daqui a menos de uma hora
 const diaSemana = (data) => new Date(`${data}T12:00:00Z`).getUTCDay();
-const aberto = (data, hora) => diaSemana(data) !== 0 && !(diaSemana(data) === 6 && hora > "13:00");
+const aberto = (data, hora) => diaSemana(data) !== 0 && !(diaSemana(data) === 6 && (hora < "09:00" || hora > "13:00"));
 const simples = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 const somarDias = (data, n) => new Date(Date.parse(`${data}T12:00:00Z`) + n * 864e5).toISOString().slice(0, 10);
 
