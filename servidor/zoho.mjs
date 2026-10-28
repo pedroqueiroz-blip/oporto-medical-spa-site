@@ -335,6 +335,26 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
     }
   } catch (e) { add(false, "Módulo das marcações (Tratamentos)", e.message); }
 
+  // Módulo «Prestadores» (horário de trabalho de cada colaboradora): por agora só se mostra como está
+  // guardado, para ligar o horário às horas livres do site.
+  try {
+    const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+    const m = mods.find((x) => /prestador/.test(simples(`${x.plural_label} ${x.singular_label} ${x.api_name}`)));
+    if (!m) add(false, "Módulo Prestadores", `Não encontrado. Módulos: ${mods.map((x) => `${x.plural_label || x.module_name} (${x.api_name})`).join(", ")}`);
+    else {
+      const campos = ((await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || []).map(resumo).filter((f) => !SISTEMA.test(f.api));
+      const txt = (f) => `«${f.rotulo}» (${f.api}, ${f.tipo}${f.valores.length ? `: ${f.valores.join(" / ")}` : ""}${f.modulo ? ` → ${f.modulo}` : ""})`;
+      add(true, `Prestadores (${m.api_name}): campos`, campos.map(txt).join("; "));
+      const vazio = (v) => v == null || v === "" || v === false || (Array.isArray(v) && !v.length);
+      for (const p of equipa) {
+        const r = ((await crm("GET", `/${m.api_name}/search?word=${encodeURIComponent(p.nome)}`))?.data || [])[0];
+        const reg = r ? (await crm("GET", `/${m.api_name}/${r.id}`))?.data?.[0] || r : null;
+        const valores = reg ? Object.entries(reg).filter(([k, v]) => !SISTEMA.test(k) && !k.startsWith("$") && k !== "id" && !vazio(v)).map(([k, v]) => `${k}: ${typeof v === "object" ? JSON.stringify(v) : v}`).join("; ") : "";
+        add(Boolean(reg), `Prestadores: ${p.nome}`, reg ? valores.slice(0, 3000) : "Sem registo com este nome.");
+      }
+    }
+  } catch (e) { add(false, "Módulo Prestadores", e.message); }
+
   // Equipa do site ↔ utilizadores do CRM
   try {
     const us = await utilizadores();

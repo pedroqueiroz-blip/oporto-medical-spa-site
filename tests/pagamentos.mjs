@@ -85,7 +85,10 @@ function zoho(req, body, j, res, out) {
   const cam = u.pathname.replace("/zoho/api/crm/v6", "");
   if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
   if (cam === "/users") return out({ users: Z.users });
-  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : [])] });
+  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : []), { api_name: "Prestadores", plural_label: "Prestadores" }] });
+  if (cam === "/settings/fields" && u.searchParams.get("module") === "Prestadores") return out({ fields: [{ api_name: "Name", field_label: "Nome", data_type: "text" }, { api_name: "Horario", field_label: "Horário", data_type: "textarea" }] });
+  if (cam === "/Prestadores/search") return u.searchParams.get("word") === "Luísa Pinto" ? out({ data: [{ id: "pr1", Name: "Luísa Pinto" }] }) : (res.statusCode = 204, res.end());
+  if (cam === "/Prestadores/pr1") return out({ data: [{ id: "pr1", Name: "Luísa Pinto", Horario: "Seg-Sex 9-18", Created_Time: "x" }] });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
   if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
   if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
@@ -307,6 +310,7 @@ try {
   ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Reuniões (Events)") && pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("não entram no Zoho"), "verificação pelos metadados: campo do NIF, Reuniões e falta do módulo Tratamentos");
+  ok(pg.txt.includes("Prestadores (Prestadores): campos") && pg.txt.includes("Horario: Seg-Sex 9-18") && !pg.txt.includes("Created_Time: x") && pg.txt.includes("✗ Prestadores: Beatriz Pena"), "verificação mostra os campos e o registo de cada colaboradora no módulo Prestadores");
 
   // Dia útil daqui a 3+ dias
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
