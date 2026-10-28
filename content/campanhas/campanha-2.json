@@ -3,21 +3,11 @@
   "ativa": true,
   "texto": "Massagem relaxante que combina técnicas manuais e aromaterapia para aliviar tensões, reduzir o stress e promover uma profunda sensação de bem-estar.",
   "inclui": [
-    "Técnicas manuais, Aromaterapia. Relaxamento profundo. Alívio de tensões"
+    "Técnicas manuais. Relaxamento profundo. Alívio de tensões",
+    "Aromaterapia (óleos essenciais)"
   ],
   "inicio": "",
   "titulo_destaque": "Aromaterapia",
-  "ordem": 20,
-  "fim": "",
-  "assinatura": "Óleos quentes essenciais",
-  "preco": 45,
-  "duracao": 60,
-  "imagem": "/img/uploads/massagem-facial-cabeca-spa-porto.jpg",
-  "etiqueta": "Campanha do mês",
-  "selo_em_campanha": true,
-  "titulo": "Massagem Manual com",
-  "preco_antigo": 65,
-  "imagem_alt": "",
   "en": {
     "etiqueta": "Offer of the month",
     "titulo": "Massage with",
@@ -27,5 +17,16 @@
     "inclui": [
       "Manual techniques, aromatherapy. Deep relaxation. Tension relief"
     ]
-  }
+  },
+  "ordem": 20,
+  "fim": "",
+  "assinatura": "Óleos quentes essenciais",
+  "preco": 45,
+  "duracao": 60,
+  "imagem": "/img/uploads/massagem-facial-cabeca-spa-porto.jpg",
+  "etiqueta": "Destaque do mês | Campanha de natal",
+  "selo_em_campanha": true,
+  "titulo": "Massagem Manual com",
+  "preco_antigo": 65,
+  "imagem_alt": ""
 }
