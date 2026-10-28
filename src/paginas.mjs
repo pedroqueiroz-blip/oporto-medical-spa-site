@@ -44,11 +44,11 @@ function campaignBlock(m, c, extra) {
     : c.tratamento ? `<button type="button" class="btn btn--primary" data-book="${esc(c.tratamento)}">${esc(c.botao || m.t('Reservar'))}</button>` : `<a class="btn btn--primary" href="#reservar">${esc(c.botao || m.t('Reservar'))}</a>`;
   const cond = (c.condicoes || []).filter(Boolean);
   const h = extra ? 'h3' : 'h2';
-  return `<div class="wrap split camp-split${extra ? ' camp-extra' : ''}">
+  return `<div class="wrap split${extra ? ' camp-extra' : ''}">
       ${img}
-      <div class="camp-body" style="display:grid;gap:24px">
-        ${c.etiqueta ? '<p class="kicker camp-head" style="margin:0">' + esc(c.etiqueta) + '</p>' : ''}
-        <${h} class="d sig-title camp-head">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</${h}>
+      <div style="display:grid;gap:24px">
+        ${c.etiqueta ? '<p class="kicker" style="margin:0">' + esc(c.etiqueta) + '</p>' : ''}
+        <${h} class="d sig-title">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</${h}>
         ${c.texto ? '<p style="margin:0;font-size:18px;max-width:46ch">' + t.inline(c.texto) + '</p>' : ''}
         ${c.selo ? `<p class="sig-seal"><span class="sig-seal__r" aria-hidden="true">®</span><span>${esc(c.selo_texto)}<br><b>${esc(c.selo_numero)}</b></span></p>` : ''}
         ${items.length ? '<ul>\n          ' + items.join('\n          ') + '\n        </ul>' : ''}
