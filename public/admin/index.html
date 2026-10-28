@@ -99,8 +99,11 @@
   .entrar .erro { min-height: 20px; margin: 10px 0 0; color: #E0A58C; font-size: 13px; }
   .entrar button { margin-top: 6px; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 0; border-radius: 999px; background: var(--linen); color: var(--night); font: 600 12px var(--body); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
   .entrar button:disabled { opacity: .6; }
-  .verificar { position: fixed; left: 16px; bottom: 14px; z-index: 50; padding: 6px 14px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 0 var(--line); color: var(--muted) !important; font-size: 12px; text-decoration: none; }
-  .verificar:hover { color: var(--night) !important; }
+  /* Atalhos da equipa, sempre à vista no canto: reservas do site e verificação das ligações */
+  .atalhos { position: fixed; left: 16px; bottom: 16px; z-index: 900; display: flex; flex-wrap: wrap; gap: 8px; }
+  .atalhos a { padding: 9px 18px; border-radius: 999px; background: var(--night); border: 1px solid var(--flame); color: var(--linen) !important; font: 500 13px var(--body); letter-spacing: .02em; text-decoration: none; box-shadow: 0 8px 24px -12px rgba(13, 10, 8, .6); }
+  .atalhos a:first-child { background: var(--flame); color: var(--night) !important; }
+  .atalhos a:hover { border-color: var(--linen); }
 </style>
 </head>
 <body>
@@ -110,8 +113,10 @@
   <p class="erro" aria-live="polite"></p>
   <button type="submit">Entrar</button>
 </form>
-<a class="verificar" href="/admin-verificar" target="_blank" rel="noopener">Verificar ligações</a>
-<a class="verificar" style="left:170px" href="/api/reservas" target="_blank" rel="noopener">Reservas</a>
+<nav class="atalhos" aria-label="Atalhos">
+  <a href="/api/reservas" target="_blank" rel="noopener">Reservas</a>
+  <a href="/admin-verificar" target="_blank" rel="noopener">Verificar ligações</a>
+</nav>
 <script>window.CMS_MANUAL_INIT = true;</script>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>
