@@ -4,6 +4,7 @@
 // ZOHO_CLIENT_SECRET no Netlify, o site continua com a agenda simulada e as marcações seguem por email.
 import crypto from "node:crypto";
 import { store, STORES } from "./store.mjs";
+import { lerHorario, descreverHorario } from "./horario.mjs";
 
 const CONTAS = () => (process.env.ZOHO_ACCOUNTS_BASE || "https://accounts.zoho.eu").replace(/\/$/, "");
 export const ESCOPOS = "ZohoCRM.modules.ALL,ZohoCRM.users.READ,ZohoCRM.coql.READ,ZohoCRM.settings.modules.READ,ZohoCRM.settings.fields.READ";
@@ -258,6 +259,27 @@ export async function ocupacoes(de, ate) {
   return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate) : [])];
 }
 
+/* ---------- Módulo «Prestadores» (horário de cada colaboradora) ---------- */
+
+// Cada colaboradora tem no módulo Prestadores o «Horário padrão» (texto, ver horario.mjs) e se está «Ativo»
+// (Pedro, 28/10/2026). As horas livres do site são esse horário menos as marcações. Sem o módulo, devolve null.
+export async function prestadores() {
+  const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+  const m = mods.find((x) => /prestador/.test(simples(`${x.plural_label} ${x.singular_label} ${x.api_name}`)));
+  if (!m) return null;
+  const campos = ((await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || []).map(resumo).filter((f) => !SISTEMA.test(f.api));
+  const horario = campos.find((f) => /horario/.test(simples(`${f.rotulo} ${f.api}`)) && /text/.test(f.tipo));
+  const ativo = campos.find((f) => simples(f.rotulo) === "ativo" || f.api === "Ativo");
+  const cols = ["Name", horario?.api, ativo?.api].filter(Boolean);
+  const lista = [];
+  for (let page = 1; page <= 10; page++) {
+    const j = await crm("GET", `/${m.api_name}?fields=${cols.join(",")}&per_page=200&page=${page}`);
+    lista.push(...(j?.data || []).map((r) => ({ nome: r.Name || "", texto: horario ? r[horario.api] || "" : "", ativo: ativo ? r[ativo.api] !== false : true })));
+    if (!j?.info?.more_records) break;
+  }
+  return { modulo: m.api_name, campos, horario, ativo, lista: lista.map((x) => ({ ...x, ...lerHorario(x.texto) })) };
+}
+
 /* ---------- Verificação pela API de metadados ---------- */
 
 // Confere no CRM real o que a integração precisa: módulos, campo do NIF, campos da agenda, utilizadores
@@ -334,6 +356,23 @@ export async function verificarCRM(equipa = [], tratamentos = []) {
       add(true, `${mm.nomeModulo}: todos os campos`, mm.todos.map(txt).join("; "));
     }
   } catch (e) { add(false, "Módulo das marcações (Tratamentos)", e.message); }
+
+  // Módulo «Prestadores»: horário de cada colaboradora, que limita as horas livres do site
+  try {
+    const pr = await prestadores();
+    if (!pr) add(false, "Módulo Prestadores", "Não encontrado: as horas livres do site seguem só o horário do SPA e as marcações.");
+    else {
+      const txt = (f) => `«${f.rotulo}» (${f.api}, ${f.tipo})`;
+      add(Boolean(pr.horario), `Prestadores (${pr.modulo}): horário`, pr.horario ? `Lido de ${txt(pr.horario)}${pr.ativo ? `; só entra quem tiver ${txt(pr.ativo)}` : ""}.` : `Não há um campo de horário. Campos: ${pr.campos.map(txt).join("; ")}`);
+      for (const p of equipa) {
+        const r = pr.lista.find((x) => simples(x.nome) === simples(p.nome));
+        if (!r) add(false, `Prestadores: ${p.nome}`, "Sem registo com este nome: as horas livres dela seguem só o horário do SPA.");
+        else if (!r.ativo) add(false, `Prestadores: ${p.nome}`, "Não está ativa: fica fora da agenda online.");
+        else if (!r.regras.length) add(false, `Prestadores: ${p.nome}`, `${r.texto ? `Não consegui ler «${r.texto}»` : "Horário padrão vazio"}: as horas livres dela seguem só o horário do SPA. Escreva, por exemplo, «seg-sex 09:00-18:00; sab 09:00-13:00 quinzenal 14-11-2026».`);
+        else add(!r.erros.length, `Prestadores: ${p.nome}`, `${r.texto} → ${descreverHorario(r.regras)}${r.erros.length ? `. Não lido: ${r.erros.join("; ")}` : ""}`);
+      }
+    }
+  } catch (e) { add(false, "Módulo Prestadores", e.message); }
 
   // Equipa do site ↔ utilizadores do CRM
   try {
