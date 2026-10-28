@@ -20,8 +20,8 @@ local_backend: true
 publish_mode: editorial_workflow
 locale: pt
 logo_url: /logo-beige.svg
-site_url: https://www.oportomedicalspa.com
-display_url: https://www.oportomedicalspa.com
+site_url: https://oportomedicalspa.netlify.app
+display_url: https://oportomedicalspa.netlify.app
 
 media_folder: public/img/uploads
 public_folder: /img/uploads
