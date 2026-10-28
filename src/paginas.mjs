@@ -44,11 +44,11 @@ function campaignBlock(m, c, extra) {
     : c.tratamento ? `<button type="button" class="btn btn--primary" data-book="${esc(c.tratamento)}">${esc(c.botao || m.t('Reservar'))}</button>` : `<a class="btn btn--primary" href="#reservar">${esc(c.botao || m.t('Reservar'))}</a>`;
   const cond = (c.condicoes || []).filter(Boolean);
   const h = extra ? 'h3' : 'h2';
-  return `<div class="wrap split${extra ? ' camp-extra' : ''}">
+  return `<div class="wrap split camp-split${extra ? ' camp-extra' : ''}">
       ${img}
-      <div style="display:grid;gap:24px">
-        ${c.etiqueta ? '<p class="kicker" style="margin:0">' + esc(c.etiqueta) + '</p>' : ''}
-        <${h} class="d sig-title">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</${h}>
+      <div class="camp-body" style="display:grid;gap:24px">
+        ${c.etiqueta ? '<p class="kicker camp-head" style="margin:0">' + esc(c.etiqueta) + '</p>' : ''}
+        <${h} class="d sig-title camp-head">${title(c.titulo, c.titulo_destaque)}${c.assinatura ? '<span class="sig-by">' + esc(c.assinatura) + '</span>' : ''}</${h}>
         ${c.texto ? '<p style="margin:0;font-size:18px;max-width:46ch">' + t.inline(c.texto) + '</p>' : ''}
         ${c.selo ? `<p class="sig-seal"><span class="sig-seal__r" aria-hidden="true">®</span><span>${esc(c.selo_texto)}<br><b>${esc(c.selo_numero)}</b></span></p>` : ''}
         ${items.length ? '<ul>\n          ' + items.join('\n          ') + '\n        </ul>' : ''}
@@ -96,9 +96,9 @@ export function home(m) {
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
   const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
-          <h3>${esc(x.nome)}${x.id === m.campaignTreatment ? ' <a class="camp-badge" href="#campanha">' + m.t('Em campanha') + '</a>' : ''}</h3>
+          <h3>${esc(x.nome)}${m.inCampaign(x.id) ? ' <a class="camp-badge" href="#campanha">' + m.t('Em campanha') + '</a>' : ''}</h3>
           <p>${t.inline(x.texto)}</p>
-          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${x.id === m.campaignTreatment && m.campaignPrice && m.campaignPrice !== x.preco ? '<b class="price-camp">' + eur(m.campaignPrice) + '<s><span class="sr-only">' + m.t('Preço normal') + ' </span>' + eur(x.preco) + '</s></b>' : eur(x.preco)}</p>
+          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${m.inCampaign(x.id) && m.campaignPrice(x.id) && m.campaignPrice(x.id) !== x.preco ? '<b class="price-camp">' + eur(m.campaignPrice(x.id)) + '<s><span class="sr-only">' + m.t('Preço normal') + ' </span>' + eur(x.preco) + '</s></b>' : eur(x.preco)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button>
         </article>`;
   /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */
@@ -116,7 +116,7 @@ export function home(m) {
   const pillars = (I.casa.pilares || []).map((p, i) => `<li><a class="pillar" href="#${p.tratamento ? 't-' + esc(p.tratamento) : 'rituais'}">${p.imagem ? '<span class="pillar__img">' + picture(p.imagem, { widths: [420, 760], sizes: '(max-width: 640px) 86vw, (max-width: 1100px) 44vw, 22vw', alt: p.imagem_alt || '' }) + '</span>' : ''}<span class="pillars__n" aria-hidden="true">${NUM[i]}</span><h3>${esc(p.titulo)}</h3><p>${t.inline(p.texto)}</p><span class="pillar__cta">${esc(p.botao)} <span aria-hidden="true">→</span></span></a></li>`).join('\n          ');
   const h = I.hero;
 
-  const body = `${header(m, { home: true, current: m.href('/'), alt: m.altPath('/') })}
+  const body = `${header(m, { home: true, current: m.href('/'), alt: m.altPath(m.href('/')) })}
 
 <main id="inicio">
   <section class="hero2" id="hero">
@@ -304,7 +304,7 @@ export function home(m) {
           <a href="${telHref(s.telefone)}">${esc(s.telefone)}</a>
           <a href="mailto:${esc(s.email)}">${esc(s.email)}</a>
         </address>
-        ${I.como_chegar.texto ? '<details class="visit__more"><summary>' + m.t('+ indicações') + '</summary><p class="prose">' + t.inline(I.como_chegar.texto) + '</p></details>' : ''}
+        ${I.como_chegar.referencia || I.como_chegar.texto ? '<details class="visit__more"><summary>' + m.t('+ indicações') + '</summary>' + [I.como_chegar.referencia, I.como_chegar.texto].filter(Boolean).map((x) => '<p class="prose">' + t.inline(x) + '</p>').join('') + '</details>' : ''}
       </div>
       <div class="mapf">
         ${MAP_SVG}

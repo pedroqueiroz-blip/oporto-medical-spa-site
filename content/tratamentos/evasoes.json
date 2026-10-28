@@ -1,20 +1,7 @@
 {
-  "ordem": 110,
-  "id": "evasoes",
-  "nome": "Ritual Evasões",
-  "nome_completo": "Ritual Evasões (Massagem Geotermal + Indian Head Therapy)",
-  "grupo": "Relaxar",
-  "tipo_servico": "Ritual de spa",
   "texto": "Pedras quentes e massagem indiana à cabeça para uma experiência de profundo relaxamento.",
-  "texto_massagens": "",
   "descricao_seo": "Pedras quentes e massagem indiana à cabeça para uma experiência de profundo relaxamento.",
-  "indicado_para": "Bem-estar e serenidade. Um presente para mim.",
-  "como_e": "Pedras quentes e massagem à cabeça",
-  "pressao": "",
-  "duracao": 90,
-  "preco": 85,
-  "visivel": true,
-  "artigo": "o",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Evasões Ritual",
     "nome_completo": "Evasões Ritual (Geothermal Massage + Indian Head Therapy)",
@@ -23,5 +10,18 @@
     "como_e": "Hot stones and head massage",
     "tipo_servico": "Spa ritual",
     "descricao_seo": "Hot stones and an Indian head massage for a deeply relaxing experience."
-  }
+  },
+  "ordem": 110,
+  "nome_completo": "Ritual Evasões (Massagem Geotermal + Indian Head Therapy)",
+  "indicado_para": "Bem-estar e serenidade. Um presente para mim.",
+  "artigo": "o",
+  "preco": 85,
+  "duracao": 90,
+  "pressao": "moderada",
+  "texto_massagens": "",
+  "tipo_servico": "Ritual de spa",
+  "visivel": true,
+  "como_e": "Pedras quentes e massagem à cabeça",
+  "nome": "Ritual Evasões",
+  "id": "evasoes"
 }

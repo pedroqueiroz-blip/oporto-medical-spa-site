@@ -1,20 +1,7 @@
 {
-  "ordem": 60,
-  "id": "sensations",
-  "nome": "Oporto Sensations",
-  "nome_completo": "Oporto Sensations",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem de relaxamento",
   "texto": "Movimentos envolventes e creme nutritivo para uma experiência profunda de relaxamento sensorial.",
-  "texto_massagens": "",
   "descricao_seo": "Movimentos envolventes e creme nutritivo para uma experiência profunda de relaxamento sensorial.",
-  "indicado_para": "Stress, relaxamento, bem-estar sensorial",
-  "como_e": "Movimentos suaves com creme nutritivo",
-  "pressao": "",
-  "duracao": 60,
-  "preco": 70,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Oporto Sensations",
     "nome_completo": "Oporto Sensations",
@@ -23,5 +10,18 @@
     "como_e": "Gentle movements with a nourishing cream",
     "tipo_servico": "Relaxation massage",
     "descricao_seo": "Enveloping movements and a nourishing cream for a deep sensory relaxation experience."
-  }
+  },
+  "ordem": 60,
+  "nome_completo": "Oporto Sensations",
+  "indicado_para": "Stress, relaxamento, bem-estar sensorial",
+  "artigo": "a",
+  "preco": 70,
+  "duracao": 60,
+  "pressao": "suave a moderada",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem de relaxamento",
+  "visivel": true,
+  "como_e": "Movimentos suaves com creme nutritivo",
+  "nome": "Oporto Sensations",
+  "id": "sensations"
 }

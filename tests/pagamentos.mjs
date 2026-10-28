@@ -110,7 +110,8 @@ function zoho(req, body, j, res, out) {
 await new Promise((r) => servidor.listen(PORTA, r));
 
 const api = (await import("../netlify/functions/api.mjs")).default;
-const news = (await import("../netlify/functions/submission-created.mjs")).handler;
+const newsFn = (await import("../netlify/functions/submission-created.mjs")).default;
+const news = ({ body }) => newsFn(new Request("http://localhost/.netlify/functions/submission-created", { method: "POST", body }));
 const cat = JSON.parse(fs.readFileSync(new URL("../servidor/gerado/catalogo.json", import.meta.url)));
 const pedir = async (rota, dados, metodo = "POST") => {
   const r = await api(new Request("https://oms.exemplo" + rota, metodo === "POST" ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dados) } : {}));
@@ -158,7 +159,7 @@ try {
   const n1 = await news({ body: JSON.stringify({ payload: { form_name: "newsletter", data: { email: "Rui@Exemplo.pt" } } }) });
   const boas = S.emails.find((e) => e.to[0] === "rui@exemplo.pt");
   const codigo = boas?.html.match(/BEMVINDO-[A-Z0-9]{6}/)?.[0];
-  ok(n1.statusCode === 200 && codigo, `newsletter: código ${codigo} enviado por email`);
+  ok(n1.status === 200 && codigo, `newsletter: código ${codigo} enviado por email`);
   await news({ body: JSON.stringify({ payload: { form_name: "newsletter", data: { email: "rui@exemplo.pt" } } }) });
   ok(S.emails.filter((e) => e.to[0] === "rui@exemplo.pt").length === 1, "reinscrever-se não gera outro código");
   r = await pedir("/api/preco", { tipo: "marcacao", tratamento: relax.id, codigo: codigo.toLowerCase() });

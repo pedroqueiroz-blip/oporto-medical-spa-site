@@ -374,6 +374,7 @@ body { margin: 0; }
 .visit__more summary { display: inline-block; cursor: pointer; list-style: none; text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .visit__more summary::-webkit-details-marker { display: none; }
 .visit__more[open] summary { margin-bottom: 4px; }
+.visit__more .prose + .prose { margin-top: 12px; }
 .mapf { position: relative; aspect-ratio: 4 / 3; border-radius: 4px; overflow: hidden; background: #15100B; border: 1px solid var(--line); }
 .mapf svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .mapf__pin { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -100%); display: grid; justify-items: center; gap: 8px; }
@@ -793,3 +794,10 @@ button.bk-group__t::after { content: ""; margin-left: auto; width: 8px; height: 
 .vc-card__camp + .vc-card__name { margin-top: 6px; }
 .vc-card__camp { margin: 28px 0 0; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--flame); }
 .vc-total s { font-size: .8em; opacity: .6; margin-left: 6px; }
+
+/* Campanha no telemóvel: etiqueta e título primeiro, depois a imagem e depois o resto */
+@media (max-width: 860px) {
+  .camp-split { gap: 24px; }
+  .camp-split .camp-body { display: contents !important; }
+  .camp-split .camp-head { order: -1; }
+}

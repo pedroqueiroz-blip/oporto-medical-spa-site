@@ -1,20 +1,7 @@
 {
-  "ordem": 50,
-  "id": "ayurvedica",
-  "nome": "Ayurvédica & Alongamento",
-  "nome_completo": "Massagem Ayurvédica e Alongamento",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem de relaxamento",
   "texto": "Massagem profunda com alongamentos para promover flexibilidade, equilíbrio e bem-estar.",
-  "texto_massagens": "",
   "descricao_seo": "Massagem profunda com alongamentos para promover flexibilidade, equilíbrio e bem-estar.",
-  "indicado_para": "Rigidez, flexibilidade, equilíbrio",
-  "como_e": "Massagem com alongamentos, deslizamentos e trações",
-  "pressao": "",
-  "duracao": 60,
-  "preco": 74,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Ayurvedic & Stretching",
     "nome_completo": "Ayurvedic Massage and Stretching",
@@ -23,5 +10,18 @@
     "como_e": "Massage with stretches, gliding strokes and traction",
     "tipo_servico": "Relaxation massage",
     "descricao_seo": "A deep massage with stretches to promote flexibility, balance and well-being."
-  }
+  },
+  "ordem": 50,
+  "nome_completo": "Massagem Ayurvédica e Alongamento",
+  "indicado_para": "Rigidez, flexibilidade, equilíbrio",
+  "artigo": "a",
+  "preco": 74,
+  "duracao": 60,
+  "pressao": "moderada a profunda",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem de relaxamento",
+  "visivel": true,
+  "como_e": "Massagem com alongamentos, deslizamentos e trações",
+  "nome": "Ayurvédica & Alongamento",
+  "id": "ayurvedica"
 }

@@ -198,9 +198,10 @@ export function loadModel(today = new Date(), lang = 'pt') {
   };
   const campaign = campaignOn ? withTreatment(camp) : null;
   const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
-  /* Tratamento da lista com o selo "Em campanha" (só com alguma campanha no site) */
-  const campaignTreatment = (campaign || extraCampaigns.length) && camp.destaque_tratamento ? camp.destaque_tratamento : null;
-  const campaignPrice = campaignTreatment && Number(camp.destaque_preco) > 0 ? Number(camp.destaque_preco) : null;
+  /* Tratamentos da lista com o selo "Em campanha" (só com alguma campanha no site) e o preço de campanha de cada um */
+  const destaques = campaign || extraCampaigns.length ? camp.destaques || {} : {};
+  const inCampaign = (id) => id in destaques;
+  const campaignPrice = (id) => destaques[id] || null;
 
   /* Campanhas que entram no Google e no llms.txt: as que estão no site e não têm nada [[a confirmar]] */
   const campaigns = [campaign, ...extraCampaigns].filter((c) => c && ![c.titulo, c.titulo_destaque, c.texto].some(text.hasTbc));
@@ -221,7 +222,7 @@ export function loadModel(today = new Date(), lang = 'pt') {
 
   return {
     lang, en, t, base, href: (p) => base + p, groupName, list,
-    s, day, changed, areaPages, pageFor, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, campaignTreatment, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
+    s, day, changed, areaPages, pageFor, campaignDays, campaigns, inicio, massagens, campaign, extraCampaigns, inCampaign, campaignPrice, treatments, team, groups, inGroup, byId, range, text, faq, auto, priceAnswer,
     hoursShort, hoursLong, addressLine, relaxRange, allRange, teamConfirmed, GROUP_AREA
   };
 }

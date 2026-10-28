@@ -20,8 +20,8 @@ local_backend: true
 publish_mode: editorial_workflow
 locale: pt
 logo_url: /logo-beige.svg
-site_url: https://oportomedicalspa.netlify.app
-display_url: https://oportomedicalspa.netlify.app
+site_url: https://www.oportomedicalspa.com
+display_url: https://www.oportomedicalspa.com
 
 media_folder: public/img/uploads
 public_folder: /img/uploads
@@ -69,7 +69,7 @@ collections:
       - { name: selo_texto, label: Texto do selo, widget: string, required: false }
       - { name: selo_numero, label: Número do selo, widget: string, required: false }
       - { name: tipo_servico, label: Tipo de serviço (Google), widget: string, required: false, hint: 'Ex.: Massagem de relaxamento. O nome e a descrição para o Google vêm do título e do texto.' }
-      - { name: selo_em_campanha, label: Pôr o selo dourado «Em campanha» no tratamento, widget: boolean, required: false, default: false, hint: 'O tratamento escolhido acima ganha um pequeno botão dourado «Em campanha» em «Rituais e tratamentos» e na agenda, com o preço de campanha e o preço normal riscado. Só conta a primeira campanha ligada com isto ativo.' }
+      - { name: selo_em_campanha, label: Pôr o selo dourado «Em campanha» no tratamento, widget: boolean, required: false, default: false, hint: 'O tratamento escolhido acima ganha um pequeno botão dourado «Em campanha» em «Rituais e tratamentos» e na agenda, com o preço de campanha e o preço normal riscado. Pode estar ativo em várias campanhas (um selo por tratamento). Não conta nas campanhas só de vouchers.' }
       - { name: so_vouchers, label: Campanha de vouchers (preço de campanha só na compra de vouchers), widget: boolean, required: false, default: false, hint: 'O botão abre o voucher desta campanha em «Oferecer», ao preço de campanha e com a duração acima, só entre as datas de início e fim. Não acumula com códigos de desconto.' }
       - { name: botao, label: Texto do botão, widget: string, required: false, hint: 'Ex.: Garanta o seu voucher Black Week. Vazio = «Reservar» (ou «Oferecer voucher» nas campanhas de vouchers).' }
       - { name: limite_vouchers, label: Limite de vouchers (opcional), widget: number, value_type: int, min: 0, required: false, hint: 'Ex.: 25. Depois de vendidos, o site responde que esgotaram. Vazio ou 0 = sem limite.' }
@@ -246,6 +246,7 @@ collections:
           - { name: etiqueta, label: Etiqueta, widget: string }
           - { name: titulo, label: Título, widget: string }
           - { name: titulo_destaque, label: Final do título em itálico, widget: string, required: false }
+          - { name: referencia, label: Ponto de referência (primeira linha das indicações), widget: string, required: false, hint: 'Aparece primeiro quando se carrega em «+ indicações». Ex.: «Fica praticamente ao lado do Pingo Doce Ramalde». Deixe vazio para não mostrar.' }
           - { name: texto, label: Estacionamento e transportes, widget: text, required: false, hint: *texto_hint }
       - name: google
         label: Google e partilhas

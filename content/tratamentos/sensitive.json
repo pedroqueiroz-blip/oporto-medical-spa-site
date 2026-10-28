@@ -1,20 +1,7 @@
 {
-  "ordem": 100,
-  "id": "sensitive",
-  "nome": "Ritual Sensitive",
-  "nome_completo": "Ritual Sensitive (Massagem Aromaterapia + Tratamento Hidratação Rosto)",
-  "grupo": "Relaxar",
-  "tipo_servico": "Ritual de spa",
   "texto": "Ritual que combina a Massagem com Óleos Essenciais e hidratação de rosto para nutrir a pele e relaxar os sentidos.",
-  "texto_massagens": "",
   "descricao_seo": "Ritual que combina a Massagem com Óleos Essenciais e hidratação de rosto para nutrir a pele e relaxar os sentidos.",
-  "indicado_para": "Relaxamento, hidratação facial, luminosidade",
-  "como_e": "Aromaterapia e hidratação facial",
-  "pressao": "",
-  "duracao": 90,
-  "preco": 95,
-  "visivel": true,
-  "artigo": "o",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Sensitive Ritual",
     "nome_completo": "Sensitive Ritual (Aromatherapy Massage + Hydrating Facial)",
@@ -23,5 +10,18 @@
     "como_e": "Aromatherapy and hydrating facial",
     "tipo_servico": "Spa ritual",
     "descricao_seo": "A ritual combining an essential oil massage with a hydrating facial to nourish the skin and relax the senses."
-  }
+  },
+  "ordem": 100,
+  "nome_completo": "Ritual Sensitive (Massagem Aromaterapia + Tratamento Hidratação Rosto)",
+  "indicado_para": "Relaxamento, hidratação facial, luminosidade",
+  "artigo": "o",
+  "preco": 95,
+  "duracao": 90,
+  "pressao": "suave a moderada",
+  "texto_massagens": "",
+  "tipo_servico": "Ritual de spa",
+  "visivel": true,
+  "como_e": "Aromaterapia e hidratação facial",
+  "nome": "Ritual Sensitive",
+  "id": "sensitive"
 }
