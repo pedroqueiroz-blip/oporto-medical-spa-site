@@ -1,20 +1,7 @@
 {
-  "ordem": 85,
-  "id": "localizada",
-  "nome": "Localizada",
-  "nome_completo": "Massagem Manual Localizada",
-  "grupo": "Relaxar",
-  "tipo_servico": "Massagem localizada",
   "texto": "Alívio da tensão muscular nas costas, pescoço e ombros através de técnicas específicas.",
-  "texto_massagens": "",
   "descricao_seo": "Alívio da tensão muscular nas costas, pescoço e ombros através de técnicas específicas.",
-  "indicado_para": "Tensão nas costas, pescoço e ombros",
-  "como_e": "Técnicas específicas na zona de tensão",
-  "pressao": "",
-  "duracao": 45,
-  "preco": 40,
-  "visivel": true,
-  "artigo": "a",
+  "grupo": "Relaxar",
   "en": {
     "nome": "Targeted",
     "nome_completo": "Targeted Massage",
@@ -23,5 +10,18 @@
     "como_e": "Specific techniques on the area of tension",
     "tipo_servico": "Targeted massage",
     "descricao_seo": "Relief from muscle tension in the back, neck and shoulders through specific techniques."
-  }
+  },
+  "ordem": 85,
+  "nome_completo": "Massagem Manual Localizada",
+  "indicado_para": "Tensão nas costas, pescoço e ombros",
+  "artigo": "a",
+  "preco": 40,
+  "duracao": 45,
+  "pressao": "moderada a profunda",
+  "texto_massagens": "",
+  "tipo_servico": "Massagem localizada",
+  "visivel": true,
+  "como_e": "Técnicas específicas na zona de tensão",
+  "nome": "Localizada",
+  "id": "localizada"
 }
