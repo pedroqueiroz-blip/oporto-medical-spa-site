@@ -40,7 +40,8 @@
   var EN = (document.documentElement.lang || '').slice(0, 2) === 'en';
   function L(pt, en) { return EN ? en : pt; }
 
-  var HOURS = ['08:00', '09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+  // Marca-se de meia em meia hora (Pedro, 28/10/2026); só aparecem as horas em que o tratamento inteiro cabe.
+  var HOURS = []; for (var hh = 8; hh < 20; hh++) HOURS.push((hh < 10 ? '0' : '') + hh + ':00', (hh < 10 ? '0' : '') + hh + ':30');
   var WEEKDAYS = EN ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   var MONTHS = EN ? ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] : ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
@@ -82,7 +83,8 @@
     var a = AGENDA[treatment];
     if (a && a.loading) return true;
     if (a && a.fonte === 'zoho') return ((a.livres[therapistId] || {})[isoDay(day)] || []).indexOf(hour) < 0;
-    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || (day.getDay() === 6 && (hour < '09:00' || hour > '13:00'));
+    var ini = +hour.slice(0, 2) * 60 + +hour.slice(3), fim = ini + ((byId(TREATMENTS, treatment) || {}).min || 60), sab = day.getDay() === 6;
+    return hash(dayKey(day) + hour + therapistId) % 10 < 4 || ini < (sab ? 540 : 480) || fim > (sab ? 780 : 1200);
   }
   function freeFor(day, hour, treatment) {
     return TEAM.filter(function (t) { return t.does.indexOf(treatment) > -1 && !isTaken(day, hour, t.id, treatment); });
@@ -174,9 +176,8 @@
         return '<button type="button" class="bk-day" data-day="' + i + '" aria-pressed="' + sel + '"' + (any ? '' : ' disabled') + '>' +
           '<span class="bk-day__w">' + WEEKDAYS[d.getDay()] + '</span><span class="bk-day__n">' + d.getDate() + '</span><span class="bk-day__m">' + MONTHS[d.getMonth()] + '</span></button>';
       }).join('');
-      html += '</div><div class="bk-slots">' + HOURS.map(function (h) {
-        var free = slotFree(s.day, h);
-        return '<button type="button" class="bk-slot" data-hour="' + h + '" aria-pressed="' + (s.hour === h) + '"' + (free ? '' : ' disabled') + '>' + h + '</button>';
+      html += '</div><div class="bk-slots">' + HOURS.filter(function (h) { return slotFree(s.day, h); }).map(function (h) {
+        return '<button type="button" class="bk-slot" data-hour="' + h + '" aria-pressed="' + (s.hour === h) + '">' + h + '</button>';
       }).join('') + '</div><p class="bk-note">' + agendaNote() + '</p></div>';
       return html;
     }

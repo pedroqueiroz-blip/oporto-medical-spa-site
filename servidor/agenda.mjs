@@ -1,34 +1,44 @@
 // Agenda das marcações: horas livres e marcação no Zoho CRM.
 // Cada pessoa da equipa liga-se a um utilizador do CRM pelo nome (igual nos dois lados) ou pelo email
 // indicado no backoffice («Utilizador no Zoho CRM»). Uma hora está livre quando essa pessoa não tem
-// nenhum evento no CRM que se sobreponha à duração do tratamento. Sem Zoho ligado, a agenda é simulada.
+// nenhum evento no CRM que se sobreponha à duração do tratamento e o tratamento cabe no horário dela
+// (módulo Prestadores). Sem Zoho ligado, a agenda é simulada.
 import catalogo from "./gerado/catalogo.json" with { type: "json" };
 import { tratamento as lerTratamento } from "./catalogo.mjs";
 import { instanteLisboa, hojeISO } from "./datas.mjs";
-import { zohoLigado, utilizadores, ocupacoes, criarMarcacao, moduloMarcacoes, clienteCRM } from "./zoho.mjs";
+import { zohoLigado, utilizadores, ocupacoes, criarMarcacao, moduloMarcacoes, clienteCRM, prestadores } from "./zoho.mjs";
+import { trabalha } from "./horario.mjs";
 import { store, STORES } from "./store.mjs";
 
 export class ErroAgenda extends Error {}
 
-// As mesmas horas que a agenda do site mostra (public/prototype.js): encerra ao domingo; ao sábado abre às 9:00 (Pedro, 27/10/2026) e fecha à tarde.
-export const HORAS = ["08:00", "09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
+// As mesmas horas que a agenda do site mostra (public/prototype.js): de meia em meia hora (Pedro, 28/10/2026), das 8:00
+// às 20:00; ao sábado das 9:00 às 13:00 (Pedro, 27/10/2026); encerra ao domingo. O tratamento inteiro tem de caber.
+export const HORAS = Array.from({ length: 24 }, (_, i) => `${String(8 + (i >> 1)).padStart(2, "0")}:${i % 2 ? "30" : "00"}`);
 const ANTECEDENCIA = 60 * 60e3; // não se marca para daqui a menos de uma hora
 const diaSemana = (data) => new Date(`${data}T12:00:00Z`).getUTCDay();
-const aberto = (data, hora) => diaSemana(data) !== 0 && !(diaSemana(data) === 6 && (hora < "09:00" || hora > "13:00"));
+const minutos = (hora) => Number(hora.slice(0, 2)) * 60 + Number(hora.slice(3, 5));
+function aberto(data, hora, duracao) {
+  const d = diaSemana(data), ini = minutos(hora), fim = ini + duracao;
+  return d !== 0 && (d === 6 ? ini >= 9 * 60 && fim <= 13 * 60 : ini >= 8 * 60 && fim <= 20 * 60);
+}
 const simples = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
 const somarDias = (data, n) => new Date(Date.parse(`${data}T12:00:00Z`) + n * 864e5).toISOString().slice(0, 10);
 
 // Equipa do site com o utilizador do CRM de cada pessoa e se tem agenda online (guardado 10 minutos).
 // As marcações vão só para o módulo «Tratamentos» (Pedro, 27/10/2026): tem agenda online quem está numa
 // das listas de profissionais do módulo («Terapeutas», «Profissionais LC»…), com o mesmo nome do site.
+// O horário de cada uma vem do módulo «Prestadores» (Pedro, 28/10/2026): quem lá está inativa fica fora;
+// sem registo ou sem horário legível, valem só as horas do SPA (a verificação avisa).
 let mapa = null;
 async function equipaCRM() {
   if (mapa && Date.now() < mapa.ate) return mapa.lista;
-  const [us, mm] = await Promise.all([utilizadores().catch(() => []), moduloMarcacoes()]);
+  const [us, mm, pr] = await Promise.all([utilizadores().catch(() => []), moduloMarcacoes(), prestadores().catch(() => null)]);
   const lista = (catalogo.equipa || []).map((p) => {
     const u = us.find((x) => (p.zoho && x.email === simples(p.zoho)) || simples(x.nome) === simples(p.nome));
-    const agenda = Boolean(mm) && mm.campos.terapeutas.some((f) => !f.valores.length || f.valores.some((v) => simples(v) === simples(p.nome)));
-    return { ...p, dono: u?.id || null, agenda };
+    const reg = pr?.lista.find((x) => simples(x.nome) === simples(p.nome));
+    const agenda = Boolean(mm) && reg?.ativo !== false && mm.campos.terapeutas.some((f) => !f.valores.length || f.valores.some((v) => simples(v) === simples(p.nome)));
+    return { ...p, dono: u?.id || null, agenda, horario: reg?.regras.length ? reg.regras : null };
   });
   mapa = { lista, modulo: Boolean(mm), ate: Date.now() + (mm ? 10 * 60e3 : 0) }; // sem módulo pronto, volta a ver na próxima vez
   return lista;
@@ -56,7 +66,7 @@ export async function guardarHora(p) {
 // Ocupa a pessoa um evento seu (utilizador do CRM) ou uma marcação do módulo com o nome dela.
 const dela = (e, p) => (e.dono && e.dono === p.dono) || (e.nome && simples(e.nome) === simples(p.nome));
 function livre(evs, p, data, hora, duracao) {
-  if (!aberto(data, hora)) return false;
+  if (!aberto(data, hora, duracao) || (p.horario && !trabalha(p.horario, data, hora, duracao))) return false;
   const ini = instanteLisboa(data, hora).t, fim = ini + duracao * 60e3;
   if (ini < Date.now() + ANTECEDENCIA) return false;
   return !evs.some((e) => dela(e, p) && (e.diaInteiro ? e.dia === data : e.inicio < fim && e.fim > ini));

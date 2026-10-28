@@ -55,7 +55,7 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
-const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [] };
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [], prestadores: [] };
 // Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
 const CAMPOS_TRAT = [
   { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" },
@@ -86,9 +86,8 @@ function zoho(req, body, j, res, out) {
   if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
   if (cam === "/users") return out({ users: Z.users });
   if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : []), { api_name: "Prestadores", plural_label: "Prestadores" }] });
-  if (cam === "/settings/fields" && u.searchParams.get("module") === "Prestadores") return out({ fields: [{ api_name: "Name", field_label: "Nome", data_type: "text" }, { api_name: "Horario", field_label: "Horário", data_type: "textarea" }] });
-  if (cam === "/Prestadores/search") return u.searchParams.get("word") === "Luísa Pinto" ? out({ data: [{ id: "pr1", Name: "Luísa Pinto" }] }) : (res.statusCode = 204, res.end());
-  if (cam === "/Prestadores/pr1") return out({ data: [{ id: "pr1", Name: "Luísa Pinto", Horario: "Seg-Sex 9-18", Created_Time: "x" }] });
+  if (cam === "/settings/fields" && u.searchParams.get("module") === "Prestadores") return out({ fields: [{ api_name: "Name", field_label: "Nome de Prestador", data_type: "text" }, { api_name: "Ativo", field_label: "Ativo", data_type: "boolean" }, { api_name: "Horario_Padrao", field_label: "Horário padrão", data_type: "text" }, { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" }] });
+  if (cam === "/Prestadores") return out({ data: Z.prestadores.map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => u.searchParams.get("fields").split(",").includes(k)))), info: { more_records: false } });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
   if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
   if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
@@ -287,6 +286,12 @@ try {
   ok(r.status === 400 && /esgotaram/.test(r.j.erro), "depois do limite, a campanha esgota");
 
   // 9) Agenda no Zoho CRM
+  const { lerHorario, trabalha } = await import("../servidor/horario.mjs");
+  let h = lerHorario("seg-sex 12:30-20:00; sab 09:00-13:00 quinzenal 14-11-2026").regras;
+  ok(!trabalha(h, "2026-11-02", "12:00", 60) && trabalha(h, "2026-11-02", "19:00", 60) && !trabalha(h, "2026-11-02", "19:00", 90), "horário padrão: de segunda a sexta das 12:30 às 20:00, o tratamento tem de caber até ao fim");
+  ok(trabalha(h, "2026-11-14", "09:00", 60) && !trabalha(h, "2026-11-21", "09:00", 60) && trabalha(h, "2026-11-28", "12:00", 60) && !trabalha(h, "2026-11-28", "12:30", 60) && !trabalha(h, "2026-11-15", "09:00", 60), "sábado quinzenal: sábado sim, sábado não, a contar de 14/11/2026");
+  h = lerHorario("qui-sex 14:30-20:00; blá");
+  ok(h.regras.length === 1 && !trabalha(h.regras, "2026-11-04", "15:00", 60) && trabalha(h.regras, "2026-11-05", "15:00", 60) && h.erros[0] === "blá", "dias da semana escolhidos e partes ilegíveis assinaladas");
   r = await pedir("/api/disponibilidade?tratamento=" + outro.id, null, "GET");
   ok(r.j.fonte === "simulada", "sem Zoho ligado, a agenda fica simulada");
   Object.assign(process.env, { ZOHO_CLIENT_ID: "cid", ZOHO_CLIENT_SECRET: "seg", ZOHO_ACCOUNTS_BASE: `${B}/zoho/contas`, BACKOFFICE_PASSWORD: "senha-certa" });
@@ -306,11 +311,15 @@ try {
   pg = await pagina(`/api/zoho/retorno?code=bom&state=${aut.searchParams.get("state")}`);
   ok(pg.status === 400, "o mesmo state não serve duas vezes");
 
+  // Horário da Luísa no módulo Prestadores: dias úteis 8:00–20:00 e sábados quinzenais (o primeiro sábado daqui a 3+ dias é de trabalho)
+  let sab = new Date(Date.now() + 3 * 864e5); while (sab.getUTCDay() !== 6) sab = new Date(sab.getTime() + 864e5);
+  const S6 = sab.toISOString().slice(0, 10), S13 = new Date(sab.getTime() + 7 * 864e5).toISOString().slice(0, 10);
+  Z.prestadores.push({ Name: "Luísa Pinto", Ativo: true, Horario_Padrao: `seg-sex 08:00-20:00; sab 09:00-13:00 quinzenal ${S6.split("-").reverse().join("-")}`, Created_Time: "x" });
   pg = await pagina("/api/zoho/verificar", form("errada"));
   ok(pg.status === 401, "verificação do CRM pede a palavra-passe");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.status === 200 && pg.txt.includes("✓ Campo do NIF") && pg.txt.includes("Contribuinte") && pg.txt.includes("✓ Reuniões (Events)") && pg.txt.includes("✗ Módulo das marcações (Tratamentos)") && pg.txt.includes("não entram no Zoho"), "verificação pelos metadados: campo do NIF, Reuniões e falta do módulo Tratamentos");
-  ok(pg.txt.includes("Prestadores (Prestadores): campos") && pg.txt.includes("Horario: Seg-Sex 9-18") && !pg.txt.includes("Created_Time: x") && pg.txt.includes("✗ Prestadores: Beatriz Pena"), "verificação mostra os campos e o registo de cada colaboradora no módulo Prestadores");
+  ok(pg.txt.includes("✓ Prestadores (Prestadores): horário") && pg.txt.includes("Horario_Padrao") && pg.txt.includes("seg–sex 08:00–20:00 · sáb 09:00–13:00 (quinzenal") && pg.txt.includes("✗ Prestadores: Beatriz Pena") && pg.txt.includes("Sem registo com este nome"), "verificação mostra o horário de cada colaboradora lido do módulo Prestadores");
 
   // Dia útil daqui a 3+ dias
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
@@ -339,11 +348,11 @@ try {
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
   const livresL = r.j.livres?.[luisa.id]?.[D] || [];
   ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && !livresL.includes("19:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm das marcações do Zoho (${livresL.length} livres; 10:00 e 19:00 ocupadas, a cancelada não conta)`);
+  ok(livresL.includes("11:30") && !livresL.includes("10:30") && livresL.includes("08:30") === (tz.duracao <= 90) && !livresL.includes(`${String(19 - Math.ceil(tz.duracao / 60) + 1).padStart(2, "0")}:30`) && !livresL.includes("19:30"), "marca-se às meias horas, desde que o tratamento caiba antes da marcação seguinte e do fecho");
   ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não está nas listas de profissionais fica fora da agenda online");
-  let sab = new Date(Date.now() + 3 * 864e5); while (sab.getUTCDay() !== 6) sab = new Date(sab.getTime() + 864e5);
-  const S6 = sab.toISOString().slice(0, 10);
-  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${S6}&dias=1`, null, "GET");
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${S6}&dias=8`, null, "GET");
   ok(!r.j.livres[luisa.id][S6].includes("08:00") && r.j.livres[luisa.id][S6].includes("09:00") && !r.j.livres[luisa.id][S6].includes("14:00"), "ao sábado abre às 9:00 e fecha à tarde");
+  ok(!r.j.livres[luisa.id][S13].length, "no sábado em que não trabalha (horário quinzenal do Prestadores) não há horas livres");
   const zc = { nome: "Carla Nova", email: "carla@exemplo.pt", telefone: "913000000", nif: "123456789" };
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "10:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
   ok(r.status === 400 && /ocupada/.test(r.j.erro), "hora ocupada no Zoho é recusada antes de pagar");
