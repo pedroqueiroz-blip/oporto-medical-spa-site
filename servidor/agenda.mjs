@@ -129,6 +129,18 @@ export async function marcarNoCRM(p) {
 
 /* ---------- Diagnóstico (/api/zoho/verificar) ---------- */
 
+// Um dia da agenda como o site o vê: tudo o que leu do Zoho e as horas livres de cada pessoa (tratamento de 60 min).
+export async function diaAgenda(data) {
+  const diag = [];
+  const evs = [...await ocupacoes(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso, diag), ...await guardadas()];
+  const equipa = await equipaCRM();
+  return {
+    lidos: [...evs, ...diag].sort((a, b) => a.inicio - b.inicio),
+    pessoas: equipa.map((p) => ({ nome: p.nome, agenda: p.agenda, dono: p.dono, horario: Boolean(p.horario), livres: p.agenda ? HORAS.filter((h) => livre(evs, p, data, h, 60)) : [],
+      ocupada: evs.filter((e) => dela(e, p)).length })),
+  };
+}
+
 // Últimas marcações do site, mais recentes primeiro, com o resultado no Zoho.
 export async function ultimasMarcacoes(n = 10) {
   const s = await store(STORES.pedidos);

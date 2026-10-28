@@ -127,10 +127,10 @@ export async function eventos(de, ate) {
   const { moduloAgenda } = await configuracao();
   const out = [];
   for (let offset = 0; offset < 2000; offset += 200) {
-    const q = `select Owner, Start_DateTime, End_DateTime, All_day from ${moduloAgenda} where Start_DateTime between '${de}' and '${ate}' order by Start_DateTime limit ${offset}, 200`;
+    const q = `select Owner, Event_Title, Start_DateTime, End_DateTime, All_day from ${moduloAgenda} where Start_DateTime between '${de}' and '${ate}' order by Start_DateTime limit ${offset}, 200`;
     const j = await crm("POST", "/coql", { select_query: q });
     const linhas = j?.data || [];
-    out.push(...linhas.map((e) => ({ dono: e.Owner?.id || e.Owner, inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
+    out.push(...linhas.map((e) => ({ origem: "Reuniões", titulo: `${e.Event_Title || ""} (responsável: ${e.Owner?.name || e.Owner?.id || "?"})`, dono: e.Owner?.id || e.Owner, inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
     if (!j?.info?.more_records) break;
   }
   return out;
@@ -234,18 +234,19 @@ export async function criarMarcacao(mm, { titulo, inicio, fim, dono, terapeuta, 
 }
 
 // Marcações do módulo entre duas datas, com a terapeuta (utilizador ou nome); as canceladas não contam.
-export async function marcacoesModulo(mm, de, ate) {
-  const c = mm.campos, ters = c.terapeutas || [c.terapeuta], cols = [c.inicio, c.fim, ...ters, c.estado].filter(Boolean).map((f) => f.api);
+export async function marcacoesModulo(mm, de, ate, diag = null) {
+  const c = mm.campos, ters = c.terapeutas || [c.terapeuta], cols = ["Name", ...[c.inicio, c.fim, ...ters, c.estado].filter(Boolean).map((f) => f.api)].filter((x, i, a) => a.indexOf(x) === i);
   const out = [];
   for (let offset = 0; offset < 2000; offset += 200) {
     const q = `select ${cols.join(", ")} from ${mm.modulo} where ${c.inicio.api} between '${de}' and '${ate}' order by ${c.inicio.api} limit ${offset}, 200`;
     const j = await crm("POST", "/coql", { select_query: q });
     for (const r of j?.data || []) {
-      if (c.estado && CANCELADA.test(simples(r[c.estado.api]))) continue;
+      if (c.estado && CANCELADA.test(simples(r[c.estado.api]))) { if (diag) diag.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""} · ${r[c.estado.api]} (não conta)`, nome: ters.map((f) => [].concat(r[f.api] ?? []).map((t) => t?.name || t).join(", ")).filter(Boolean).join(" / "), inicio: Date.parse(r[c.inicio.api]), fim: c.fim && r[c.fim.api] ? Date.parse(r[c.fim.api]) : null }); continue; }
       const inicio = Date.parse(r[c.inicio.api]), fim = c.fim && r[c.fim.api] ? Date.parse(r[c.fim.api]) : inicio + 60 * 60e3;
       // Uma marcação ocupa cada profissional indicado em qualquer das listas.
+      if (diag && !ters.some((f) => [].concat(r[f.api] ?? []).length)) diag.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""} · sem profissional em nenhuma lista (não ocupa ninguém)`, nome: "", inicio, fim });
       for (const f of ters) for (const t of [].concat(r[f.api] ?? [])) {
-        out.push({ dono: f.tipo === "userlookup" ? t?.id : null, nome: typeof t === "object" ? t?.name || "" : String(t || ""), inicio, fim, diaInteiro: false, dia: String(r[c.inicio.api]).slice(0, 10) });
+        out.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""}${c.estado ? ` · ${r[c.estado.api] || "sem estado"}` : ""}`, dono: f.tipo === "userlookup" ? t?.id : null, nome: typeof t === "object" ? t?.name || "" : String(t || ""), inicio, fim, diaInteiro: false, dia: String(r[c.inicio.api]).slice(0, 10) });
       }
     }
     if (!j?.info?.more_records) break;
@@ -254,9 +255,9 @@ export async function marcacoesModulo(mm, de, ate) {
 }
 
 // Tudo o que ocupa a agenda: eventos (Reuniões, por responsável) e marcações do módulo «Tratamentos».
-export async function ocupacoes(de, ate) {
+export async function ocupacoes(de, ate, diag = null) {
   const mm = await moduloMarcacoes();
-  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate) : [])];
+  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate, diag) : [])];
 }
 
 /* ---------- Módulo «Prestadores» (horário de cada colaboradora) ---------- */
