@@ -7,6 +7,7 @@ import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos } from "../../servidor/zoho.mjs";
 import { estados, simbolo, ultimosPedidos } from "../../servidor/estado.mjs";
 import { dataPT, hojeISO } from "../../servidor/datas.mjs";
+import { listarVouchers, filtrar, CAMPOS, estadoVoucher, meioPagamento, nomeOferta } from "../../servidor/vouchers.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -130,6 +131,48 @@ ${st.map((x) => `<div style="font-size:13px;color:${cor(x.ok)}">${simbolo(x.ok)}
       const comErro = lista.filter((p) => estados(p).some((x) => x.ok === false)).length;
       return pagina(`<h1>Reservas</h1><p class="nota">${lista.length} pedidos mais recentes${comErro ? ` · <span class="erro">${comErro} com erro (a vermelho)</span>` : " · sem erros"}. ✓ feito · ✗ erro a resolver · … a aguardar.</p>
 ${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há pedidos.</p>`}`, 200, { ...opc, largura: 720 });
+    }
+
+    // Vouchers (backoffice): cada voucher comprado com os dados da compra, a oferta, o meio de pagamento,
+    // a mensagem e o número do voucher, e pesquisa por qualquer um (Pedro, 29/10/2026).
+    if (rota === "/vouchers") {
+      const form = m === "POST" ? new URLSearchParams(await req.text()) : new URLSearchParams();
+      const opc = { titulo: "Vouchers · Oporto Medical Spa" };
+      if (!process.env.BACKOFFICE_PASSWORD) return pagina(`<h1>Vouchers</h1><p>Falta a palavra-passe do backoffice (BACKOFFICE_PASSWORD) no Netlify, que protege esta página.</p>`, 200, opc);
+      const senha = form.get("senha") || "";
+      if (!senhaCerta(senha)) {
+        if (m === "POST") await pausa(1500);
+        return pagina(`<h1>Vouchers</h1><p class="nota">Vouchers comprados no site, com pesquisa.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" autocomplete="current-password" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Entrar</button></form>`, m === "POST" ? 401 : 200, opc);
+      }
+      const e = (x) => String(x ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      const q = (form.get("q") || "").slice(0, 100), campo = CAMPOS[form.get("campo")] ? form.get("campo") : "todos";
+      const todos = await listarVouchers();
+      const lista = filtrar(todos, q, campo);
+      const MAX = 200;
+      const COR = { ativo: "#A8C99A", usado: "rgba(232,220,200,.6)", expirado: "rgba(232,220,200,.6)", pagar: "#D9A86C", erro: "#E0A58C" };
+      const linha = (rotulo, valor) => `<span class="nota">${rotulo}</span><span>${valor}</span>`;
+      const eur = (v) => `${Number(v).toFixed(2).replace(".", ",")} €`;
+      const cartao = (p) => {
+        const st = estadoVoucher(p), v = p.voucher || {}, c = p.cliente || {};
+        const criado = String(p.criado || "");
+        return `<div style="text-align:left;border:1px solid ${st.chave === "erro" ? "#E0A58C" : "rgba(232,220,200,.2)"};border-radius:6px;padding:14px 16px;margin:12px 0">
+<p style="margin:0 0 8px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline"><b style="font-size:18px;letter-spacing:.08em">${v.codigo ? e(v.codigo) : `<span class="nota" style="font-size:15px;letter-spacing:0">Voucher por emitir</span>`}</b><span style="font-size:13px;color:${COR[st.chave]}">${e(st.texto)}</span>${v.validade ? `<span class="nota">válido até ${e(dataPT(v.validade))}</span>` : ""}</p>
+<div style="display:grid;grid-template-columns:minmax(96px,150px) 1fr;gap:4px 12px;align-items:baseline">
+${linha("Oferta", `<b>${e(nomeOferta(p))}</b>${p.tratamento?.duracao ? ` · ${e(p.tratamento.duracao)} min` : ""}`)}
+${linha("Compra", `${e(p.numero)} · ${e(dataPT(criado))}${criado ? `, ${e(new Date(criado).toLocaleTimeString("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit" }))}` : ""} · ${e(eur(p.total > 0 ? p.total : 0))}${p.desconto > 0 ? ` <span class="nota">(${e(eur(p.precoBase))} − ${e(p.codigo?.texto || "desconto")})</span>` : ""}${p.fatura?.numero ? ` · fatura ${e(p.fatura.numero)}` : ""}`)}
+${linha("Cliente", `${e(c.nome)} · <a href="mailto:${e(c.email)}" style="color:inherit">${e(c.email)}</a>${c.telefone ? ` · <a href="tel:${e(String(c.telefone).replace(/\s/g, ""))}" style="color:inherit">${e(c.telefone)}</a>` : ""}${c.nif ? ` · NIF ${e(c.nif)}` : ""}${p.lingua === "en" ? " · inglês" : ""}`)}
+${linha("Meio de pagamento", `${e(meioPagamento(p))}${p.pagamento?.pago?.transacao ? ` <span class="nota">· transação ${e(p.pagamento.pago.transacao)}</span>` : ""}`)}
+${linha("Mensagem", `${v.mensagem ? `<i>“${e(v.mensagem)}”</i>` : `<span class="nota">sem mensagem</span>`}${v.para || v.de ? ` <span class="nota">· ${[v.para && `para ${e(v.para)}`, v.de && `de ${e(v.de)}`].filter(Boolean).join(" · ")}</span>` : ""}`)}
+${linha("Entrega", v.formato === "caixa" ? "Caixa oferta, levanta no spa" : "Digital, por email")}</div></div>`;
+      };
+      const opcoes = Object.entries(CAMPOS).map(([k, t]) => `<option value="${k}"${k === campo ? " selected" : ""}>${t}</option>`).join("");
+      const pesquisa = `<form method="post" style="display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px"><input type="hidden" name="senha" value="${e(senha)}">
+<input type="search" name="q" value="${e(q)}" placeholder="Pesquisar: número, nome, email, oferta, MB WAY, mensagem…" style="flex:1 1 260px;width:auto">
+<select name="campo" style="flex:0 1 auto;padding:12px 10px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:#0D0A08;color:inherit;font:inherit">${opcoes}</select>
+<button type="submit" style="margin:0;width:auto;padding:12px 22px">Pesquisar</button></form>`;
+      const resumoTxt = q ? `${lista.length} de ${todos.length} vouchers para «${e(q)}»${campo !== "todos" ? ` em ${e(CAMPOS[campo].toLowerCase())}` : ""}` : `${todos.length} vouchers, mais recentes primeiro`;
+      return pagina(`<h1>Vouchers</h1>${pesquisa}<p class="nota" style="text-align:left">${resumoTxt}${lista.length > MAX ? ` · a mostrar os ${MAX} mais recentes` : ""}.</p>
+${lista.length ? lista.slice(0, MAX).map(cartao).join("") : `<p class="nota">${q ? "Nenhum voucher encontrado." : "Ainda não há vouchers comprados."}</p>`}`, 200, { ...opc, largura: 760 });
     }
 
     if (rota === "/zoho/retorno" && m === "GET") {
