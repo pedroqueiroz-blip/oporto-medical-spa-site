@@ -413,6 +413,28 @@ try {
   ok(!pg.txt.includes(pz.numero), "sem a chave do backoffice definida, essa chave não serve de palavra-passe");
   pg = await pagina("/api/reservas", form("senha-certa"));
   ok(pg.txt.includes(pz.numero) && pg.txt.includes("Carla Nova") && pg.txt.includes("913000000") && pg.txt.includes("✗ Não ficou na agenda Zoho") && pg.txt.includes("✓ euPago OK") && /\d+ com erro/.test(pg.txt), "página de reservas: cliente, contactos, estado de cada passo e erros à vista");
+  // Vouchers no backoffice: dados da compra, oferta, meio de pagamento, mensagem e número, com pesquisa
+  pg = await pagina("/api/vouchers");
+  ok(pg.status === 200 && pg.txt.includes("Palavra-passe") && !pg.txt.includes(vcod), "página de vouchers pede a palavra-passe");
+  const html = (t) => String(t).replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+  const procurar = (q, campo = "todos") => pagina("/api/vouchers", { ...form("senha-certa"), body: `senha=senha-certa&q=${encodeURIComponent(q)}&campo=${campo}` });
+  pg = await pagina("/api/vouchers", form("senha-certa"));
+  ok(pg.txt.includes(vcod) && pg.txt.includes(p4.numero) && pg.txt.includes("Para parares.") && pg.txt.includes("joao@exemplo.pt") && pg.txt.includes("Cartão") && pg.txt.includes(html(relax.nome)) && pg.txt.includes("Multibanco") && !pg.txt.includes(pz.numero), "página de vouchers: número, compra, oferta, meio de pagamento e mensagem; sem marcações");
+  ok(pg.txt.includes("Usado na marcação"), "voucher já usado aparece como usado");
+  pg = await procurar(vcod.toLowerCase());
+  ok(pg.txt.includes(p4.numero) && pg.txt.includes("1 de "), "pesquisa pelo número do voucher");
+  pg = await procurar("parares", "mensagem");
+  ok(pg.txt.includes(vcod) && /1 de \d+ vouchers/.test(pg.txt), "pesquisa pela mensagem do voucher");
+  pg = await procurar("multibanco", "pagamento");
+  ok(!pg.txt.includes(vcod) && pg.txt.includes("rui@exemplo.pt"), "pesquisa pelo meio de pagamento");
+  pg = await procurar("joão", "compra");
+  ok(pg.txt.includes(vcod), "pesquisa pelos dados da compra, sem ligar aos acentos");
+  pg = await procurar("parares", "oferta");
+  ok(pg.txt.includes("Nenhum voucher encontrado"), "pesquisa só no campo escolhido");
+  pg = await procurar(relax.nome, "oferta");
+  ok(pg.txt.includes(vcod), "pesquisa pelo nome da oferta");
+  pg = await procurar("<script>");
+  ok(!pg.txt.includes("<script>") && pg.txt.includes("&lt;script&gt;"), "a pesquisa não injeta HTML");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
   Z.falhaMarcacao = false;
