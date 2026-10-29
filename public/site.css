@@ -191,6 +191,7 @@ a { color: inherit; }
 .bk-done { text-align: center; padding-block: 50px 20px; display: grid; justify-items: center; gap: 12px; }
 .bk-done__mark { margin: 0; color: var(--flame); font-size: 30px; }
 .bk-done__title { margin: 0; font-family: var(--display); font-size: clamp(32px, 5vw, 52px); }
+.bk-cal { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 0 0 6px; }
 .bk-done__text { margin: 0 0 10px; color: var(--oat); max-width: 46ch; font-size: 17px; }
 
 /* Vouchers */

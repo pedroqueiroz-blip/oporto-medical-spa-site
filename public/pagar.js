@@ -36,6 +36,9 @@
       '<p class="bk-done__text">' + (voucher
         ? L('Enviámos o voucher ' + esc(p.tratamento) + ', com o código para marcar, para o seu email.', 'We’ve emailed you the ' + esc(p.tratamento) + ' voucher, with the code to book.')
         : esc(p.tratamento) + (p.marcacao ? ', ' + dataPT(p.marcacao.data) + L(' às ', ' at ') + esc(p.marcacao.hora) : '') + L('. Enviámos a confirmação para o seu email. Chegue dez a quinze minutos antes: o chá fica à sua espera.', '. We’ve emailed you the confirmation. Please arrive ten to fifteen minutes early: your tea will be waiting.')) + '</p>' +
+      (p.calendario ? '<div class="bk-cal">' +
+        (p.calendario.google ? '<a class="btn btn--primary" href="' + esc(p.calendario.google) + '" target="_blank" rel="noopener">' + L('Adicionar ao Google Calendar', 'Add to Google Calendar') + '</a>' : '') +
+        '<a class="btn btn--ghost" href="' + esc(p.calendario.ics) + '" download>' + L('Calendário do iPhone ou Outlook', 'iPhone or Outlook calendar') + '</a></div>' : '') +
       (p.total > 0 ? '<p class="bk-note">' + L('A fatura-recibo segue num email à parte.', 'Your invoice-receipt will follow in a separate email (in Portuguese).') + '</p>' : '') + '</div>';
   }
 
