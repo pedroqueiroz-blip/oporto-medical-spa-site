@@ -6,6 +6,7 @@ import { tratamento as lerTratamento, campanha as lerCampanha } from "./catalogo
 import { lerCodigo } from "./codigos.mjs";
 import { hojeISO } from "./datas.mjs";
 import { lingua, nomeEN, campanhaEN } from "./ingles.mjs";
+import { linkGoogle } from "./calendario.mjs";
 
 export class ErroCliente extends Error {}
 
@@ -118,4 +119,7 @@ export const publico = (p) => ({
   metodo: p.pagamento?.metodo || null,
   multibanco: p.pagamento?.multibanco || null,
   telemovel: p.pagamento?.telemovel ? p.pagamento.telemovel.replace(/^(\d{3})\d{3}/, "$1 ***") : null,
+  // Marcação confirmada: link do Google Calendar e ficheiro .ics (só quem tem o token vê este resumo).
+  calendario: p.marcacao && (p.estado === "pago" || p.estado === "confirmado")
+    ? { google: linkGoogle(p), ics: `/api/calendario?n=${encodeURIComponent(p.numero)}&t=${encodeURIComponent(p.token)}` } : null,
 });

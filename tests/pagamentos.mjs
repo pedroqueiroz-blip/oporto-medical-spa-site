@@ -127,7 +127,7 @@ const marcar = (d) => pedir("/api/pagamento", d);
 const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tratamentos.find((t) => t.grupo !== "Relaxar");
 const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
 const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
-const { validadeVoucher, dataPT } = await import("../servidor/datas.mjs");
+const { validadeVoucher, dataPT, instanteLisboa } = await import("../servidor/datas.mjs");
 
 try {
   ok(relax.artigo === "TPREV" && outro.artigo === "TREAB" && cat.tratamentos.every((t) => t.artigo === (t.grupo === "Relaxar" ? "TPREV" : "TREAB")), "catálogo: Relaxar → TPREV, o resto → TREAB");
@@ -148,6 +148,15 @@ try {
   await notificar(p1);
   r = await pedir(`/api/pedido?n=${p1.numero}&t=${p1.token}`, null, "GET");
   ok(r.j.estado === "pago", "notificação da euPago: pedido pago");
+  const g = new URL(r.j.calendario?.google || "https://x");
+  ok(g.host === "calendar.google.com" && g.searchParams.get("text") === `${outro.nome} · ${cat.spa.nome}` && g.searchParams.get("location").includes(cat.spa.morada) && g.searchParams.get("details").includes(p1.numero), "marcação paga: link «Adicionar ao Google Calendar» com tratamento, morada e n.º");
+  const ini = new Date(instanteLisboa(amanha, "10:00").t).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  ok(g.searchParams.get("dates").startsWith(ini + "/"), "calendário: começa às 10:00 de Lisboa");
+  let rc = await api(new Request("https://oms.exemplo" + r.j.calendario.ics));
+  const txtIcs = await rc.text();
+  ok(rc.status === 200 && rc.headers.get("content-type").startsWith("text/calendar") && txtIcs.includes(`DTSTART:${ini}`) && txtIcs.includes(`UID:${p1.numero}@`) && txtIcs.split("\r\n").every((l) => Buffer.byteLength(l) <= 75), "ficheiro .ics da marcação (iPhone, Outlook)");
+  rc = await api(new Request(`https://oms.exemplo/api/calendario?n=${p1.numero}&t=errado`));
+  ok(rc.status === 404, "ficheiro .ics só com o token certo");
   const d1 = Object.values(S.docs)[0];
   ok(d1.status === 1 && d1.dados.documentSetId === 7, "fatura-recibo fechada na série SPA");
   ok(d1.dados.products.length === 1 && d1.dados.products[0].productId === 101 && d1.dados.products[0].taxes.length === 0 && d1.dados.products[0].exemptionReason === "M10", "linha TREAB, sem IVA, com motivo de isenção");
@@ -156,6 +165,7 @@ try {
   ok(S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome), "fatura enviada com o texto da terapêutica de reabilitação");
   const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && !e.subject.includes("código"));
   ok(e1 && e1.html.includes("Iniciará de seguida a sua terapêutica de reabilitação: " + esc(outro.nome)) && e1.subject.includes("Marcação confirmada"), "email de confirmação com o texto do Pedro (reabilitação)");
+  ok(e1.html.includes("Adicionar ao Google Calendar") && e1.attachments?.[0]?.filename === `${p1.numero}.ics` && Buffer.from(e1.attachments[0].content, "base64").toString().includes("BEGIN:VEVENT"), "email de confirmação com o botão do Google Calendar e o .ics em anexo");
   ok(S.emails.some((e) => e.to[0] === cat.spa.email && e.subject.includes(p1.numero)), "aviso à equipa por email");
   await notificar(p1);
   ok(Object.keys(S.docs).length === 1, "notificação repetida não emite segunda fatura");
@@ -327,7 +337,6 @@ try {
   // Dia útil daqui a 3+ dias
   let dia = new Date(Date.now() + 3 * 864e5); while ([0, 6].includes(dia.getUTCDay())) dia = new Date(dia.getTime() + 864e5);
   const D = dia.toISOString().slice(0, 10);
-  const { instanteLisboa } = await import("../servidor/datas.mjs");
   const luisa = cat.equipa.find((p) => p.nome === "Luísa Pinto");
   const tz = cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60 && t.grupo !== "Relaxar") || cat.tratamentos.find((t) => luisa.faz.includes(t.id) && t.duracao <= 60);
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");

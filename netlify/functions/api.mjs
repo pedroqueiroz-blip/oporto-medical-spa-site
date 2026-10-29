@@ -7,6 +7,7 @@ import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
 import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos } from "../../servidor/zoho.mjs";
 import { estados, simbolo, ultimosPedidos, vouchersComprados, nomeMetodo } from "../../servidor/estado.mjs";
 import { dataPT, hojeISO } from "../../servidor/datas.mjs";
+import { ics } from "../../servidor/calendario.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -218,6 +219,14 @@ ${procura}${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda n
       const p = await obter(url.searchParams.get("n"));
       if (!p || p.token !== url.searchParams.get("t")) return json({ erro: erro("Pedido não encontrado.") }, 404);
       return json(publico(p));
+    }
+
+    // Ficheiro .ics da marcação confirmada (botão na página de confirmação), para guardar no calendário do cliente.
+    if (rota === "/calendario" && m === "GET") {
+      const p = await obter(url.searchParams.get("n"));
+      const texto = p && p.token === url.searchParams.get("t") && (p.estado === "pago" || p.estado === "confirmado") ? ics(p) : null;
+      if (!texto) return json({ erro: erro("Pedido não encontrado.") }, 404);
+      return new Response(texto, { headers: { "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": `attachment; filename="${p.numero}.ics"`, "Cache-Control": "no-store" } });
     }
 
     // Notificação de pagamento da euPago (Webhook 1.0), configurada no canal da euPago.

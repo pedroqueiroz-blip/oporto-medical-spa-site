@@ -4,6 +4,7 @@ import { spa, TEXTO_TERAPEUTICA } from "./catalogo.mjs";
 import { dataPT } from "./datas.mjs";
 import { estados, simbolo } from "./estado.mjs";
 import { dataEN, nomeEN, campanhaEN, codigoEN, TEXTO_TERAPEUTICA_EN } from "./ingles.mjs";
+import { linkGoogle, ics } from "./calendario.mjs";
 
 export const emailAtivo = () => Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
 
@@ -12,14 +13,14 @@ const eur = (v) => Number(v).toLocaleString("pt-PT", { minimumFractionDigits: Nu
 const eurEN = (v) => "€" + Number(v).toLocaleString("en-GB", { minimumFractionDigits: Number(v) % 1 ? 2 : 0, maximumFractionDigits: 2 });
 const site = () => String(process.env.URL_SITE || spa.url || "").replace(/\/$/, "");
 
-async function enviar({ para, assunto, html }) {
+async function enviar({ para, assunto, html, anexos }) {
   if (!emailAtivo() || !para) return { enviado: false };
   try {
     const r = await fetch(process.env.RESEND_API_BASE || "https://api.resend.com/emails", {
       method: "POST",
       signal: AbortSignal.timeout(15000),
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: process.env.EMAIL_FROM, to: [para], subject: assunto, html, ...(spa.email ? { reply_to: spa.email } : {}) }),
+      body: JSON.stringify({ from: process.env.EMAIL_FROM, to: [para], subject: assunto, html, ...(anexos?.length ? { attachments: anexos } : {}), ...(spa.email ? { reply_to: spa.email } : {}) }),
     });
     if (r.ok) return { enviado: true };
     const j = await r.json().catch(() => ({}));
@@ -42,6 +43,11 @@ const linhas = (pares) => `<table style="width:100%;border-collapse:collapse;fon
 const valorPago = (p) => p.total > 0 ? eur(p.total) + (p.desconto ? ` <span style="color:#7a6650;font-weight:400">(${esc(p.codigo?.texto || "desconto")})</span>` : "")
   : p.codigo?.tipo === "voucher" ? `Voucher oferta ${esc(p.codigo.codigo)}` : "Sem custos";
 
+// Marcação no calendário do cliente: botão do Google Calendar e o ficheiro .ics em anexo (iPhone, Outlook).
+const botaoCalendario = (p, texto, nota) => `<p style="margin:18px 0 6px"><a href="${esc(linkGoogle(p))}" style="display:inline-block;background:#0D0A08;color:#E8DCC8;text-decoration:none;padding:12px 22px;font-size:12px;letter-spacing:.2em;text-transform:uppercase">${esc(texto)}</a></p>
+<p style="font-size:13px;color:#7a6650;margin:0 0 14px">${esc(nota)}</p>`;
+const anexoCalendario = (p) => [{ filename: `${p.numero}.ics`, content: Buffer.from(ics(p), "utf8").toString("base64") }];
+
 // Confirmação da marcação, com o texto do Pedro para a terapêutica (TREAB ou TPREV).
 export const emailMarcacao = (p) => p.lingua === "en" ? EN.marcacao(p) : enviar({
   para: p.cliente.email,
@@ -50,8 +56,10 @@ export const emailMarcacao = (p) => p.lingua === "en" ? EN.marcacao(p) : enviar(
 <p>${esc(TEXTO_TERAPEUTICA[p.tratamento.artigo](p.tratamento.nome))}</p>
 ${linhas([["Tratamento", esc(p.tratamento.nome)], ["Dia", esc(dataPT(p.marcacao.data, { semana: true }))], ["Hora", `${esc(p.marcacao.hora)} · ${esc(p.tratamento.duracao)} min`],
     p.marcacao.terapeuta && ["Terapeuta", esc(p.marcacao.terapeuta)], ["Valor", valorPago(p)], ["N.º da marcação", esc(p.numero)]])}
+${botaoCalendario(p, "Adicionar ao Google Calendar", "No iPhone ou no Outlook, abra o ficheiro de calendário em anexo.")}
 <p>Chegue dez a quinze minutos antes: o chá fica à sua espera. Pode alterar ou cancelar sem custos até 24 horas antes, respondendo a este email ou pelo ${esc(spa.telefone)}.</p>
 ${p.total > 0 ? `<p style="font-size:13px;color:#7a6650">A fatura-recibo segue num email à parte.</p>` : ""}`),
+  anexos: anexoCalendario(p),
 });
 
 // Voucher pago: o código só aparece aqui.
@@ -127,8 +135,10 @@ const EN = {
 <p>${esc(TEXTO_TERAPEUTICA_EN[p.tratamento.artigo](nomeTrat(p)))}</p>
 ${linhas([["Treatment", esc(nomeTrat(p))], ["Day", esc(dataEN(p.marcacao.data, { semana: true }))], ["Time", `${esc(p.marcacao.hora)} · ${esc(p.tratamento.duracao)} min`],
       p.marcacao.terapeuta && ["Therapist", esc(p.marcacao.terapeuta)], ["Amount", valorPagoEN(p)], ["Booking no.", esc(p.numero)]])}
+${botaoCalendario(p, "Add to Google Calendar", "On iPhone or Outlook, open the attached calendar file.")}
 <p>Please arrive ten to fifteen minutes early: your tea will be waiting. You can change or cancel free of charge up to 24 hours beforehand by replying to this email or calling ${esc(spa.telefone)}.</p>
 ${p.total > 0 ? `<p style="font-size:13px;color:#7a6650">Your invoice-receipt will follow in a separate email (in Portuguese).</p>` : ""}`, "en"),
+    anexos: anexoCalendario(p),
   }),
   voucher: (p) => {
     const nome = p.campanha ? campanhaEN(p.campanha.id) || nomeTrat(p) : nomeTrat(p);
