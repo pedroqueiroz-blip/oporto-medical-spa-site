@@ -152,17 +152,20 @@ ${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há pe
         const situacao = !v.codigo ? (pago ? ["✗ voucher por emitir", "#E0A58C"] : ["… à espera do pagamento", "rgba(232,220,200,.6)"])
           : p.uso ? [`usado a ${quando(p.uso.em).slice(0, 10)} (marcação ${p.uso.pedido})`, "rgba(232,220,200,.6)"]
           : v.validade && v.validade < hoje ? [`expirou a ${dataPT(v.validade)}`, "#E0A58C"]
-          : [`por usar · válido até ${v.validade ? dataPT(v.validade) : "?"}`, "#A8C99A"];
+          : ["por usar", "#A8C99A"];
+        // Validade: fim do mês, 12 meses depois da compra (só existe depois de pago, quando o voucher é emitido).
+        const validade = v.validade ? `${dataPT(v.validade)} (${v.validade.split("-").reverse().join("/")})` : "";
         const oferta = `${p.tratamento?.nome || ""}${p.campanha?.nome ? ` · campanha ${p.campanha.nome}` : ""}`;
         const metodo = p.total > 0 ? `${nomeMetodo(p) || "por escolher"} · ${eur(p.pagamento?.pago?.valor ?? p.total)}${p.codigo ? ` (${p.codigo.texto})` : ""}${p.pagamento?.pago?.transacao ? ` · transação ${p.pagamento.pago.transacao}` : ""}` : `Sem pagamento (${p.codigo?.texto || "0 €"})`;
         const compra = [p.numero, quando(p.criado), p.cliente?.nome, p.cliente?.email, p.cliente?.telefone, p.cliente?.nif ? `NIF ${p.cliente.nif}` : "", p.fatura?.numero ? `fatura ${p.fatura.numero}` : ""].filter(Boolean);
         const entrega = `${v.formato === "caixa" ? "Caixa oferta, no SPA" : "Digital, por email"}${v.para ? ` · para ${v.para}` : ""}${v.de ? ` · de ${v.de}` : ""}`;
         // Texto de cada campo para a pesquisa (em minúsculas e sem acentos, como a pesquisa).
-        const campos = { codigo: [v.codigo, p.numero], compra: [...compra, entrega], oferta: [oferta], pagamento: [metodo], mensagem: [v.mensagem, v.para, v.de] };
+        const campos = { codigo: [v.codigo, p.numero], compra: [...compra, entrega], oferta: [oferta], validade: [validade], pagamento: [metodo], mensagem: [v.mensagem, v.para, v.de] };
         const dados = Object.entries(campos).map(([k, xs]) => ` data-${k}="${e(xs.filter(Boolean).join(" ").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase())}"`).join("");
         return `<div class="v"${dados}${pago ? "" : " data-porpagar"} style="text-align:left;border:1px solid rgba(232,220,200,.2);border-radius:6px;padding:14px 16px;margin:12px 0">
 <p style="margin:0;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline"><b style="font:400 22px 'EB Garamond',Georgia,serif;letter-spacing:.04em">${e(v.codigo || "Sem número ainda")}</b><span style="font-size:13px;color:${situacao[1]}">${e(situacao[0])}</span></p>
 <p style="margin:6px 0 0"><span class="nota">Oferta:</span> ${e(oferta)}</p>
+<p style="margin:2px 0 0"><span class="nota">Validade:</span> ${validade ? `até ${e(validade)}` : `<span class="nota">só depois de pago</span>`}</p>
 <p style="margin:2px 0 0"><span class="nota">Entrega:</span> ${e(entrega)}</p>
 <p style="margin:2px 0 0"><span class="nota">Mensagem:</span> ${v.mensagem ? `«${e(v.mensagem)}»` : `<span class="nota">sem mensagem</span>`}</p>
 <p style="margin:2px 0 0"><span class="nota">Pagamento:</span> ${e(metodo)}</p>
@@ -172,15 +175,15 @@ ${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há pe
       const procura = `<form id="procura" onsubmit="return false" style="display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px">
 <input type="search" id="q" placeholder="Pesquisar…" autocomplete="off" style="flex:1 1 240px">
 <select id="campo" style="flex:0 1 auto;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:#0D0A08;color:inherit;font:inherit">
-<option value="">em todos os campos</option><option value="codigo">nº do voucher</option><option value="compra">dados da compra</option><option value="oferta">oferta</option><option value="pagamento">meio de pagamento</option><option value="mensagem">mensagem</option></select>
+<option value="">em todos os campos</option><option value="codigo">nº do voucher</option><option value="compra">dados da compra</option><option value="oferta">oferta</option><option value="validade">validade</option><option value="pagamento">meio de pagamento</option><option value="mensagem">mensagem</option></select>
 ${porPagar ? `<label class="nota" style="width:100%;text-align:left"><input type="checkbox" id="todos" style="width:auto;margin-right:6px">Mostrar também ${porPagar} ${porPagar === 1 ? "voucher" : "vouchers"} à espera do pagamento</label>` : ""}</form>
 <p class="nota" id="conta" style="text-align:left"></p>`;
-      const script = `<script>(function(){var q=document.getElementById("q"),c=document.getElementById("campo"),t=document.getElementById("todos"),n=document.getElementById("conta"),vs=[].slice.call(document.querySelectorAll(".v")),k=["codigo","compra","oferta","pagamento","mensagem"];
+      const script = `<script>(function(){var q=document.getElementById("q"),c=document.getElementById("campo"),t=document.getElementById("todos"),n=document.getElementById("conta"),vs=[].slice.call(document.querySelectorAll(".v")),k=["codigo","compra","oferta","validade","pagamento","mensagem"];
 function f(){var s=q.value.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim().split(/\\s+/).filter(Boolean),ks=c.value?[c.value]:k,x=0;
 vs.forEach(function(v){var txt=ks.map(function(a){return v.dataset[a]||""}).join(" "),ok=(!v.hasAttribute("data-porpagar")||(t&&t.checked))&&s.every(function(p){return txt.indexOf(p)>=0});v.hidden=!ok;if(ok)x++});
 n.textContent=x+(x===1?" voucher":" vouchers")+(s.length?(x===1?" encontrado":" encontrados"):"");}
 q.addEventListener("input",f);c.addEventListener("change",f);if(t)t.addEventListener("change",f);f();q.focus();})();</script>`;
-      return pagina(`<h1>Vouchers</h1><p class="nota">Vouchers comprados no site, mais recentes primeiro. Pesquise pelo nº do voucher, comprador, email, telemóvel, NIF, oferta, meio de pagamento ou mensagem.</p>
+      return pagina(`<h1>Vouchers</h1><p class="nota">Vouchers comprados no site, mais recentes primeiro. Pesquise pelo nº do voucher, comprador, email, telemóvel, NIF, oferta, validade, meio de pagamento ou mensagem.</p>
 ${procura}${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há vouchers comprados.</p>`}${script}`, 200, { ...opc, largura: 760 });
     }
 
