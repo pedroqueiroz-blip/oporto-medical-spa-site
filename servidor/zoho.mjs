@@ -281,6 +281,35 @@ export async function prestadores() {
   return { modulo: m.api_name, campos, horario, ativo, lista: lista.map((x) => ({ ...x, ...lerHorario(x.texto) })) };
 }
 
+/* ---------- Turnos de cada dia («Horários de Colaborador») ---------- */
+
+// Pedro (29/10/2026): antes de propor uma hora, ver os turnos da profissional nesse dia. Estão no módulo
+// «Horários de Colaborador», um registo por pessoa e dia: Name «2026-10-29|Catarina Silva» e Periodos
+// «08:00-14:00, 15:00-20:00» (turno 1 e turno 2) ou «-» (sem turno, a tracejado na agenda).
+// Devolve Map «data|nome simplificado» → texto dos períodos, ou null se o módulo não existir.
+let moduloTurnos = null;
+async function apiTurnos() {
+  if (process.env.ZOHO_MODULO_TURNOS) return process.env.ZOHO_MODULO_TURNOS;
+  if (moduloTurnos) return moduloTurnos;
+  const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+  const m = mods.find((x) => x.api_name === "Horario_Colaborador") || mods.find((x) => /horarios? de colaborador/.test(simples(`${x.plural_label} ${x.singular_label}`)));
+  return (moduloTurnos = m?.api_name || null);
+}
+export async function turnos(datas, nomes) {
+  const mod = await apiTurnos();
+  if (!mod) return null;
+  const chaves = datas.flatMap((d) => nomes.map((n) => `${d}|${n}`)), out = new Map();
+  for (let i = 0; i < chaves.length; i += 50) {
+    const lista = chaves.slice(i, i + 50).map((k) => `'${k.replace(/'/g, "\\'")}'`).join(", ");
+    const j = await crm("POST", "/coql", { select_query: `select Name, Periodos from ${mod} where Name in (${lista}) limit 200` });
+    for (const r of j?.data || []) {
+      const [d, n] = String(r.Name || "").split("|");
+      out.set(`${d}|${simples(n)}`, String(r.Periodos ?? "").trim());
+    }
+  }
+  return out;
+}
+
 /* ---------- Turnos de cada dia (à procura do módulo) ---------- */
 
 // Pedro (29/10/2026): cada profissional tem, para cada dia, o turno 1 e o turno 2; sem turno (a tracejado

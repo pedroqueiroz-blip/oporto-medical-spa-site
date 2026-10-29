@@ -55,7 +55,7 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
-const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [], prestadores: [] };
+const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [], prestadores: [], moduloTurnos: false, turnos: [] };
 // Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
 const CAMPOS_TRAT = [
   { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" },
@@ -85,7 +85,8 @@ function zoho(req, body, j, res, out) {
   const cam = u.pathname.replace("/zoho/api/crm/v6", "");
   if (req.headers.authorization !== "Zoho-oauthtoken a1" && req.headers.authorization !== "Zoho-oauthtoken a2") { res.statusCode = 401; return out({ code: "INVALID_TOKEN" }); }
   if (cam === "/users") return out({ users: Z.users });
-  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : []), { api_name: "Prestadores", plural_label: "Prestadores" }] });
+  if (cam === "/settings/modules") return out({ modules: [{ api_name: "Contacts", plural_label: "Contactos" }, { api_name: "Events", plural_label: "Reuniões" }, ...(Z.moduloTrat ? [{ api_name: "Tratamentos_SPA", plural_label: "Tratamentos", singular_label: "Tratamento" }] : []), { api_name: "Prestadores", plural_label: "Prestadores" }, ...(Z.moduloTurnos ? [{ api_name: "Horario_Colaborador", plural_label: "Horários de Colaborador" }] : [])] });
+  if (cam === "/coql" && /from Horario_Colaborador/.test(j.select_query)) return out({ data: Z.turnos.filter((t) => j.select_query.includes(`'${t.Name}'`)), info: { more_records: false } });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Prestadores") return out({ fields: [{ api_name: "Name", field_label: "Nome de Prestador", data_type: "text" }, { api_name: "Ativo", field_label: "Ativo", data_type: "boolean" }, { api_name: "Horario_Padrao", field_label: "Horário padrão", data_type: "text" }, { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" }] });
   if (cam === "/Prestadores") return out({ data: Z.prestadores.map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => u.searchParams.get("fields").split(",").includes(k)))), info: { more_records: false } });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
@@ -410,6 +411,22 @@ try {
   ok(Z.marcacoes.length === nM + 1, "não duplica a marcação se já está na agenda");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D, hora: "18:00", qualquer: true, ...zc, codigo: "VIP" });
   ok(r.j.estado === "confirmado" && Z.marcacoes.at(-1).Pagamento === "Isento", "marcação com código VIP fica com Pagamento = Isento");
+
+  // Turnos do dia (Horários de Colaborador): só se marca dentro de um turno; «-» ou sem registo = indisponível
+  const mais = (d, n) => new Date(Date.parse(d + "T12:00:00Z") + n * 864e5).toISOString().slice(0, 10);
+  const D2 = mais(D, 7), D3 = mais(D, 14), D4 = mais(D, 21);
+  Z.moduloTurnos = true;
+  Z.turnos.push({ Name: `${D2}|Luísa Pinto`, Periodos: "09:00-11:00, 15:00-18:00" }, { Name: `${D3}|Luísa Pinto`, Periodos: "-" });
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D2}&dias=1`, null, "GET");
+  const lt = r.j.livres[luisa.id][D2];
+  ok(lt.includes("09:00") && lt.includes("15:00") && !lt.includes("08:00") && !lt.includes("12:00") && !lt.includes("18:00") && !lt.includes(tz.duracao > 60 ? "10:30" : "11:00"), `só há horas dentro dos turnos do dia (${lt.join(", ")})`);
+  r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D3}&dias=1`, null, "GET");
+  const r4 = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D4}&dias=1`, null, "GET");
+  ok(!r.j.livres[luisa.id][D3].length && !r4.j.livres[luisa.id][D4].length, "sem turno nesse dia («-») ou sem registo, a profissional não está disponível");
+  r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D2, hora: "12:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
+  ok(r.status === 400, "uma hora fora dos turnos é recusada antes de pagar, mesmo sem outra marcação");
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D2 });
+  ok(pg.txt.includes("turnos: 09:00-11:00, 15:00-18:00"), "a verificação mostra os turnos de cada pessoa no dia");
 
   console.log("\nTudo certo.");
 } finally {

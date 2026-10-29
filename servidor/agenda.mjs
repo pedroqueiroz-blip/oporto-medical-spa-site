@@ -6,7 +6,7 @@
 import catalogo from "./gerado/catalogo.json" with { type: "json" };
 import { tratamento as lerTratamento } from "./catalogo.mjs";
 import { instanteLisboa, hojeISO } from "./datas.mjs";
-import { zohoLigado, utilizadores, ocupacoes, criarMarcacao, moduloMarcacoes, clienteCRM, prestadores } from "./zoho.mjs";
+import { zohoLigado, utilizadores, ocupacoes, criarMarcacao, moduloMarcacoes, clienteCRM, prestadores, turnos } from "./zoho.mjs";
 import { trabalha } from "./horario.mjs";
 import { store, STORES } from "./store.mjs";
 
@@ -65,8 +65,20 @@ export async function guardarHora(p) {
 
 // Ocupa a pessoa um evento seu (utilizador do CRM) ou uma marcação do módulo com o nome dela.
 const dela = (e, p) => (e.dono && e.dono === p.dono) || (e.nome && simples(e.nome) === simples(p.nome));
-function livre(evs, p, data, hora, duracao) {
-  if (!aberto(data, hora, duracao) || (p.horario && !trabalha(p.horario, data, hora, duracao))) return false;
+// Turnos do dia (Horários de Colaborador): «08:00-14:00, 15:00-20:00» → [[480, 840], [900, 1200]]; «-» → [].
+const faixasTurno = (texto) => [...String(texto || "").matchAll(/(\d{1,2})[:h](\d{2})\s*[-–]\s*(\d{1,2})[:h](\d{2})/g)].map((m) => [m[1] * 60 + +m[2], m[3] * 60 + +m[4]]);
+function noTurno(tur, p, data, hora, duracao) {
+  const texto = tur.get(`${data}|${simples(p.nome)}`);
+  const ini = minutos(hora), fim = ini + duracao;
+  // Sem registo ou sem turno nesse dia, não está disponível; a marcação inteira tem de caber num só turno.
+  return texto != null && faixasTurno(texto).some(([a, b]) => ini >= a && fim <= b);
+}
+const lerTurnos = (datas, pessoas) => turnos(datas, pessoas.map((p) => p.nome)).catch((e) => { console.error("Zoho turnos", e.message); return null; });
+
+// tur: turnos do dia (Map) quando o módulo existe; mandam eles. Sem o módulo, vale o horário padrão do Prestadores.
+function livre(evs, p, data, hora, duracao, tur = null) {
+  if (!aberto(data, hora, duracao)) return false;
+  if (tur ? !noTurno(tur, p, data, hora, duracao) : p.horario && !trabalha(p.horario, data, hora, duracao)) return false;
   const ini = instanteLisboa(data, hora).t, fim = ini + duracao * 60e3;
   if (ini < Date.now() + ANTECEDENCIA) return false;
   return !evs.some((e) => dela(e, p) && (e.diaInteiro ? e.dia === data : e.inicio < fim && e.fim > ini));
@@ -85,10 +97,11 @@ export async function disponibilidade({ tratamento: id, de, dias = 14 }) {
   if (!comAgenda.length) return { fonte: "simulada", aviso: "Ninguém da equipa deste tratamento está nas listas de profissionais do módulo Tratamentos." };
   const datas = Array.from({ length: n }, (_, i) => somarDias(inicio, i));
   const evs = [...await ocupacoes(instanteLisboa(datas[0], "00:00").iso, instanteLisboa(datas.at(-1), "23:59").iso), ...await guardadas()];
+  const tur = await lerTurnos(datas, comAgenda);
   const livres = {};
   for (const p of comAgenda) {
     livres[p.id] = {};
-    for (const d of datas) livres[p.id][d] = HORAS.filter((h) => livre(evs, p, d, h, t.duracao));
+    for (const d of datas) livres[p.id][d] = HORAS.filter((h) => livre(evs, p, d, h, t.duracao, tur));
   }
   return { fonte: "zoho", livres, semAgenda: equipa.filter((p) => !p.agenda).map((p) => p.nome) };
 }
@@ -103,7 +116,8 @@ export async function confirmarHora(p, { terapeutaId, qualquer }) {
   const evs = [...await ocupacoes(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso), ...await guardadas(p.cliente.email)];
   // «Sem preferência»: das livres a essa hora, a que tem menos marcações nesse dia; empate à sorte (Pedro, 28/10/2026).
   const marcacoesDia = (x) => new Set(evs.filter((e) => dela(e, x)).map((e) => `${e.inicio}-${e.fim}`)).size;
-  const livres = candidatos.filter((x) => livre(evs, x, data, hora, dur)).map((x) => ({ x, n: marcacoesDia(x), sorte: Math.random() }));
+  const tur = await lerTurnos([data], candidatos);
+  const livres = candidatos.filter((x) => livre(evs, x, data, hora, dur, tur)).map((x) => ({ x, n: marcacoesDia(x), sorte: Math.random() }));
   const escolhida = livres.sort((a, b) => a.n - b.n || a.sorte - b.sorte)[0]?.x;
   if (!escolhida) throw new ErroAgenda("Esta hora acabou de ser ocupada. Escolha outra, por favor.");
   p.marcacao.terapeuta = escolhida.nome;
@@ -137,9 +151,10 @@ export async function diaAgenda(data) {
   const diag = [];
   const evs = [...await ocupacoes(instanteLisboa(data, "00:00").iso, instanteLisboa(data, "23:59").iso, diag), ...await guardadas()];
   const equipa = await equipaCRM();
+  const tur = await lerTurnos([data], equipa);
   return {
     lidos: [...evs, ...diag].sort((a, b) => a.inicio - b.inicio),
-    pessoas: equipa.map((p) => ({ nome: p.nome, agenda: p.agenda, dono: p.dono, horario: Boolean(p.horario), livres: p.agenda ? HORAS.filter((h) => livre(evs, p, data, h, 60)) : [],
+    pessoas: equipa.map((p) => ({ nome: p.nome, agenda: p.agenda, dono: p.dono, horario: Boolean(p.horario), turno: tur ? tur.get(`${data}|${simples(p.nome)}`) ?? null : undefined, livres: p.agenda ? HORAS.filter((h) => livre(evs, p, data, h, 60, tur)) : [],
       ocupada: evs.filter((e) => dela(e, p)).length })),
   };
 }
