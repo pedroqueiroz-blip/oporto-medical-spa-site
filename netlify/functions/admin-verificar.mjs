@@ -164,7 +164,8 @@ export default async (req) => {
   if (!env("BACKOFFICE_PASSWORD")) return pagina(`<h1>Verificar ligações</h1><p>Falta a palavra-passe do backoffice (BACKOFFICE_PASSWORD) no Netlify, que protege esta página.</p>`);
   if (req.method !== "POST") return formulario();
   const dados = new URLSearchParams(await req.text());
-  if (!certa(dados.get("senha") || "", env("BACKOFFICE_PASSWORD"))) { await pausa(1500); return formulario("Palavra-passe errada."); }
+  // Palavra-passe, ou a chave da sessão já aberta no /admin (botão «Verificar ligações»).
+  if (!certa(dados.get("senha") || "", env("BACKOFFICE_PASSWORD")) && !certa(dados.get("senha") || "", env("BACKOFFICE_GITHUB_TOKEN"))) { await pausa(1500); return formulario("Palavra-passe errada."); }
 
   const origem = new URL(req.url).origin;
   const [gh, em, mo, eu] = await Promise.all([github(), resend(dados.get("email") === "1"), moloni(), eupago(origem)]);

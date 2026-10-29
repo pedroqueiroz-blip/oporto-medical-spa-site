@@ -2,6 +2,7 @@
 // (o pagamento e a fatura funcionam na mesma; o cliente vê o resultado na página de pagamento).
 import { spa, TEXTO_TERAPEUTICA } from "./catalogo.mjs";
 import { dataPT } from "./datas.mjs";
+import { estados, simbolo } from "./estado.mjs";
 import { dataEN, nomeEN, campanhaEN, codigoEN, TEXTO_TERAPEUTICA_EN } from "./ingles.mjs";
 
 export const emailAtivo = () => Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
@@ -89,6 +90,7 @@ export const emailInterno = (p, problema) => enviar({
   para: process.env.EMAIL_RESERVAS || spa.email,
   assunto: `${problema ? "Atenção · " : ""}${p.tipo === "voucher" ? "Voucher" : "Marcação"} ${p.numero} · ${p.tratamento.nome}${p.marcacao ? ` · ${p.marcacao.data} ${p.marcacao.hora}` : ""}`,
   html: moldura(`${problema ? `<p style="color:#a33"><b>${esc(problema)}</b></p>` : ""}${linhas([
+    ["Estado", estados(p).map((x) => `<span style="color:${x.ok === false ? "#a33" : x.ok ? "#2f6b3a" : "#7a6650"}">${simbolo(x.ok)} ${esc(x.texto)}</span>`).join("<br>")],
     ["Pedido", esc(p.numero)], ["Tratamento", `${esc(p.tratamento.nome)} (${esc(p.tratamento.artigo)})`], ...(p.campanha ? [["Campanha", `${esc(p.campanha.nome)} · ${esc(p.tratamento.duracao)} min`]] : []),
     p.marcacao && ["Dia e hora", `${esc(dataPT(p.marcacao.data, { semana: true }))}, ${esc(p.marcacao.hora)}`],
     p.marcacao?.terapeuta && ["Terapeuta", esc(p.marcacao.terapeuta)],
@@ -97,9 +99,7 @@ export const emailInterno = (p, problema) => enviar({
     p.lingua === "en" && ["Língua", "Inglês (marcou no site em inglês)"],
     p.voucher && ["Entrega", p.voucher.formato === "caixa" ? "Caixa oferta, levanta no SPA (preparar a caixa)" : "Digital, por email"],
     ["Cliente", `${esc(p.cliente.nome)} · ${esc(p.cliente.email)} · ${esc(p.cliente.telefone)}${p.cliente.nif ? ` · NIF ${esc(p.cliente.nif)}` : ""}`],
-    ["Valor", valorPago(p)], p.fatura?.numero && ["Fatura", esc(p.fatura.numero)], p.moloni?.erro && ["Moloni", esc(p.moloni.erro)],
-    p.zoho?.evento && ["Zoho CRM", `Na agenda${p.zoho.clienteNovo ? " · ficha de cliente nova" : " · cliente já existente"}${p.zoho.nota ? ` · ${esc(p.zoho.nota)}` : ""}`],
-    p.zoho?.erro && ["Zoho CRM", `<span style="color:#a33">Não ficou na agenda: ${esc(p.zoho.erro)}. Marcar à mão.</span>`],
+    ["Valor", valorPago(p)],
   ])}`),
 });
 

@@ -19,6 +19,12 @@ euPago ── notificação ──> /api/eupago-notificacao
 Newsletter (Netlify Forms) ──> submission-created: código de 10% por email
 ```
 
+O email à equipa começa por um «Estado» com ✓/✗ para cada passo (reservado na agenda Zoho, euPago, fatura Moloni,
+email ao cliente) e os erros. A página `/api/reservas` (palavra-passe do backoffice, botão «Reservas» no /admin) mostra
+os últimos 50 pedidos com cliente, contactos, valor e o mesmo estado; os que têm erro ficam a vermelho.
+A página `/api/vouchers` (botão «Vouchers» no /admin) mostra todos os vouchers comprados: número do voucher e se já
+foi usado, oferta, entrega, mensagem, meio de pagamento e dados da compra, com pesquisa por qualquer um desses campos.
+
 Código: `netlify/functions/` (rotas) e `servidor/` (euPago, Moloni ON, emails, códigos, pedidos).
 Os pedidos e os códigos ficam no Netlify Blobs. Teste completo com serviços simulados: `npm test`.
 
@@ -114,10 +120,20 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
 
 - **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
   uma hora está livre quando ela não tem nenhuma marcação no módulo Tratamentos (nem evento em Reuniões) que se sobreponha à duração do tratamento
-  (eventos de dia inteiro ocupam o dia). Mesmas horas do site, encerra ao domingo e ao sábado à tarde, e nunca a menos de 1 hora.
+  (eventos de dia inteiro ocupam o dia; uma Reunião «Bloqueado (Profissionais:Spa:Nome)» ocupa a profissional do título, seja quem for o responsável). Horas de meia em meia hora, das 8:00 às 20:00 (ao sábado das 9:00 às 13:00, encerra ao domingo),
+  com o tratamento inteiro dentro desse período, e nunca a menos de 1 hora.
+- **Turnos de cada dia** (manda sobre o horário padrão): módulo «Horários de Colaborador», um registo por pessoa e dia
+  (Name `2026-10-29|Catarina Silva`, Periodos `08:00-14:00, 15:00-20:00` ou `-`). Só aparecem horas em que o tratamento inteiro
+  cabe num turno; com `-` não se marca nesse dia; sem registo nesse dia vale o «Horário padrão» do Prestadores
+  (Pedro, 29/10/2026).
+- **Horário de cada colaboradora**: campo «Horário padrão» do módulo Prestadores (registo com o mesmo nome do site), por exemplo
+  `seg-sex 12:30-20:00; sab 09:00-13:00 quinzenal 14-11-2026` (partes separadas por «;»; «quinzenal» = sábado sim, sábado não,
+  contando a semana da data indicada). Só aparecem horas em que o tratamento inteiro cabe nesse horário. Quem tiver «Ativo» desligado
+  fica fora da agenda online; sem registo ou com horário que não se consiga ler, valem só as horas do SPA. A página
+  `/api/zoho/verificar` mostra como cada horário foi lido.
 - **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
   do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
-- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
+- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a pessoa livre a essa hora que tem menos marcações nesse dia (empate à sorte).
 - **Só MB WAY ou cartão** nas marcações (Pedro, 27/10/2026): confirmam na hora, e a marcação entra logo no CRM. O Multibanco fica para os vouchers.
 - Enquanto o pagamento não chega, a hora fica **guardada 10 minutos** (Netlify Blobs `reservas`): não aparece livre a mais ninguém.
   Pago, passa a evento no CRM; sem pagamento, volta a ficar livre.

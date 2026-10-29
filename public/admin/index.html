@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Backoffice · Oporto Medical Spa</title>
-<link rel="icon" href="/logo-brown.svg">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap">
@@ -99,8 +100,11 @@
   .entrar .erro { min-height: 20px; margin: 10px 0 0; color: #E0A58C; font-size: 13px; }
   .entrar button { margin-top: 6px; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 0; border-radius: 999px; background: var(--linen); color: var(--night); font: 600 12px var(--body); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
   .entrar button:disabled { opacity: .6; }
-  .verificar { position: fixed; left: 16px; bottom: 14px; z-index: 50; padding: 6px 14px; border-radius: 999px; background: var(--card); box-shadow: 0 1px 0 var(--line); color: var(--muted) !important; font-size: 12px; text-decoration: none; }
-  .verificar:hover { color: var(--night) !important; }
+  /* Atalhos da equipa, sempre à vista no canto: reservas do site, vouchers e verificação das ligações */
+  .atalhos { position: fixed; left: 16px; bottom: 16px; z-index: 900; display: flex; flex-wrap: wrap; gap: 8px; }
+  .atalhos a { padding: 9px 18px; border-radius: 999px; background: var(--night); border: 1px solid var(--flame); color: var(--linen) !important; font: 500 13px var(--body); letter-spacing: .02em; text-decoration: none; box-shadow: 0 8px 24px -12px rgba(13, 10, 8, .6); }
+  .atalhos a:first-child { background: var(--flame); color: var(--night) !important; }
+  .atalhos a:hover { border-color: var(--linen); }
 </style>
 </head>
 <body>
@@ -110,7 +114,26 @@
   <p class="erro" aria-live="polite"></p>
   <button type="submit">Entrar</button>
 </form>
-<a class="verificar" href="/admin-verificar" target="_blank" rel="noopener">Verificar ligações</a>
+<nav class="atalhos" aria-label="Atalhos">
+  <a href="/api/reservas" target="_blank" rel="noopener" data-atalho>Reservas</a>
+  <a href="/api/vouchers" target="_blank" rel="noopener" data-atalho>Vouchers</a>
+  <a href="/admin-verificar" target="_blank" rel="noopener" data-atalho>Verificar ligações</a>
+</nav>
+<script>
+  /* Com a sessão do backoffice aberta, os atalhos entram logo, sem pedir a palavra-passe outra vez */
+  document.querySelectorAll('[data-atalho]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var t = '';
+      try { t = (JSON.parse(localStorage.getItem('decap-cms-user') || 'null') || {}).token || ''; } catch (x) {}
+      if (!t) return;
+      e.preventDefault();
+      var f = document.createElement('form'), i = document.createElement('input');
+      f.method = 'post'; f.action = a.getAttribute('href'); f.target = '_blank';
+      i.type = 'hidden'; i.name = 'senha'; i.value = t; f.appendChild(i);
+      document.body.appendChild(f); f.submit(); f.remove();
+    });
+  });
+</script>
 <script>window.CMS_MANUAL_INIT = true;</script>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>

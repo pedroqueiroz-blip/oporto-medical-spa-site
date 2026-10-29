@@ -2,9 +2,11 @@
 // e a notificação de pagamento da euPago. A fatura (Moloni ON) e os emails seguem do servidor.
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
-import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, ErroAgenda } from "../../servidor/agenda.mjs";
+import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, diaAgenda, ErroAgenda } from "../../servidor/agenda.mjs";
 import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
-import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
+import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos } from "../../servidor/zoho.mjs";
+import { estados, simbolo, ultimosPedidos, vouchersComprados, nomeMetodo } from "../../servidor/estado.mjs";
+import { dataPT, hojeISO } from "../../servidor/datas.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -13,12 +15,14 @@ export const config = { path: "/api/*" };
 const json = (dados, status = 200) => new Response(JSON.stringify(dados), { status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" } });
 const pausa = (ms) => new Promise((r) => setTimeout(r, ms)); // trava tentativas de códigos em série
 
-// Página simples (ligação ao Zoho CRM), nas cores da marca.
-const pagina = (html, status = 200) => new Response(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Ligar ao Zoho CRM</title>
-<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(380px,calc(100vw - 32px));text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
+// Página simples (Zoho CRM, reservas), nas cores da marca.
+const pagina = (html, status = 200, { titulo = "Ligar ao Zoho CRM", largura = 380 } = {}) => new Response(`<!doctype html><html lang="pt"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${titulo}</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(${largura}px,calc(100vw - 32px));padding:24px 0;text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
   { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer" } });
 const resumo = (t) => createHash("sha256").update(String(t)).digest();
-const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD && dada) && timingSafeEqual(resumo(dada), resumo(process.env.BACKOFFICE_PASSWORD));
+// Palavra-passe do backoffice, ou a chave da sessão já aberta no /admin (botões «Reservas» e «Verificar ligações»).
+const igual = (dada, guardada) => Boolean(guardada && dada) && timingSafeEqual(resumo(dada), resumo(guardada));
+const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD) && (igual(dada, process.env.BACKOFFICE_PASSWORD) || igual(dada, process.env.BACKOFFICE_GITHUB_TOKEN));
 
 async function corpo(req) {
   const tipo = req.headers.get("content-type") || "";
@@ -73,6 +77,22 @@ export default async (req) => {
       }
       const linhas = estado.ligado ? await verificarCRM(catalogo.equipa || [], catalogo.tratamentos || []) : [{ ok: false, titulo: "Ligação ao Zoho CRM", detalhe: estado.configurado ? "Por ligar neste site: abra /api/zoho/ligar." : "Faltam ZOHO_CLIENT_ID e ZOHO_CLIENT_SECRET neste site (Netlify, contexto de produção)." }];
       const marc = await ultimasMarcacoes(10);
+      // Um dia da agenda como o site o vê (para conferir com o Zoho): o que leu e as horas livres de cada pessoa.
+      const dia = /^\d{4}-\d{2}-\d{2}$/.test(form.get("dia") || "") ? form.get("dia") : hojeISO(new Date(Date.now() + 864e5));
+      let blocoDia = "";
+      if (estado.ligado) {
+        const hm = (t) => (t ? new Date(t).toLocaleTimeString("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit" }) : "?");
+        try {
+          const d = await diaAgenda(dia);
+          blocoDia = `<p class="nota"><b>Lido do Zoho para ${e(dataPT(dia, { semana: true }))}</b> (${d.lidos.length}):</p>${d.lidos.map((x) => `<p class="nota" style="margin:2px 0">${x.diaInteiro ? "dia inteiro" : `${hm(x.inicio)}–${hm(x.fim)}`} · ${e(x.origem || "hora guardada no site (pagamento)")} · ${e(x.nome || "")}${x.titulo ? ` · ${e(x.titulo)}` : ""}</p>`).join("") || `<p class="nota">Nada neste dia.</p>`}
+<p class="nota" style="margin-top:14px"><b>Horas livres no site</b> (tratamento de 60 min):</p>${d.pessoas.map((p) => `<p class="nota" style="margin:2px 0"><b>${e(p.nome)}</b>: ${!p.agenda ? "sem agenda online (não está nas listas de profissionais ou está inativa)" : `${p.livres.join(", ") || "nenhuma"} · ${p.ocupada} ocupações lidas · ${p.turno === undefined ? (p.horario ? "com horário do Prestadores" : "sem horário do Prestadores") : p.turno === null ? `sem registo nos Horários de Colaborador: ${p.horario ? "vale o horário padrão do Prestadores" : "sem horário padrão, não está disponível"}` : !/\d/.test(p.turno) ? `turnos: ${p.turno}: não se marca nesse dia` : `turnos: ${p.turno}`}${p.dono ? " · utilizadora do CRM" : " · não é utilizadora do CRM (as Reuniões não contam para ela)"}`}</p>`).join("")}`;
+        } catch (err) { blocoDia = `<p class="erro">Não consegui ler a agenda deste dia: ${e(err.message)}</p>`; }
+        try {
+          const t = await procurarTurnos(dia);
+          blocoDia += `<p class="nota" style="margin-top:14px"><b>Turnos: módulos que podem ter o horário de cada dia</b></p>${t.map((l) => `<p class="nota" style="margin:4px 0"><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br>${e(l.detalhe)}</p>`).join("")}`;
+        } catch (err) { blocoDia += `<p class="erro">Turnos: ${e(err.message)}</p>`; }
+      }
+      const formDia = `<form method="post" style="display:flex;gap:8px;align-items:center;margin:8px 0 14px"><input type="hidden" name="senha" value="${e(senha)}"><input type="date" name="dia" value="${e(dia)}" style="width:auto"><button type="submit" style="margin:0;width:auto;padding:10px 18px">Ver dia</button></form>`;
       const ESTADOS = { novo: "por pagar", aguarda_pagamento: "à espera do pagamento", pago: "pago", confirmado: "confirmado (0 €)" };
       const linhaMarc = (x) => {
         const zoho = x.zoho?.evento ? "✓ na agenda do Zoho" : x.zoho?.erro ? `✗ ${x.zoho.erro}` : ["pago", "confirmado"].includes(x.estado) ? "✗ não foi enviada ao Zoho" : "— só vai para o Zoho depois de pago";
@@ -81,7 +101,87 @@ export default async (req) => {
         return `<p><b>${e(x.numero)}</b> · ${e(x.data)} ${e(x.hora)} · ${e(x.tratamento)} · ${e(x.terapeuta || "")}<br><span class="nota">${e(x.cliente)} · ${e(ESTADOS[x.estado] || x.estado)}${x.metodo ? ` (${e(x.metodo)})` : ""} · ${e(zoho)}</span>${botao}</p>`;
       };
       return pagina(`<h1>Verificação do Zoho CRM</h1>${aviso ? `<p class="${aviso.startsWith("✓") ? "nota" : "erro"}">${aviso}</p>` : ""}<div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}
+<h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Agenda de um dia</h2>${formDia}${blocoDia}
 <h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Últimas marcações do site</h2>${marc.length ? marc.map(linhaMarc).join("") : `<p class="nota">Ainda não há marcações.</p>`}</div>`);
+    }
+
+    // Reservas (backoffice): últimas marcações e vouchers com cliente, contactos, valor e o estado de cada passo,
+    // erros incluídos (Pedro, 28/10/2026). Protegida pela palavra-passe do backoffice.
+    if (rota === "/reservas") {
+      const form = m === "POST" ? new URLSearchParams(await req.text()) : new URLSearchParams();
+      const opc = { titulo: "Reservas · Oporto Medical Spa" };
+      if (!process.env.BACKOFFICE_PASSWORD) return pagina(`<h1>Reservas</h1><p>Falta a palavra-passe do backoffice (BACKOFFICE_PASSWORD) no Netlify, que protege esta página.</p>`, 200, opc);
+      if (!senhaCerta(form.get("senha") || "")) {
+        if (m === "POST") await pausa(1500);
+        return pagina(`<h1>Reservas</h1><p class="nota">Últimas marcações e vouchers do site, com o pagamento, a fatura e a agenda.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" autocomplete="current-password" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Entrar</button></form>`, m === "POST" ? 401 : 200, opc);
+      }
+      const e = (x) => String(x ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      const lista = await ultimosPedidos(50);
+      const cor = (ok) => (ok === false ? "#E0A58C" : ok ? "#A8C99A" : "rgba(232,220,200,.6)");
+      const cartao = (p) => {
+        const st = estados(p), erro = st.some((x) => x.ok === false);
+        const quando = p.marcacao ? `${dataPT(p.marcacao.data, { semana: true })}, ${p.marcacao.hora}` : `Voucher${p.voucher?.para ? ` para ${p.voucher.para}` : ""}`;
+        return `<div style="text-align:left;border:1px solid ${erro ? "#E0A58C" : "rgba(232,220,200,.2)"};border-radius:6px;padding:14px 16px;margin:12px 0">
+<p style="margin:0"><b>${e(quando)}</b> · ${e(p.tratamento?.nome)}${p.marcacao?.terapeuta ? ` · ${e(p.marcacao.terapeuta)}` : ""}</p>
+<p class="nota" style="margin:2px 0 8px">${e(p.numero)} · pedido a ${e(String(p.criado || "").slice(0, 16).replace("T", " "))} · ${p.total > 0 ? `${e(Number(p.total).toFixed(2))} €` : "0 €"}${p.codigo ? ` (${e(p.codigo.texto)})` : ""}</p>
+<p style="margin:0 0 8px">${e(p.cliente?.nome)} · <a href="mailto:${e(p.cliente?.email)}" style="color:inherit">${e(p.cliente?.email)}</a> · <a href="tel:${e(String(p.cliente?.telefone || "").replace(/\s/g, ""))}" style="color:inherit">${e(p.cliente?.telefone)}</a>${p.cliente?.nif ? ` · NIF ${e(p.cliente.nif)}` : ""}</p>
+${st.map((x) => `<div style="font-size:13px;color:${cor(x.ok)}">${simbolo(x.ok)} ${e(x.texto)}</div>`).join("")}</div>`;
+      };
+      const comErro = lista.filter((p) => estados(p).some((x) => x.ok === false)).length;
+      return pagina(`<h1>Reservas</h1><p class="nota">${lista.length} pedidos mais recentes${comErro ? ` · <span class="erro">${comErro} com erro (a vermelho)</span>` : " · sem erros"}. ✓ feito · ✗ erro a resolver · … a aguardar.</p>
+${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há pedidos.</p>`}`, 200, { ...opc, largura: 720 });
+    }
+
+    // Vouchers (backoffice): todos os vouchers comprados, com os dados da compra, a oferta, o meio de pagamento,
+    // a mensagem e o número do voucher, e pesquisa por qualquer um deles (Pedro, 29/10/2026).
+    if (rota === "/vouchers") {
+      const form = m === "POST" ? new URLSearchParams(await req.text()) : new URLSearchParams();
+      const opc = { titulo: "Vouchers · Oporto Medical Spa" };
+      if (!process.env.BACKOFFICE_PASSWORD) return pagina(`<h1>Vouchers</h1><p>Falta a palavra-passe do backoffice (BACKOFFICE_PASSWORD) no Netlify, que protege esta página.</p>`, 200, opc);
+      if (!senhaCerta(form.get("senha") || "")) {
+        if (m === "POST") await pausa(1500);
+        return pagina(`<h1>Vouchers</h1><p class="nota">Vouchers comprados no site, com pesquisa.</p><form method="post"><input type="password" name="senha" placeholder="Palavra-passe do backoffice" autocomplete="current-password" required>${m === "POST" ? `<p class="erro">Palavra-passe errada.</p>` : ""}<button type="submit">Entrar</button></form>`, m === "POST" ? 401 : 200, opc);
+      }
+      const e = (x) => String(x ?? "").replace(/[<>&"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+      const quando = (t) => (t ? new Date(t).toLocaleString("pt-PT", { timeZone: "Europe/Lisbon", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "");
+      const eur = (v) => `${Number(v || 0).toFixed(2).replace(".", ",")} €`;
+      const lista = await vouchersComprados();
+      const hoje = hojeISO();
+      const cartao = (p) => {
+        const v = p.voucher || {}, pago = ["pago", "confirmado"].includes(p.estado);
+        const situacao = !v.codigo ? (pago ? ["✗ voucher por emitir", "#E0A58C"] : ["… à espera do pagamento", "rgba(232,220,200,.6)"])
+          : p.uso ? [`usado a ${quando(p.uso.em).slice(0, 10)} (marcação ${p.uso.pedido})`, "rgba(232,220,200,.6)"]
+          : v.validade && v.validade < hoje ? [`expirou a ${dataPT(v.validade)}`, "#E0A58C"]
+          : [`por usar · válido até ${v.validade ? dataPT(v.validade) : "?"}`, "#A8C99A"];
+        const oferta = `${p.tratamento?.nome || ""}${p.campanha?.nome ? ` · campanha ${p.campanha.nome}` : ""}`;
+        const metodo = p.total > 0 ? `${nomeMetodo(p) || "por escolher"} · ${eur(p.pagamento?.pago?.valor ?? p.total)}${p.codigo ? ` (${p.codigo.texto})` : ""}${p.pagamento?.pago?.transacao ? ` · transação ${p.pagamento.pago.transacao}` : ""}` : `Sem pagamento (${p.codigo?.texto || "0 €"})`;
+        const compra = [p.numero, quando(p.criado), p.cliente?.nome, p.cliente?.email, p.cliente?.telefone, p.cliente?.nif ? `NIF ${p.cliente.nif}` : "", p.fatura?.numero ? `fatura ${p.fatura.numero}` : ""].filter(Boolean);
+        const entrega = `${v.formato === "caixa" ? "Caixa oferta, no SPA" : "Digital, por email"}${v.para ? ` · para ${v.para}` : ""}${v.de ? ` · de ${v.de}` : ""}`;
+        // Texto de cada campo para a pesquisa (em minúsculas e sem acentos, como a pesquisa).
+        const campos = { codigo: [v.codigo, p.numero], compra: [...compra, entrega], oferta: [oferta], pagamento: [metodo], mensagem: [v.mensagem, v.para, v.de] };
+        const dados = Object.entries(campos).map(([k, xs]) => ` data-${k}="${e(xs.filter(Boolean).join(" ").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase())}"`).join("");
+        return `<div class="v"${dados}${pago ? "" : " data-porpagar"} style="text-align:left;border:1px solid rgba(232,220,200,.2);border-radius:6px;padding:14px 16px;margin:12px 0">
+<p style="margin:0;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline"><b style="font:400 22px 'EB Garamond',Georgia,serif;letter-spacing:.04em">${e(v.codigo || "Sem número ainda")}</b><span style="font-size:13px;color:${situacao[1]}">${e(situacao[0])}</span></p>
+<p style="margin:6px 0 0"><span class="nota">Oferta:</span> ${e(oferta)}</p>
+<p style="margin:2px 0 0"><span class="nota">Entrega:</span> ${e(entrega)}</p>
+<p style="margin:2px 0 0"><span class="nota">Mensagem:</span> ${v.mensagem ? `«${e(v.mensagem)}»` : `<span class="nota">sem mensagem</span>`}</p>
+<p style="margin:2px 0 0"><span class="nota">Pagamento:</span> ${e(metodo)}</p>
+<p style="margin:2px 0 0"><span class="nota">Compra:</span> ${e(p.numero)} · ${e(quando(p.criado))} · ${e(p.cliente?.nome)} · <a href="mailto:${e(p.cliente?.email)}" style="color:inherit">${e(p.cliente?.email)}</a>${p.cliente?.telefone ? ` · <a href="tel:${e(String(p.cliente.telefone).replace(/\s/g, ""))}" style="color:inherit">${e(p.cliente.telefone)}</a>` : ""}${p.cliente?.nif ? ` · NIF ${e(p.cliente.nif)}` : ""}${p.fatura?.numero ? ` · fatura ${e(p.fatura.numero)}` : ""}</p></div>`;
+      };
+      const porPagar = lista.filter((p) => !["pago", "confirmado"].includes(p.estado)).length;
+      const procura = `<form id="procura" onsubmit="return false" style="display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px">
+<input type="search" id="q" placeholder="Pesquisar…" autocomplete="off" style="flex:1 1 240px">
+<select id="campo" style="flex:0 1 auto;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:#0D0A08;color:inherit;font:inherit">
+<option value="">em todos os campos</option><option value="codigo">nº do voucher</option><option value="compra">dados da compra</option><option value="oferta">oferta</option><option value="pagamento">meio de pagamento</option><option value="mensagem">mensagem</option></select>
+${porPagar ? `<label class="nota" style="width:100%;text-align:left"><input type="checkbox" id="todos" style="width:auto;margin-right:6px">Mostrar também ${porPagar} ${porPagar === 1 ? "voucher" : "vouchers"} à espera do pagamento</label>` : ""}</form>
+<p class="nota" id="conta" style="text-align:left"></p>`;
+      const script = `<script>(function(){var q=document.getElementById("q"),c=document.getElementById("campo"),t=document.getElementById("todos"),n=document.getElementById("conta"),vs=[].slice.call(document.querySelectorAll(".v")),k=["codigo","compra","oferta","pagamento","mensagem"];
+function f(){var s=q.value.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().trim().split(/\\s+/).filter(Boolean),ks=c.value?[c.value]:k,x=0;
+vs.forEach(function(v){var txt=ks.map(function(a){return v.dataset[a]||""}).join(" "),ok=(!v.hasAttribute("data-porpagar")||(t&&t.checked))&&s.every(function(p){return txt.indexOf(p)>=0});v.hidden=!ok;if(ok)x++});
+n.textContent=x+(x===1?" voucher":" vouchers")+(s.length?(x===1?" encontrado":" encontrados"):"");}
+q.addEventListener("input",f);c.addEventListener("change",f);if(t)t.addEventListener("change",f);f();q.focus();})();</script>`;
+      return pagina(`<h1>Vouchers</h1><p class="nota">Vouchers comprados no site, mais recentes primeiro. Pesquise pelo nº do voucher, comprador, email, telemóvel, NIF, oferta, meio de pagamento ou mensagem.</p>
+${procura}${lista.length ? lista.map(cartao).join("") : `<p class="nota">Ainda não há vouchers comprados.</p>`}${script}`, 200, { ...opc, largura: 760 });
     }
 
     if (rota === "/zoho/retorno" && m === "GET") {
