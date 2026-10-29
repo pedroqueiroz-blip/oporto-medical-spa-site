@@ -127,7 +127,7 @@ const marcar = (d) => pedir("/api/pagamento", d);
 const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tratamentos.find((t) => t.grupo !== "Relaxar");
 const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
 const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
-const { validadeVoucher } = await import("../servidor/datas.mjs");
+const { validadeVoucher, dataPT } = await import("../servidor/datas.mjs");
 
 try {
   ok(relax.artigo === "TPREV" && outro.artigo === "TREAB" && cat.tratamentos.every((t) => t.artigo === (t.grupo === "Relaxar" ? "TPREV" : "TREAB")), "catálogo: Relaxar → TPREV, o resto → TREAB");
@@ -417,7 +417,7 @@ try {
   ok(pg.status === 200 && pg.txt.includes("Palavra-passe") && !pg.txt.includes(vcod), "página de vouchers pede a palavra-passe");
   pg = await pagina("/api/vouchers", form("senha-certa"));
   ok(pg.txt.includes(vcod) && pg.txt.includes("«Para parares.»") && pg.txt.includes(p4.numero) && pg.txt.includes("joao@exemplo.pt") && pg.txt.includes(relax.nome.replace(/&/g, "&amp;")) && pg.txt.includes("Cartão") && pg.txt.includes("usado a") && !pg.txt.includes(pz.numero), "página de vouchers: número, mensagem, compra, oferta, meio de pagamento e uso, sem as marcações");
-  ok(pg.txt.includes('id="q"') && pg.txt.includes(`data-codigo="${vcod.toLowerCase()}`) && pg.txt.includes('data-mensagem="para parares. maria joao"'), "página de vouchers: pesquisa por campo, sem acentos");
+  ok(pg.txt.includes('id="q"') && pg.txt.includes(`data-codigo="${vcod.toLowerCase()}`) && pg.txt.includes('data-mensagem="para parares. maria joao"') && pg.txt.includes("Validade:</span> até " + dataPT(validadeVoucher())) && pg.txt.includes(`data-validade="${dataPT(validadeVoucher())}`), "página de vouchers: validade à vista e pesquisa por campo, sem acentos");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
   Z.falhaMarcacao = false;
