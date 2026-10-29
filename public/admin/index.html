@@ -100,7 +100,7 @@
   .entrar .erro { min-height: 20px; margin: 10px 0 0; color: #E0A58C; font-size: 13px; }
   .entrar button { margin-top: 6px; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 0; border-radius: 999px; background: var(--linen); color: var(--night); font: 600 12px var(--body); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
   .entrar button:disabled { opacity: .6; }
-  /* Atalhos da equipa, sempre à vista no canto: reservas do site e verificação das ligações */
+  /* Atalhos da equipa, sempre à vista no canto: reservas do site, vouchers e verificação das ligações */
   .atalhos { position: fixed; left: 16px; bottom: 16px; z-index: 900; display: flex; flex-wrap: wrap; gap: 8px; }
   .atalhos a { padding: 9px 18px; border-radius: 999px; background: var(--night); border: 1px solid var(--flame); color: var(--linen) !important; font: 500 13px var(--body); letter-spacing: .02em; text-decoration: none; box-shadow: 0 8px 24px -12px rgba(13, 10, 8, .6); }
   .atalhos a:first-child { background: var(--flame); color: var(--night) !important; }
@@ -116,6 +116,7 @@
 </form>
 <nav class="atalhos" aria-label="Atalhos">
   <a href="/api/reservas" target="_blank" rel="noopener" data-atalho>Reservas</a>
+  <a href="/api/vouchers" target="_blank" rel="noopener" data-atalho>Vouchers</a>
   <a href="/admin-verificar" target="_blank" rel="noopener" data-atalho>Verificar ligações</a>
 </nav>
 <script>

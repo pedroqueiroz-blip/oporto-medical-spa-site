@@ -413,6 +413,11 @@ try {
   ok(!pg.txt.includes(pz.numero), "sem a chave do backoffice definida, essa chave não serve de palavra-passe");
   pg = await pagina("/api/reservas", form("senha-certa"));
   ok(pg.txt.includes(pz.numero) && pg.txt.includes("Carla Nova") && pg.txt.includes("913000000") && pg.txt.includes("✗ Não ficou na agenda Zoho") && pg.txt.includes("✓ euPago OK") && /\d+ com erro/.test(pg.txt), "página de reservas: cliente, contactos, estado de cada passo e erros à vista");
+  pg = await pagina("/api/vouchers");
+  ok(pg.status === 200 && pg.txt.includes("Palavra-passe") && !pg.txt.includes(vcod), "página de vouchers pede a palavra-passe");
+  pg = await pagina("/api/vouchers", form("senha-certa"));
+  ok(pg.txt.includes(vcod) && pg.txt.includes("«Para parares.»") && pg.txt.includes(p4.numero) && pg.txt.includes("joao@exemplo.pt") && pg.txt.includes(relax.nome.replace(/&/g, "&amp;")) && pg.txt.includes("Cartão") && pg.txt.includes("usado a") && !pg.txt.includes(pz.numero), "página de vouchers: número, mensagem, compra, oferta, meio de pagamento e uso, sem as marcações");
+  ok(pg.txt.includes('id="q"') && pg.txt.includes(`data-codigo="${vcod.toLowerCase()}`) && pg.txt.includes('data-mensagem="para parares. maria joao"'), "página de vouchers: pesquisa por campo, sem acentos");
   pg = await pagina("/api/zoho/verificar", form("senha-certa"));
   ok(pg.txt.includes("Últimas marcações") && pg.txt.includes(pz.numero) && pg.txt.includes("Pôr na agenda"), "verificação mostra as últimas marcações e a que não ficou na agenda");
   Z.falhaMarcacao = false;
