@@ -12,7 +12,7 @@ Site: Reservar (agenda) ou Oferecer (voucher)
        └─ POST /api/pagamento   cria o pedido OMS-AAMMDD-XXXX e o pagamento na euPago
                                 (total 0 com VIP ou voucher: fica logo confirmado, sem pagamento nem fatura)
 euPago ── notificação ──> /api/eupago-notificacao
-       ├─ Moloni ON             fatura-recibo na série SPA, fechada e enviada ao cliente
+       ├─ Moloni ON             fatura-recibo na série SPA, fechada; o PDF segue ao cliente pelo email do site
        ├─ email ao cliente      confirmação da marcação, ou o voucher com o código
        ├─ email à equipa        aviso de cada marcação ou voucher (EMAIL_RESERVAS ou o email do site)
        └─ Zoho CRM              ficha do cliente (NIF/email) e evento na agenda da terapeuta
@@ -72,7 +72,10 @@ Marcação confirmada, com o texto da terapêutica:
 - TPREV: «Somos um medical SPA. A fisioterapeuta no dia da sua marcação irá avaliar e indicar a melhor forma de cuidar
   da sua saúde e bem-estar. Iniciará de seguida a sua terapêutica de prevenção: *tratamento*.»
 
-O mesmo texto vai na mensagem do email da fatura-recibo, enviado pelo Moloni ON.
+O mesmo texto vai no email da fatura-recibo. Esse email é enviado pelo site, com o remetente do spa (`EMAIL_FROM`)
+e o PDF da fatura descarregado do Moloni ON em anexo, em português ou em inglês conforme a língua em que o cliente
+comprou. O Moloni ON enviaria com o remetente da empresa (CNP), o mesmo da nutrição. Só se o email do site não estiver
+configurado ou o PDF não descarregar é que a fatura segue pelo Moloni ON, e o aviso à equipa diz porquê.
 Também há o email com a referência Multibanco, o do voucher e o do código de 10% da newsletter.
 
 ## Configuração (uma vez)

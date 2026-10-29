@@ -10,12 +10,12 @@ const PORTA = 9997, B = `http://localhost:${PORTA}`;
 Object.assign(process.env, {
   LOCAL_BLOBS_DIR: fs.mkdtempSync(path.join(os.tmpdir(), "oms-pag-")),
   EUPAGO_API_KEY: "demo-chave-teste", EUPAGO_MODO: "real", EUPAGO_API_BASE: `${B}/eupago`,
-  MOLONI_API_KEY: "apik:teste", MOLONI_API_BASE: `${B}/moloni`, MOLONI_FECHAR: "sim",
+  MOLONI_API_KEY: "apik:teste", MOLONI_API_BASE: `${B}/moloni`, MOLONI_MEDIA_BASE: `${B}/media`, MOLONI_FECHAR: "sim",
   RESEND_API_KEY: "re_teste", EMAIL_FROM: "Oporto Medical Spa <reservas@exemplo.pt>", RESEND_API_BASE: `${B}/resend`,
 });
 
 // --- Serviços simulados ---
-const S = { mb: [], mbway: [], cartao: [], docs: {}, faturaEmails: [], emails: [], artigos: { TREAB: "M10", TPREV: "M10" } };
+const S = { mb: [], mbway: [], cartao: [], docs: {}, faturaEmails: [], emails: [], pdfTokens: 0, semPdf: false, artigos: { TREAB: "M10", TPREV: "M10" } };
 const r2 = (v) => Math.round(v * 100) / 100;
 const esc = (s) => String(s).replace(/&/g, "&amp;");
 const servidor = http.createServer(async (req, res) => {
@@ -24,6 +24,7 @@ const servidor = http.createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
   const out = (x) => res.end(JSON.stringify(x));
   if (req.url.startsWith("/zoho")) return zoho(req, body, j, res, out);
+  if (req.url.startsWith("/media/")) return res.end(new URL(req.url, B).searchParams.get("jwt") === "tok" ? "%PDF-1.4 fatura de teste" : "token errado");
   if (req.url.startsWith("/resend")) { S.emails.push(j); return out({ id: "e" + S.emails.length }); }
   if (req.url === "/eupago/clientes/rest_api/multibanco/create") { S.mb.push(j); return out({ sucesso: true, entidade: "12345", referencia: "123456789", valor: j.valor, data_fim: j.data_fim }); }
   if (req.url === "/eupago/api/v1.02/mbway/create") { S.mbway.push(j); return out({ transactionStatus: "Success", transactionID: "mw" + S.mbway.length, reference: "r1" }); }
@@ -49,6 +50,9 @@ const servidor = http.createServer(async (req, res) => {
       }
       case "invoiceReceiptUpdate": Object.assign(S.docs[v.data.documentId], { status: 1, number: Object.values(S.docs).filter((d) => d.status === 1).length + 1 }); return dados(S.docs[v.data.documentId]);
       case "invoiceReceiptGetPDF": return out({ data: { invoiceReceiptGetPDF: true } });
+      case "invoiceReceiptGetPDFToken": // a primeira vez o PDF ainda não está pronto
+        if (S.semPdf || !S.pdfTokens++) return out({ data: { [nome]: { errors: [{ field: "documentId", msg: "PDF não disponível" }], data: null } } });
+        return dados({ token: "tok", path: `/privateassets/file/molonion/FR-${v.documentId}.pdf`, filename: `FR-${v.documentId}.pdf` });
       case "invoiceReceiptSendMail": S.faturaEmails.push(v.mailData); return out({ data: { invoiceReceiptSendMail: true } });
     }
   }
@@ -128,6 +132,7 @@ const relax = cat.tratamentos.find((t) => t.grupo === "Relaxar"), outro = cat.tr
 const amanha = new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10);
 const cliente = { nome: "Ana Teste", email: "ana@exemplo.pt", telefone: "912 345 678" };
 const { validadeVoucher, dataPT, instanteLisboa } = await import("../servidor/datas.mjs");
+const { obter } = await import("../servidor/pedidos.mjs");
 
 try {
   ok(relax.artigo === "TPREV" && outro.artigo === "TREAB" && cat.tratamentos.every((t) => t.artigo === (t.grupo === "Relaxar" ? "TPREV" : "TREAB")), "catálogo: Relaxar → TPREV, o resto → TREAB");
@@ -162,8 +167,10 @@ try {
   ok(d1.dados.products.length === 1 && d1.dados.products[0].productId === 101 && d1.dados.products[0].taxes.length === 0 && d1.dados.products[0].exemptionReason === "M10", "linha TREAB, sem IVA, com motivo de isenção");
   ok(d1.dados.products[0].price === outro.preco && d1.totalValue === outro.preco && d1.dados.payments[0].paymentMethodId === 3, "valor da fatura = valor pago, meio MB WAY");
   ok(d1.dados.customerId === 1, "sem NIF: Consumidor final");
-  ok(S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome), "fatura enviada com o texto da terapêutica de reabilitação");
-  const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && !e.subject.includes("código"));
+  const f1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && e.subject.startsWith("Fatura-recibo FR SPA/"));
+  ok(f1 && f1.from.startsWith("Oporto Medical Spa") && f1.html.includes("terapêutica de reabilitação: " + esc(outro.nome)) && f1.attachments?.[0]?.filename === `FR-${d1.documentId}.pdf` && Buffer.from(f1.attachments[0].content, "base64").toString().startsWith("%PDF"), "fatura enviada pelo email do site, com o PDF do Moloni ON e o texto da terapêutica");
+  ok(S.faturaEmails.length === 0 && (await obter(p1.numero)).moloni.emailPor === "site", "o Moloni ON não envia a fatura (remetente da empresa)");
+  const e1 = S.emails.find((e) => e.to[0] === "ana@exemplo.pt" && e.subject.startsWith("Marcação confirmada"));
   ok(e1 && e1.html.includes("Iniciará de seguida a sua terapêutica de reabilitação: " + esc(outro.nome)) && e1.subject.includes("Marcação confirmada"), "email de confirmação com o texto do Pedro (reabilitação)");
   ok(e1.html.includes("Adicionar ao Google Calendar") && e1.attachments?.[0]?.filename === `${p1.numero}.ics` && Buffer.from(e1.attachments[0].content, "base64").toString().includes("BEGIN:VEVENT"), "email de confirmação com o botão do Google Calendar e o .ics em anexo");
   ok(S.emails.some((e) => e.to[0] === cat.spa.email && e.subject.includes(p1.numero)), "aviso à equipa por email");
@@ -237,8 +244,10 @@ try {
   r = await pedir("/api/pagamento?lingua=en", { tipo: "voucher", tratamento: relax.id, formato: "caixa", para: "Sam", nome: "Jo Smith", email: "jo@exemplo.co.uk", metodo: "card" });
   ok(S.cartao.at(-1).payment.lang === "EN" && S.cartao.at(-1).payment.successUrl.includes(`/en/payment/?n=${r.j.numero}`) && r.j.tratamento === relax.nome_en, "inglês: cartão da euPago em inglês e regresso a /en/payment/");
   await notificar(r.j, { mp: "CC:PT" });
-  const ven = S.emails.find((e) => e.to[0] === "jo@exemplo.co.uk");
+  const ven = S.emails.find((e) => e.to[0] === "jo@exemplo.co.uk" && e.subject.startsWith("Your gift voucher"));
   ok(ven && ven.subject === `Your gift voucher · ${relax.nome_en}` && ven.html.includes("Valid until") && ven.html.includes("Gift box") && ven.html.includes("/en/#reservar") && !/Válido até/.test(ven.html), "inglês: email do voucher em inglês, com a caixa oferta");
+  const fen = S.emails.find((e) => e.to[0] === "jo@exemplo.co.uk" && e.subject.startsWith("Invoice-receipt FR SPA/"));
+  ok(fen && fen.html.includes(`Thank you for giving ${esc(relax.nome_en)}`) && fen.html.includes("in Portuguese") && fen.attachments?.[0]?.filename.endsWith(".pdf"), "inglês: fatura pelo email do site em inglês, com o PDF");
   ok(S.emails.some((e) => e.subject.includes(r.j.numero) && e.to[0] === cat.spa.email && e.html.includes("Caixa oferta, levanta no SPA") && e.html.includes("Inglês")), "inglês: aviso à equipa em português, com a língua do cliente");
   r = await pedir("/api/pagamento?lingua=en", { tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "10:00", ...cliente, telefone: "", metodo: "card" });
   ok(r.status === 400 && r.j.erro === "Please enter your mobile number.", "inglês: erros em inglês");
@@ -264,9 +273,17 @@ try {
   S.artigos.TREAB = null;
   r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "12:00", ...cliente, metodo: "mb_way" });
   await notificar(r.j);
-  const { obter } = await import("../servidor/pedidos.mjs");
   const p6 = await obter(r.j.numero);
   ok(p6.estado === "pago" && !p6.fatura && /isenção/.test(p6.moloni.erro) && S.emails.some((e) => e.subject.includes(p6.numero) && e.html.includes("isenção")), "artigo sem motivo de isenção: pago, sem fatura, e a equipa é avisada do erro");
+
+  // 6b) Sem PDF do Moloni ON: a fatura segue na mesma, enviada pelo Moloni ON, e a equipa vê porquê
+  S.artigos.TREAB = "M10"; S.semPdf = true;
+  r = await marcar({ tipo: "marcacao", tratamento: outro.id, data: amanha, hora: "12:30", ...cliente, metodo: "mb_way" });
+  await notificar(r.j);
+  const p6b = await obter(r.j.numero);
+  ok(p6b.fatura?.numero && S.faturaEmails.length === 1 && S.faturaEmails[0].to.email === "ana@exemplo.pt" && S.faturaEmails[0].message.includes("terapêutica de reabilitação: " + outro.nome) && p6b.moloni.emailPor === "Moloni ON", "sem PDF: a fatura é enviada pelo Moloni ON, com o texto da terapêutica");
+  ok(S.emails.some((e) => e.subject.includes(p6b.numero) && e.to[0] === cat.spa.email && e.html.includes("o email do site falhou")), "sem PDF: a equipa vê que a fatura seguiu pelo Moloni ON");
+  S.semPdf = false;
 
   // 7) euPago em modo de teste: a fatura fica só em rascunho
   S.artigos.TREAB = "M10";
