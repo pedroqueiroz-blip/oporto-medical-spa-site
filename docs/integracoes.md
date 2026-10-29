@@ -122,7 +122,8 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
   com o tratamento inteiro dentro desse período, e nunca a menos de 1 hora.
 - **Turnos de cada dia** (manda sobre o horário padrão): módulo «Horários de Colaborador», um registo por pessoa e dia
   (Name `2026-10-29|Catarina Silva`, Periodos `08:00-14:00, 15:00-20:00` ou `-`). Só aparecem horas em que o tratamento inteiro
-  cabe num turno; com `-` ou sem registo nesse dia, a profissional não está disponível (Pedro, 29/10/2026).
+  cabe num turno; com `-` a profissional não está disponível; sem registo nesse dia vale o «Horário padrão» do Prestadores
+  (Pedro, 29/10/2026).
 - **Horário de cada colaboradora**: campo «Horário padrão» do módulo Prestadores (registo com o mesmo nome do site), por exemplo
   `seg-sex 12:30-20:00; sab 09:00-13:00 quinzenal 14-11-2026` (partes separadas por «;»; «quinzenal» = sábado sim, sábado não,
   contando a semana da data indicada). Só aparecem horas em que o tratamento inteiro cabe nesse horário. Quem tiver «Ativo» desligado

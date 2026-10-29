@@ -422,7 +422,8 @@ try {
   ok(lt.includes("09:00") && lt.includes("15:00") && !lt.includes("08:00") && !lt.includes("12:00") && !lt.includes("18:00") && !lt.includes(tz.duracao > 60 ? "10:30" : "11:00"), `só há horas dentro dos turnos do dia (${lt.join(", ")})`);
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D3}&dias=1`, null, "GET");
   const r4 = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D4}&dias=1`, null, "GET");
-  ok(!r.j.livres[luisa.id][D3].length && !r4.j.livres[luisa.id][D4].length, "sem turno nesse dia («-») ou sem registo, a profissional não está disponível");
+  ok(!r.j.livres[luisa.id][D3].length, "sem turno nesse dia («-»), a profissional não está disponível");
+  ok(r4.j.livres[luisa.id][D4].includes("08:00") && r4.j.livres[luisa.id][D4].includes("18:00"), "sem registo nesse dia, vale o horário padrão do Prestadores");
   r = await marcar({ tipo: "marcacao", tratamento: tz.id, data: D2, hora: "12:00", terapeutaId: luisa.id, ...zc, metodo: "mb_way" });
   ok(r.status === 400, "uma hora fora dos turnos é recusada antes de pagar, mesmo sem outra marcação");
   pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D2 });
