@@ -70,11 +70,10 @@ const faixasTurno = (texto) => [...String(texto || "").matchAll(/(\d{1,2})[:h](\
 function noTurno(tur, p, data, hora, duracao) {
   const texto = tur.get(`${data}|${simples(p.nome)}`);
   const ini = minutos(hora), fim = ini + duracao;
-  // Sem registo nesse dia ou com «-» vale o horário padrão do Prestadores (Pedro, 29/10/2026: a Beatriz Pena
-  // e a Luísa a 2/11); com turnos, a marcação inteira tem de caber num só turno.
-  const faixas = faixasTurno(texto);
-  if (!faixas.length) return Boolean(p.horario) && trabalha(p.horario, data, hora, duracao);
-  return faixas.some(([a, b]) => ini >= a && fim <= b);
+  // Sem registo nesse dia vale o horário padrão do Prestadores (Pedro, 29/10/2026: a Beatriz Pena a 2/11);
+  // com «-» não se marca nesse dia (Pedro, 29/10/2026, 11:05); a marcação inteira tem de caber num só turno.
+  if (texto == null) return Boolean(p.horario) && trabalha(p.horario, data, hora, duracao);
+  return faixasTurno(texto).some(([a, b]) => ini >= a && fim <= b);
 }
 const lerTurnos = (datas, pessoas) => turnos(datas, pessoas.map((p) => p.nome)).catch((e) => { console.error("Zoho turnos", e.message); return null; });
 

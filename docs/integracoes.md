@@ -118,11 +118,11 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
 
 - **Horas livres** (`GET /api/disponibilidade?tratamento=…&de=…&dias=…`): para cada pessoa da equipa que faz o tratamento,
   uma hora está livre quando ela não tem nenhuma marcação no módulo Tratamentos (nem evento em Reuniões) que se sobreponha à duração do tratamento
-  (eventos de dia inteiro ocupam o dia). Horas de meia em meia hora, das 8:00 às 20:00 (ao sábado das 9:00 às 13:00, encerra ao domingo),
+  (eventos de dia inteiro ocupam o dia; uma Reunião «Bloqueado (Profissionais:Spa:Nome)» ocupa a profissional do título, seja quem for o responsável). Horas de meia em meia hora, das 8:00 às 20:00 (ao sábado das 9:00 às 13:00, encerra ao domingo),
   com o tratamento inteiro dentro desse período, e nunca a menos de 1 hora.
 - **Turnos de cada dia** (manda sobre o horário padrão): módulo «Horários de Colaborador», um registo por pessoa e dia
   (Name `2026-10-29|Catarina Silva`, Periodos `08:00-14:00, 15:00-20:00` ou `-`). Só aparecem horas em que o tratamento inteiro
-  cabe num turno; com `-` ou sem registo nesse dia vale o «Horário padrão» do Prestadores
+  cabe num turno; com `-` não se marca nesse dia; sem registo nesse dia vale o «Horário padrão» do Prestadores
   (Pedro, 29/10/2026).
 - **Horário de cada colaboradora**: campo «Horário padrão» do módulo Prestadores (registo com o mesmo nome do site), por exemplo
   `seg-sex 12:30-20:00; sab 09:00-13:00 quinzenal 14-11-2026` (partes separadas por «;»; «quinzenal» = sábado sim, sábado não,
