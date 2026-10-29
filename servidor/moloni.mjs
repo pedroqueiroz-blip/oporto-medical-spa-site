@@ -1,5 +1,7 @@
 // Faturação no Moloni ON (API GraphQL). Quando um pedido fica pago na euPago, cria a fatura-recibo na
-// série "SPA", fecha-a (fica numerada e comunicada à AT) e envia-a ao cliente por email.
+// série "SPA", fecha-a (fica numerada e comunicada à AT) e envia-a ao cliente por email: pelo email do site
+// (remetente Oporto Medical Spa, com o PDF em anexo) ou, se não der, pelo próprio Moloni ON (pedido do Pedro, 29/10/2026:
+// o Moloni envia com o remetente da empresa CNP, o mesmo da nutrição).
 //
 // Artigos (pedido do Pedro, 22/10/2026), ambos isentos de IVA:
 //   TPREV  Terapêuticas de Prevenção   tratamentos da área Relaxar
@@ -15,10 +17,12 @@
 //   MOLONI_SERIE     opcional: outra série que não "SPA"
 //   MOLONI_ISENCAO   opcional: código do motivo de isenção, se o artigo não o tiver no Moloni ON
 import { modoTeste } from "./eupago.mjs";
-import { TEXTO_TERAPEUTICA, spa } from "./catalogo.mjs";
+import { spa } from "./catalogo.mjs";
+import { emailAtivo, emailFatura, mensagemFatura } from "./email.mjs";
 import { dataPT } from "./datas.mjs";
 
 const API = process.env.MOLONI_API_BASE || "https://api.molonion.pt/v1"; // substituível em testes
+const MEDIA = process.env.MOLONI_MEDIA_BASE || "https://mediaapi.moloni.org";
 export const ARTIGOS = ["TREAB", "TPREV"];
 
 export const moloniAtivo = () => Boolean(process.env.MOLONI_API_KEY);
@@ -142,10 +146,24 @@ const nomeLinha = (p) => p.tipo === "voucher"
   ? `Voucher oferta · ${p.tratamento.nome}`
   : `${p.tratamento.nome} · ${dataPT(p.marcacao.data, { ano: false })}, ${p.marcacao.hora}`;
 
-// Mensagem do email da fatura: o texto do Pedro para marcações, uma nota simples para vouchers.
-export const mensagemFatura = (p) => p.tipo === "voucher"
-  ? `Obrigado por oferecer ${p.tratamento.nome}. O código do voucher segue noutro email.`
-  : TEXTO_TERAPEUTICA[p.tratamento.artigo](p.tratamento.nome);
+// PDF da fatura para o site enviar: o Moloni ON gera-o (GetPDF), dá um token que dura uns 10 segundos e o
+// ficheiro descarrega-se de mediaapi.moloni.org. O token só aparece quando o PDF estiver pronto, daí as tentativas.
+async function pdfFatura(companyId, documentId) {
+  await gql("mutation($companyId:Int!,$documentId:Int!){ invoiceReceiptGetPDF(companyId:$companyId,documentId:$documentId) }", { companyId, documentId }, "invoiceReceiptGetPDF");
+  let erro;
+  for (let i = 0; i < 6; i++) {
+    if (i) await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const t = await gql("query($documentId:Int!){ invoiceReceiptGetPDFToken(documentId:$documentId){ errors{field msg} data{ token path filename } } }", { documentId }, "invoiceReceiptGetPDFToken");
+      if (!t?.token || !t?.path) throw new Error("PDF ainda não está pronto");
+      const r = await fetch(`${MEDIA}${t.path}?jwt=${encodeURIComponent(t.token)}`, { signal: AbortSignal.timeout(15000) });
+      const pdf = Buffer.from(await r.arrayBuffer());
+      if (!r.ok || pdf.subarray(0, 4).toString() !== "%PDF") throw new Error(`download do PDF falhou (${r.status})`);
+      return { filename: t.filename || `fatura-${documentId}.pdf`, content: pdf.toString("base64") };
+    } catch (e) { erro = e; }
+  }
+  throw new Error(`Não foi possível obter o PDF da fatura: ${erro?.message}`);
+}
 
 export async function emitirFatura(p, { autor = "Moloni ON (automático)", guardar, soRascunho = false } = {}) {
   if (!moloniAtivo() || !p || p.fatura?.numero) return { feito: false };
@@ -194,16 +212,33 @@ export async function emitirFatura(p, { autor = "Moloni ON (automático)", guard
     p.fatura = { numero, em: new Date().toISOString(), por: autor, moloniId: documentId };
     p.moloni = { ...p.moloni, aEmitir: "", estado: "fechada", rascunho: undefined };
     await guardar(p);
-    // Envio por email (a fatura já está emitida; uma falha aqui não a anula).
-    try {
-      await gql("mutation($companyId:Int!,$documentId:Int!){ invoiceReceiptGetPDF(companyId:$companyId,documentId:$documentId) }", { companyId, documentId }, "invoiceReceiptGetPDF");
-      await gql("mutation($companyId:Int!,$documents:[Int]!,$mailData:MailData){ invoiceReceiptSendMail(companyId:$companyId,documents:$documents,mailData:$mailData) }", {
-        companyId, documents: [documentId],
-        mailData: { to: { name: p.cliente.nome || "", email: p.cliente.email }, attachment: true, message: mensagemFatura(p) },
-      }, "invoiceReceiptSendMail");
-      p.moloni.emailEnviado = new Date().toISOString();
-    } catch (e) {
-      p.moloni.erro = `Fatura emitida, mas o email não seguiu: ${e.message}`;
+    // Envio por email (a fatura já está emitida; uma falha aqui não a anula). Primeiro pelo email do site, com o PDF
+    // em anexo; se o email do site não estiver configurado ou falhar, envia o Moloni ON (remetente da empresa).
+    let avisoSite = "";
+    if (emailAtivo()) {
+      try {
+        const r = await emailFatura(p, await pdfFatura(companyId, documentId));
+        if (!r.enviado) throw new Error(r.erro || "email não enviado");
+        p.moloni.emailEnviado = new Date().toISOString();
+        p.moloni.emailPor = "site";
+      } catch (e) {
+        avisoSite = e.message;
+        console.error("Fatura pelo email do site", p.numero, e.message);
+      }
+    }
+    if (!p.moloni.emailEnviado) {
+      try {
+        await gql("mutation($companyId:Int!,$documentId:Int!){ invoiceReceiptGetPDF(companyId:$companyId,documentId:$documentId) }", { companyId, documentId }, "invoiceReceiptGetPDF");
+        await gql("mutation($companyId:Int!,$documents:[Int]!,$mailData:MailData){ invoiceReceiptSendMail(companyId:$companyId,documents:$documents,mailData:$mailData) }", {
+          companyId, documents: [documentId],
+          mailData: { to: { name: p.cliente.nome || "", email: p.cliente.email }, attachment: true, message: mensagemFatura(p) },
+        }, "invoiceReceiptSendMail");
+        p.moloni.emailEnviado = new Date().toISOString();
+        p.moloni.emailPor = "Moloni ON";
+        if (avisoSite) p.moloni.aviso = `Fatura enviada pelo Moloni ON (o email do site falhou: ${avisoSite})`;
+      } catch (e) {
+        p.moloni.erro = `Fatura emitida, mas o email não seguiu: ${e.message}`;
+      }
     }
     await guardar(p);
     return { feito: true, numero };

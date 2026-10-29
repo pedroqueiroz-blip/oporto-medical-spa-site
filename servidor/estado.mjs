@@ -28,6 +28,8 @@ export function estados(p) {
     else if (p.moloni?.erro) add(false, `Moloni: ${p.moloni.erro}`);
     else if (p.moloni?.estado === "rascunho") add(null, "Moloni: fatura em rascunho, fechar no Moloni ON");
     else add(false, "Moloni: fatura por emitir");
+    if (p.fatura?.numero && p.moloni?.emailEnviado) add(true, p.moloni.aviso || `Fatura enviada ao cliente${p.moloni.emailPor === "site" ? " pelo email do site" : ""}`);
+    else if (p.fatura?.numero && p.moloni?.erro) add(false, p.moloni.erro);
   }
 
   for (const [qual, nome] of [["cliente", "Email ao cliente"]]) {

@@ -62,6 +62,22 @@ ${p.total > 0 ? `<p style="font-size:13px;color:#7a6650">A fatura-recibo segue n
   anexos: anexoCalendario(p),
 });
 
+// Mensagem da fatura: o texto do Pedro para marcações, uma nota simples para vouchers (também no envio pelo Moloni ON).
+export const mensagemFatura = (p) => p.tipo === "voucher"
+  ? `Obrigado por oferecer ${p.tratamento.nome}. O código do voucher segue noutro email.`
+  : TEXTO_TERAPEUTICA[p.tratamento.artigo](p.tratamento.nome);
+
+// Fatura-recibo do Moloni ON enviada pelo site, com o remetente do spa e o PDF em anexo.
+export const emailFatura = (p, pdf) => p.lingua === "en" ? EN.fatura(p, pdf) : enviar({
+  para: p.cliente.email,
+  assunto: `Fatura-recibo ${p.fatura.numero} · ${spa.nome}`,
+  html: moldura(`${h1("A sua fatura-recibo")}
+<p>${esc(mensagemFatura(p))}</p>
+${linhas([["Fatura-recibo", esc(p.fatura.numero)], [p.tipo === "voucher" ? "Voucher" : "Tratamento", esc(p.tratamento.nome)], ["Valor", valorPago(p)], ["N.º do pedido", esc(p.numero)]])}
+<p style="font-size:13px;color:#7a6650">A fatura-recibo segue em anexo, em PDF.</p>`),
+  anexos: [pdf],
+});
+
 // Voucher pago: o código só aparece aqui.
 export const emailVoucher = (p) => p.lingua === "en" ? EN.voucher(p) : enviar({
   para: p.cliente.email,
@@ -128,6 +144,15 @@ const valorPagoEN = (p) => p.total > 0 ? eurEN(p.total) + (p.desconto ? ` <span 
 const nomeTrat = (p) => nomeEN(p.tratamento.id) || p.tratamento.nome;
 const siteEN = () => `${site()}/en/`;
 const EN = {
+  fatura: (p, pdf) => enviar({
+    para: p.cliente.email,
+    assunto: `Invoice-receipt ${p.fatura.numero} · ${spa.nome}`,
+    html: moldura(`${h1("Your invoice-receipt")}
+<p>${esc(p.tipo === "voucher" ? `Thank you for giving ${nomeTrat(p)}. The voucher code follows in a separate email.` : TEXTO_TERAPEUTICA_EN[p.tratamento.artigo](nomeTrat(p)))}</p>
+${linhas([["Invoice-receipt", esc(p.fatura.numero)], [p.tipo === "voucher" ? "Voucher" : "Treatment", esc(nomeTrat(p))], ["Amount", valorPagoEN(p)], ["Order no.", esc(p.numero)]])}
+<p style="font-size:13px;color:#7a6650">Your invoice-receipt is attached as a PDF (in Portuguese).</p>`, "en"),
+    anexos: [pdf],
+  }),
   marcacao: (p) => enviar({
     para: p.cliente.email,
     assunto: `Booking confirmed · ${nomeTrat(p)}`,
