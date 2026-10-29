@@ -55,6 +55,8 @@ const servidor = http.createServer(async (req, res) => {
   res.statusCode = 404; out({ erro: "desconhecido " + req.url });
 });
 // Zoho (contas e CRM) simulado: utilizadores, eventos (COQL), contactos
+// «where X between 'a' and 'b'» das leituras COQL; regista a maior janela pedida (em dias).
+const entre = (q, v) => { const m = q.match(/between '([^']+)' and '([^']+)'/); if (!m) return true; Z.janela = Math.max(Z.janela || 0, (Date.parse(m[2]) - Date.parse(m[1])) / 864e5); return Date.parse(v) >= Date.parse(m[1]) && Date.parse(v) <= Date.parse(m[2]); };
 const Z = { tokens: [], users: [{ id: "u1", full_name: "Luísa Pinto", email: "luisa@exemplo.pt" }], eventos: [], contactos: [], criados: [], falhaMarcacao: false, moduloTrat: false, marcacoes: [], produtos: [], prestadores: [], moduloTurnos: false, turnos: [] };
 // Módulo «Tratamentos» da Agenda do Zoho (como o do SPA): tratamento, terapeuta, estado, pagamento, início e fim
 const CAMPOS_TRAT = [
@@ -90,13 +92,13 @@ function zoho(req, body, j, res, out) {
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Prestadores") return out({ fields: [{ api_name: "Name", field_label: "Nome de Prestador", data_type: "text" }, { api_name: "Ativo", field_label: "Ativo", data_type: "boolean" }, { api_name: "Horario_Padrao", field_label: "Horário padrão", data_type: "text" }, { api_name: "Created_Time", field_label: "Hora de criação", data_type: "datetime" }] });
   if (cam === "/Prestadores") return out({ data: Z.prestadores.map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => u.searchParams.get("fields").split(",").includes(k)))), info: { more_records: false } });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
-  if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
+  if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes.filter((m) => entre(j.select_query, m.Data_do_tratamento)), info: { more_records: false } });
   if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
   if (cam === "/Tratamentos_SPA" && req.method === "POST") { if (Z.falhaMarcacao) return out({ data: [{ status: "error", message: "required field not found" }] }); const m = { id: "t" + (Z.marcacoes.length + 1), ...j.data[0] }; Z.marcacoes.push(m); return out({ data: [{ status: "success", details: { id: m.id } }] }); }
   if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
     ? [{ api_name: "Last_Name", field_label: "Apelido", data_type: "text" }, { api_name: "Email", field_label: "Email", data_type: "email" }, { api_name: "Contribuinte", field_label: "N.º Contribuinte", data_type: "text" }]
     : [...["Event_Title", "Start_DateTime", "End_DateTime", "Owner", "Who_Id"].map((n) => ({ api_name: n, field_label: n, data_type: "text" }))] });
-  if (cam === "/coql") return out({ data: Z.eventos, info: { more_records: false } });
+  if (cam === "/coql") return out({ data: Z.eventos.filter((e) => entre(j.select_query, e.Start_DateTime)), info: { more_records: false } });
   if (cam === "/Contacts/search") {
     const [, campo, nif] = u.searchParams.get("criteria")?.match(/\((\w+):equals:(\d+)\)/) || [], email = u.searchParams.get("email");
     const r = Z.contactos.filter((c) => (nif && c[campo] === nif) || (email && c.Email === email));
@@ -349,6 +351,9 @@ try {
   r = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET");
   const livresL = r.j.livres?.[luisa.id]?.[D] || [];
   ok(r.j.fonte === "zoho" && !livresL.includes("10:00") && !livresL.includes("19:00") && livresL.includes("11:00") && livresL.includes("08:00"), `horas livres vêm das marcações do Zoho (${livresL.length} livres; 10:00 e 19:00 ocupadas, a cancelada não conta)`);
+  Z.janela = 0;
+  const r14 = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=14`, null, "GET");
+  ok(r14.j.fonte === "zoho" && Z.janela > 0 && Z.janela < 1 && !r14.j.livres[luisa.id][D].includes("10:00"), "a agenda do Zoho lê-se dia a dia, mesmo para 14 dias (sem páginas que saltem marcações)");
   ok(livresL.includes("11:30") && !livresL.includes("10:30") && livresL.includes("08:30") === (tz.duracao <= 90) && !livresL.includes(`${String(19 - Math.ceil(tz.duracao / 60) + 1).padStart(2, "0")}:30`) && !livresL.includes("19:30"), "marca-se às meias horas, desde que o tratamento caiba antes da marcação seguinte e do fecho");
   pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D });
   ok(pg.txt.includes("Lido do Zoho para") && pg.txt.includes("10:00–11:00 · Reuniões") && pg.txt.includes("19:00–20:00 · Tratamentos") && pg.txt.includes("Cancelado (não conta)") && pg.txt.includes("Turnos: módulos") && /<b>Luísa Pinto<\/b>: [^<]*11:00/.test(pg.txt), "verificação mostra um dia da agenda: o que leu do Zoho e as horas livres de cada pessoa");

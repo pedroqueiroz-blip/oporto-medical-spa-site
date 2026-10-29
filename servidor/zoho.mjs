@@ -5,6 +5,7 @@
 import crypto from "node:crypto";
 import { store, STORES } from "./store.mjs";
 import { lerHorario, descreverHorario } from "./horario.mjs";
+import { instanteLisboa } from "./datas.mjs";
 
 const CONTAS = () => (process.env.ZOHO_ACCOUNTS_BASE || "https://accounts.zoho.eu").replace(/\/$/, "");
 export const ESCOPOS = "ZohoCRM.modules.ALL,ZohoCRM.users.READ,ZohoCRM.coql.READ,ZohoCRM.settings.modules.READ,ZohoCRM.settings.fields.READ";
@@ -255,9 +256,24 @@ export async function marcacoesModulo(mm, de, ate, diag = null) {
 }
 
 // Tudo o que ocupa a agenda: eventos (Reuniões, por responsável) e marcações do módulo «Tratamentos».
+// Lê-se dia a dia: numa leitura de semanas, as páginas de 200 do Zoho saltavam registos à mesma hora
+// na mudança de página (Pedro, 29/10/2026: a Luísa às 9:30 de 3/11 aparecia livre).
 export async function ocupacoes(de, ate, diag = null) {
   const mm = await moduloMarcacoes();
-  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate, diag) : [])];
+  const umDia = async ([a, b]) => [...await eventos(a, b), ...(mm ? await marcacoesModulo(mm, a, b, diag) : [])];
+  const dias = janelasDiarias(de, ate), out = [];
+  for (let i = 0; i < dias.length; i += 4) for (const r of await Promise.all(dias.slice(i, i + 4).map(umDia))) out.push(...r);
+  return out;
+}
+// [de, ate] (ISO com desvio) → um intervalo por dia de calendário, do primeiro ao último.
+function janelasDiarias(de, ate) {
+  const [d0, d1] = [de, ate].map((x) => String(x).slice(0, 10));
+  if (d0 === d1) return [[de, ate]];
+  const out = [];
+  for (let d = d0; d <= d1; d = new Date(Date.parse(`${d}T12:00:00Z`) + 864e5).toISOString().slice(0, 10)) {
+    out.push([d === d0 ? de : instanteLisboa(d, "00:00").iso, d === d1 ? ate : instanteLisboa(d, "23:59").iso]);
+  }
+  return out;
 }
 
 /* ---------- Módulo «Prestadores» (horário de cada colaboradora) ---------- */
