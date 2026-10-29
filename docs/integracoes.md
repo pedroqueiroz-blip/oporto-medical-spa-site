@@ -120,6 +120,9 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
   uma hora está livre quando ela não tem nenhuma marcação no módulo Tratamentos (nem evento em Reuniões) que se sobreponha à duração do tratamento
   (eventos de dia inteiro ocupam o dia). Horas de meia em meia hora, das 8:00 às 20:00 (ao sábado das 9:00 às 13:00, encerra ao domingo),
   com o tratamento inteiro dentro desse período, e nunca a menos de 1 hora.
+- **Turnos de cada dia** (manda sobre o horário padrão): módulo «Horários de Colaborador», um registo por pessoa e dia
+  (Name `2026-10-29|Catarina Silva`, Periodos `08:00-14:00, 15:00-20:00` ou `-`). Só aparecem horas em que o tratamento inteiro
+  cabe num turno; com `-` ou sem registo nesse dia, a profissional não está disponível (Pedro, 29/10/2026).
 - **Horário de cada colaboradora**: campo «Horário padrão» do módulo Prestadores (registo com o mesmo nome do site), por exemplo
   `seg-sex 12:30-20:00; sab 09:00-13:00 quinzenal 14-11-2026` (partes separadas por «;»; «quinzenal» = sábado sim, sábado não,
   contando a semana da data indicada). Só aparecem horas em que o tratamento inteiro cabe nesse horário. Quem tiver «Ativo» desligado
@@ -127,7 +130,7 @@ Com o Zoho CRM ligado, a agenda do site usa a agenda do CRM:
   `/api/zoho/verificar` mostra como cada horário foi lido.
 - **Equipa ↔ CRM**: cada pessoa liga-se ao utilizador do CRM com o mesmo nome; se o nome for diferente, indica-se o email
   do utilizador no backoffice (Equipa → «Utilizador no Zoho CRM»). Quem não estiver ligado não aparece na agenda online.
-- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a primeira pessoa livre.
+- **Antes de pagar** (`/api/pagamento`) o servidor confirma que a hora continua livre; «Sem preferência» fica com a pessoa livre a essa hora que tem menos marcações nesse dia (empate à sorte).
 - **Só MB WAY ou cartão** nas marcações (Pedro, 27/10/2026): confirmam na hora, e a marcação entra logo no CRM. O Multibanco fica para os vouchers.
 - Enquanto o pagamento não chega, a hora fica **guardada 10 minutos** (Netlify Blobs `reservas`): não aparece livre a mais ninguém.
   Pago, passa a evento no CRM; sem pagamento, volta a ficar livre.

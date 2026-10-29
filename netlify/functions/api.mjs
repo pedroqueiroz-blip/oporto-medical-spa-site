@@ -2,11 +2,11 @@
 // e a notificação de pagamento da euPago. A fatura (Moloni ON) e os emails seguem do servidor.
 import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/pedidos.mjs";
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
-import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, ErroAgenda } from "../../servidor/agenda.mjs";
+import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, diaAgenda, ErroAgenda } from "../../servidor/agenda.mjs";
 import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
-import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM } from "../../servidor/zoho.mjs";
+import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos } from "../../servidor/zoho.mjs";
 import { estados, simbolo, ultimosPedidos } from "../../servidor/estado.mjs";
-import { dataPT } from "../../servidor/datas.mjs";
+import { dataPT, hojeISO } from "../../servidor/datas.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -20,7 +20,9 @@ const pagina = (html, status = 200, { titulo = "Ligar ao Zoho CRM", largura = 38
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0D0A08;color:#E8DCC8;font:15px/1.6 Manrope,system-ui,sans-serif}main{width:min(${largura}px,calc(100vw - 32px));padding:24px 0;text-align:center}h1{font:400 26px "EB Garamond",Georgia,serif}input{box-sizing:border-box;width:100%;padding:12px 14px;border:1px solid rgba(232,220,200,.3);border-radius:4px;background:transparent;color:inherit;font:inherit}button{margin-top:14px;width:100%;padding:12px;border:0;border-radius:999px;background:#E8DCC8;color:#0D0A08;font:600 12px Manrope,system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}.nota{font-size:13px;opacity:.8}.erro{color:#E0A58C}</style></head><body><main>${html}</main></body></html>`,
   { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Frame-Options": "DENY", "Referrer-Policy": "no-referrer" } });
 const resumo = (t) => createHash("sha256").update(String(t)).digest();
-const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD && dada) && timingSafeEqual(resumo(dada), resumo(process.env.BACKOFFICE_PASSWORD));
+// Palavra-passe do backoffice, ou a chave da sessão já aberta no /admin (botões «Reservas» e «Verificar ligações»).
+const igual = (dada, guardada) => Boolean(guardada && dada) && timingSafeEqual(resumo(dada), resumo(guardada));
+const senhaCerta = (dada) => Boolean(process.env.BACKOFFICE_PASSWORD) && (igual(dada, process.env.BACKOFFICE_PASSWORD) || igual(dada, process.env.BACKOFFICE_GITHUB_TOKEN));
 
 async function corpo(req) {
   const tipo = req.headers.get("content-type") || "";
@@ -75,6 +77,22 @@ export default async (req) => {
       }
       const linhas = estado.ligado ? await verificarCRM(catalogo.equipa || [], catalogo.tratamentos || []) : [{ ok: false, titulo: "Ligação ao Zoho CRM", detalhe: estado.configurado ? "Por ligar neste site: abra /api/zoho/ligar." : "Faltam ZOHO_CLIENT_ID e ZOHO_CLIENT_SECRET neste site (Netlify, contexto de produção)." }];
       const marc = await ultimasMarcacoes(10);
+      // Um dia da agenda como o site o vê (para conferir com o Zoho): o que leu e as horas livres de cada pessoa.
+      const dia = /^\d{4}-\d{2}-\d{2}$/.test(form.get("dia") || "") ? form.get("dia") : hojeISO(new Date(Date.now() + 864e5));
+      let blocoDia = "";
+      if (estado.ligado) {
+        const hm = (t) => (t ? new Date(t).toLocaleTimeString("pt-PT", { timeZone: "Europe/Lisbon", hour: "2-digit", minute: "2-digit" }) : "?");
+        try {
+          const d = await diaAgenda(dia);
+          blocoDia = `<p class="nota"><b>Lido do Zoho para ${e(dataPT(dia, { semana: true }))}</b> (${d.lidos.length}):</p>${d.lidos.map((x) => `<p class="nota" style="margin:2px 0">${x.diaInteiro ? "dia inteiro" : `${hm(x.inicio)}–${hm(x.fim)}`} · ${e(x.origem || "hora guardada no site (pagamento)")} · ${e(x.nome || "")}${x.titulo ? ` · ${e(x.titulo)}` : ""}</p>`).join("") || `<p class="nota">Nada neste dia.</p>`}
+<p class="nota" style="margin-top:14px"><b>Horas livres no site</b> (tratamento de 60 min):</p>${d.pessoas.map((p) => `<p class="nota" style="margin:2px 0"><b>${e(p.nome)}</b>: ${!p.agenda ? "sem agenda online (não está nas listas de profissionais ou está inativa)" : `${p.livres.join(", ") || "nenhuma"} · ${p.ocupada} ocupações lidas · ${p.turno === undefined ? (p.horario ? "com horário do Prestadores" : "sem horário do Prestadores") : p.turno === null ? "sem registo nos Horários de Colaborador (não está disponível)" : `turnos: ${p.turno}`}${p.dono ? " · utilizadora do CRM" : " · não é utilizadora do CRM (as Reuniões não contam para ela)"}`}</p>`).join("")}`;
+        } catch (err) { blocoDia = `<p class="erro">Não consegui ler a agenda deste dia: ${e(err.message)}</p>`; }
+        try {
+          const t = await procurarTurnos(dia);
+          blocoDia += `<p class="nota" style="margin-top:14px"><b>Turnos: módulos que podem ter o horário de cada dia</b></p>${t.map((l) => `<p class="nota" style="margin:4px 0"><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br>${e(l.detalhe)}</p>`).join("")}`;
+        } catch (err) { blocoDia += `<p class="erro">Turnos: ${e(err.message)}</p>`; }
+      }
+      const formDia = `<form method="post" style="display:flex;gap:8px;align-items:center;margin:8px 0 14px"><input type="hidden" name="senha" value="${e(senha)}"><input type="date" name="dia" value="${e(dia)}" style="width:auto"><button type="submit" style="margin:0;width:auto;padding:10px 18px">Ver dia</button></form>`;
       const ESTADOS = { novo: "por pagar", aguarda_pagamento: "à espera do pagamento", pago: "pago", confirmado: "confirmado (0 €)" };
       const linhaMarc = (x) => {
         const zoho = x.zoho?.evento ? "✓ na agenda do Zoho" : x.zoho?.erro ? `✗ ${x.zoho.erro}` : ["pago", "confirmado"].includes(x.estado) ? "✗ não foi enviada ao Zoho" : "— só vai para o Zoho depois de pago";
@@ -83,6 +101,7 @@ export default async (req) => {
         return `<p><b>${e(x.numero)}</b> · ${e(x.data)} ${e(x.hora)} · ${e(x.tratamento)} · ${e(x.terapeuta || "")}<br><span class="nota">${e(x.cliente)} · ${e(ESTADOS[x.estado] || x.estado)}${x.metodo ? ` (${e(x.metodo)})` : ""} · ${e(zoho)}</span>${botao}</p>`;
       };
       return pagina(`<h1>Verificação do Zoho CRM</h1>${aviso ? `<p class="${aviso.startsWith("✓") ? "nota" : "erro"}">${aviso}</p>` : ""}<div style="text-align:left">${linhas.map((l) => `<p><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br><span class="nota">${e(l.detalhe)}</span></p>`).join("")}
+<h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Agenda de um dia</h2>${formDia}${blocoDia}
 <h2 style="font:400 20px 'EB Garamond',Georgia,serif;margin-top:28px">Últimas marcações do site</h2>${marc.length ? marc.map(linhaMarc).join("") : `<p class="nota">Ainda não há marcações.</p>`}</div>`);
     }
 

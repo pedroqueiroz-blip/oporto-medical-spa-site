@@ -127,10 +127,10 @@ export async function eventos(de, ate) {
   const { moduloAgenda } = await configuracao();
   const out = [];
   for (let offset = 0; offset < 2000; offset += 200) {
-    const q = `select Owner, Start_DateTime, End_DateTime, All_day from ${moduloAgenda} where Start_DateTime between '${de}' and '${ate}' order by Start_DateTime limit ${offset}, 200`;
+    const q = `select Owner, Event_Title, Start_DateTime, End_DateTime, All_day from ${moduloAgenda} where Start_DateTime between '${de}' and '${ate}' order by Start_DateTime limit ${offset}, 200`;
     const j = await crm("POST", "/coql", { select_query: q });
     const linhas = j?.data || [];
-    out.push(...linhas.map((e) => ({ dono: e.Owner?.id || e.Owner, inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
+    out.push(...linhas.map((e) => ({ origem: "Reuniões", titulo: `${e.Event_Title || ""} (responsável: ${e.Owner?.name || e.Owner?.id || "?"})`, dono: e.Owner?.id || e.Owner, inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
     if (!j?.info?.more_records) break;
   }
   return out;
@@ -234,18 +234,19 @@ export async function criarMarcacao(mm, { titulo, inicio, fim, dono, terapeuta, 
 }
 
 // Marcações do módulo entre duas datas, com a terapeuta (utilizador ou nome); as canceladas não contam.
-export async function marcacoesModulo(mm, de, ate) {
-  const c = mm.campos, ters = c.terapeutas || [c.terapeuta], cols = [c.inicio, c.fim, ...ters, c.estado].filter(Boolean).map((f) => f.api);
+export async function marcacoesModulo(mm, de, ate, diag = null) {
+  const c = mm.campos, ters = c.terapeutas || [c.terapeuta], cols = ["Name", ...[c.inicio, c.fim, ...ters, c.estado].filter(Boolean).map((f) => f.api)].filter((x, i, a) => a.indexOf(x) === i);
   const out = [];
   for (let offset = 0; offset < 2000; offset += 200) {
     const q = `select ${cols.join(", ")} from ${mm.modulo} where ${c.inicio.api} between '${de}' and '${ate}' order by ${c.inicio.api} limit ${offset}, 200`;
     const j = await crm("POST", "/coql", { select_query: q });
     for (const r of j?.data || []) {
-      if (c.estado && CANCELADA.test(simples(r[c.estado.api]))) continue;
+      if (c.estado && CANCELADA.test(simples(r[c.estado.api]))) { if (diag) diag.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""} · ${r[c.estado.api]} (não conta)`, nome: ters.map((f) => [].concat(r[f.api] ?? []).map((t) => t?.name || t).join(", ")).filter(Boolean).join(" / "), inicio: Date.parse(r[c.inicio.api]), fim: c.fim && r[c.fim.api] ? Date.parse(r[c.fim.api]) : null }); continue; }
       const inicio = Date.parse(r[c.inicio.api]), fim = c.fim && r[c.fim.api] ? Date.parse(r[c.fim.api]) : inicio + 60 * 60e3;
       // Uma marcação ocupa cada profissional indicado em qualquer das listas.
+      if (diag && !ters.some((f) => [].concat(r[f.api] ?? []).length)) diag.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""} · sem profissional em nenhuma lista (não ocupa ninguém)`, nome: "", inicio, fim });
       for (const f of ters) for (const t of [].concat(r[f.api] ?? [])) {
-        out.push({ dono: f.tipo === "userlookup" ? t?.id : null, nome: typeof t === "object" ? t?.name || "" : String(t || ""), inicio, fim, diaInteiro: false, dia: String(r[c.inicio.api]).slice(0, 10) });
+        out.push({ origem: mm.nomeModulo, titulo: `${r.Name || ""}${c.estado ? ` · ${r[c.estado.api] || "sem estado"}` : ""}`, dono: f.tipo === "userlookup" ? t?.id : null, nome: typeof t === "object" ? t?.name || "" : String(t || ""), inicio, fim, diaInteiro: false, dia: String(r[c.inicio.api]).slice(0, 10) });
       }
     }
     if (!j?.info?.more_records) break;
@@ -254,9 +255,9 @@ export async function marcacoesModulo(mm, de, ate) {
 }
 
 // Tudo o que ocupa a agenda: eventos (Reuniões, por responsável) e marcações do módulo «Tratamentos».
-export async function ocupacoes(de, ate) {
+export async function ocupacoes(de, ate, diag = null) {
   const mm = await moduloMarcacoes();
-  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate) : [])];
+  return [...await eventos(de, ate), ...(mm ? await marcacoesModulo(mm, de, ate, diag) : [])];
 }
 
 /* ---------- Módulo «Prestadores» (horário de cada colaboradora) ---------- */
@@ -278,6 +279,64 @@ export async function prestadores() {
     if (!j?.info?.more_records) break;
   }
   return { modulo: m.api_name, campos, horario, ativo, lista: lista.map((x) => ({ ...x, ...lerHorario(x.texto) })) };
+}
+
+/* ---------- Turnos de cada dia («Horários de Colaborador») ---------- */
+
+// Pedro (29/10/2026): antes de propor uma hora, ver os turnos da profissional nesse dia. Estão no módulo
+// «Horários de Colaborador», um registo por pessoa e dia: Name «2026-10-29|Catarina Silva» e Periodos
+// «08:00-14:00, 15:00-20:00» (turno 1 e turno 2) ou «-» (sem turno, a tracejado na agenda).
+// Devolve Map «data|nome simplificado» → texto dos períodos, ou null se o módulo não existir.
+let moduloTurnos = null;
+async function apiTurnos() {
+  if (process.env.ZOHO_MODULO_TURNOS) return process.env.ZOHO_MODULO_TURNOS;
+  if (moduloTurnos) return moduloTurnos;
+  const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+  const m = mods.find((x) => x.api_name === "Horario_Colaborador") || mods.find((x) => /horarios? de colaborador/.test(simples(`${x.plural_label} ${x.singular_label}`)));
+  return (moduloTurnos = m?.api_name || null);
+}
+export async function turnos(datas, nomes) {
+  const mod = await apiTurnos();
+  if (!mod) return null;
+  const chaves = datas.flatMap((d) => nomes.map((n) => `${d}|${n}`)), out = new Map();
+  for (let i = 0; i < chaves.length; i += 50) {
+    const lista = chaves.slice(i, i + 50).map((k) => `'${k.replace(/'/g, "\\'")}'`).join(", ");
+    const j = await crm("POST", "/coql", { select_query: `select Name, Periodos from ${mod} where Name in (${lista}) limit 200` });
+    for (const r of j?.data || []) {
+      const [d, n] = String(r.Name || "").split("|");
+      out.set(`${d}|${simples(n)}`, String(r.Periodos ?? "").trim());
+    }
+  }
+  return out;
+}
+
+/* ---------- Turnos de cada dia (à procura do módulo) ---------- */
+
+// Pedro (29/10/2026): cada profissional tem, para cada dia, o turno 1 e o turno 2; sem turno (a tracejado
+// na agenda) não está disponível. Enquanto não se sabe em que módulo estão, mostra os módulos candidatos,
+// os campos e os registos desse dia, para a página de verificação.
+const CANDIDATO = /turno|horario|escala|disponib|ausenc|folga|feria|bloque|presenc|agenda/;
+export async function procurarTurnos(dia) {
+  const out = [], add = (ok, titulo, detalhe) => out.push({ ok, titulo, detalhe });
+  const mods = (await crm("GET", "/settings/modules"))?.modules || [];
+  add(true, "Módulos do CRM", mods.filter((x) => x.api_supported !== false).map((x) => `${x.plural_label || x.module_name} (${x.api_name})`).join(", "));
+  const txt = (f) => `${f.rotulo} (${f.api}, ${f.tipo})`;
+  for (const m of mods.filter((x) => x.api_supported !== false && x.api_name !== "Events" && CANDIDATO.test(simples(`${x.plural_label} ${x.singular_label} ${x.api_name}`)))) {
+    try {
+      const campos = ((await crm("GET", `/settings/fields?module=${m.api_name}`))?.fields || []).map(resumo).filter((f) => !SISTEMA.test(f.api));
+      const data = campos.find((f) => /turno|^dia|^data/.test(simples(f.rotulo)) && /^(date|datetime)$/.test(f.tipo)) || campos.find((f) => /^(date|datetime)$/.test(f.tipo));
+      const cols = ["Name", ...campos.map((f) => f.api).filter((a) => a !== "Name" && a !== "id")].slice(0, 45);
+      let regs = [];
+      if (data) {
+        const cond = data.tipo === "date" ? `${data.api} = '${dia}'` : `${data.api} between '${dia}T00:00:00+00:00' and '${dia}T23:59:59+00:00'`;
+        regs = (await crm("POST", "/coql", { select_query: `select ${cols.join(", ")} from ${m.api_name} where ${cond} limit 50` }))?.data || [];
+      } else regs = (await crm("GET", `/${m.api_name}?fields=${cols.join(",")}&per_page=5`))?.data || [];
+      const vazio = (v) => v == null || v === "" || (Array.isArray(v) && !v.length);
+      const linha = (r) => Object.entries(r).filter(([k, v]) => k !== "id" && !vazio(v)).map(([k, v]) => `${k}: ${typeof v === "object" ? v.name || JSON.stringify(v) : v}`).join("; ");
+      add(true, `${m.plural_label || m.api_name} (${m.api_name})`, `Campos: ${campos.map(txt).join("; ")}. ${data ? `Registos em ${dia} (por ${data.api}): ${regs.length}` : `Sem campo de data; primeiros registos: ${regs.length}`}${regs.length ? ` → ${regs.map(linha).join(" | ").slice(0, 3000)}` : ""}`);
+    } catch (e) { add(false, `${m.plural_label || m.api_name} (${m.api_name})`, e.message); }
+  }
+  return out;
 }
 
 /* ---------- Verificação pela API de metadados ---------- */

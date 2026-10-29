@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Backoffice · Oporto Medical Spa</title>
-<link rel="icon" href="/logo-brown.svg">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@300;400;500;600&display=swap">
@@ -114,9 +115,24 @@
   <button type="submit">Entrar</button>
 </form>
 <nav class="atalhos" aria-label="Atalhos">
-  <a href="/api/reservas" target="_blank" rel="noopener">Reservas</a>
-  <a href="/admin-verificar" target="_blank" rel="noopener">Verificar ligações</a>
+  <a href="/api/reservas" target="_blank" rel="noopener" data-atalho>Reservas</a>
+  <a href="/admin-verificar" target="_blank" rel="noopener" data-atalho>Verificar ligações</a>
 </nav>
+<script>
+  /* Com a sessão do backoffice aberta, os atalhos entram logo, sem pedir a palavra-passe outra vez */
+  document.querySelectorAll('[data-atalho]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var t = '';
+      try { t = (JSON.parse(localStorage.getItem('decap-cms-user') || 'null') || {}).token || ''; } catch (x) {}
+      if (!t) return;
+      e.preventDefault();
+      var f = document.createElement('form'), i = document.createElement('input');
+      f.method = 'post'; f.action = a.getAttribute('href'); f.target = '_blank';
+      i.type = 'hidden'; i.name = 'senha'; i.value = t; f.appendChild(i);
+      document.body.appendChild(f); f.submit(); f.remove();
+    });
+  });
+</script>
 <script>window.CMS_MANUAL_INIT = true;</script>
 <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
 <script>
