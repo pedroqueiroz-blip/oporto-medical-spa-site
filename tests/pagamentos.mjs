@@ -355,6 +355,13 @@ try {
   const r14 = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=14`, null, "GET");
   ok(r14.j.fonte === "zoho" && Z.janela > 0 && Z.janela < 1 && !r14.j.livres[luisa.id][D].includes("10:00"), "a agenda do Zoho lê-se dia a dia, mesmo para 14 dias (sem páginas que saltem marcações)");
   ok(livresL.includes("11:30") && !livresL.includes("10:30") && livresL.includes("08:30") === (tz.duracao <= 90) && !livresL.includes(`${String(19 - Math.ceil(tz.duracao / 60) + 1).padStart(2, "0")}:30`) && !livresL.includes("19:30"), "marca-se às meias horas, desde que o tratamento caiba antes da marcação seguinte e do fecho");
+  // Bloqueio da profissional: Reunião com o nome dela no título e outro responsável; o de um aparelho não ocupa ninguém
+  const nEv = Z.eventos.length;
+  Z.eventos.push({ Owner: { id: "u9" }, Event_Title: "Bloqueado (Profissionais:Spa:Luísa Pinto)", Start_DateTime: instanteLisboa(D, "14:00").iso, End_DateTime: instanteLisboa(D, "15:00").iso, All_day: false },
+    { Owner: { id: "u9" }, Event_Title: "Bloqueado (Tratamentos:LPG Infinity#0)", Start_DateTime: instanteLisboa(D, "16:00").iso, End_DateTime: instanteLisboa(D, "17:00").iso, All_day: false });
+  const rb = await pedir(`/api/disponibilidade?tratamento=${tz.id}&de=${D}&dias=1`, null, "GET"), lb = rb.j.livres[luisa.id][D];
+  ok(!lb.includes("14:00") && lb.includes("16:00"), "um bloqueio «Bloqueado (Profissionais:Spa:Nome)» ocupa essa profissional; o de um aparelho não");
+  Z.eventos.splice(nEv);
   pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D });
   ok(pg.txt.includes("Lido do Zoho para") && pg.txt.includes("10:00–11:00 · Reuniões") && pg.txt.includes("19:00–20:00 · Tratamentos") && pg.txt.includes("Cancelado (não conta)") && pg.txt.includes("Turnos: módulos") && /<b>Luísa Pinto<\/b>: [^<]*11:00/.test(pg.txt), "verificação mostra um dia da agenda: o que leu do Zoho e as horas livres de cada pessoa");
   ok(Object.keys(r.j.livres).length === 1 && r.j.semAgenda.length >= 1, "quem não está nas listas de profissionais fica fora da agenda online");

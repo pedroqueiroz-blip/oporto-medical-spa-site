@@ -124,6 +124,9 @@ export async function utilizadores() {
 }
 
 // Eventos entre duas datas (ISO com fuso), de toda a equipa.
+// Bloqueio de uma profissional na agenda do Zoho: Reunião «Bloqueado (Profissionais:Spa:Beatriz Pena)», com
+// outro responsável (Pedro, 29/10/2026); ocupa a pessoa do título. «Bloqueado (Tratamentos:LPG Infinity#0)» é de um aparelho.
+const bloqueioDe = (titulo) => String(titulo || "").match(/Profissionais:(?:[^:)]*:)?([^:)#]+)/i)?.[1].trim() || "";
 export async function eventos(de, ate) {
   const { moduloAgenda } = await configuracao();
   const out = [];
@@ -131,7 +134,7 @@ export async function eventos(de, ate) {
     const q = `select Owner, Event_Title, Start_DateTime, End_DateTime, All_day from ${moduloAgenda} where Start_DateTime between '${de}' and '${ate}' order by Start_DateTime limit ${offset}, 200`;
     const j = await crm("POST", "/coql", { select_query: q });
     const linhas = j?.data || [];
-    out.push(...linhas.map((e) => ({ origem: "Reuniões", titulo: `${e.Event_Title || ""} (responsável: ${e.Owner?.name || e.Owner?.id || "?"})`, dono: e.Owner?.id || e.Owner, inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
+    out.push(...linhas.map((e) => ({ origem: "Reuniões", titulo: `${e.Event_Title || ""} (responsável: ${e.Owner?.name || e.Owner?.id || "?"})`, dono: e.Owner?.id || e.Owner, nome: bloqueioDe(e.Event_Title), inicio: Date.parse(e.Start_DateTime), fim: Date.parse(e.End_DateTime), diaInteiro: Boolean(e.All_day), dia: String(e.Start_DateTime).slice(0, 10) })));
     if (!j?.info?.more_records) break;
   }
   return out;
