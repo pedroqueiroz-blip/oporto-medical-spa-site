@@ -4,9 +4,9 @@ import { calcular, criar, obter, publico, ErroCliente } from "../../servidor/ped
 import { pagar, notificacao } from "../../servidor/fluxo.mjs";
 import { disponibilidade, confirmarHora, guardarHora, ultimasMarcacoes, repetirNoCRM, diaAgenda, ErroAgenda } from "../../servidor/agenda.mjs";
 import { lingua, erroEN, codigoEN } from "../../servidor/ingles.mjs";
-import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos } from "../../servidor/zoho.mjs";
+import { zohoConfigurado, estadoLigacao, urlAutorizacao, concluirLigacao, verificarCRM, procurarTurnos, camposMarcacoes } from "../../servidor/zoho.mjs";
 import { estados, simbolo, ultimosPedidos } from "../../servidor/estado.mjs";
-import { dataPT, hojeISO } from "../../servidor/datas.mjs";
+import { dataPT, hojeISO, instanteLisboa } from "../../servidor/datas.mjs";
 import catalogo from "../../servidor/gerado/catalogo.json" with { type: "json" };
 import { createHash, timingSafeEqual } from "node:crypto";
 
@@ -87,6 +87,10 @@ export default async (req) => {
           blocoDia = `<p class="nota"><b>Lido do Zoho para ${e(dataPT(dia, { semana: true }))}</b> (${d.lidos.length}):</p>${d.lidos.map((x) => `<p class="nota" style="margin:2px 0">${x.diaInteiro ? "dia inteiro" : `${hm(x.inicio)}–${hm(x.fim)}`} · ${e(x.origem || "hora guardada no site (pagamento)")} · ${e(x.nome || "")}${x.titulo ? ` · ${e(x.titulo)}` : ""}</p>`).join("") || `<p class="nota">Nada neste dia.</p>`}
 <p class="nota" style="margin-top:14px"><b>Horas livres no site</b> (tratamento de 60 min):</p>${d.pessoas.map((p) => `<p class="nota" style="margin:2px 0"><b>${e(p.nome)}</b>: ${!p.agenda ? "sem agenda online (não está nas listas de profissionais ou está inativa)" : `${p.livres.join(", ") || "nenhuma"} · ${p.ocupada} ocupações lidas · ${p.turno === undefined ? (p.horario ? "com horário do Prestadores" : "sem horário do Prestadores") : p.turno === null || !/\d/.test(p.turno) ? `${p.turno === null ? "sem registo nos Horários de Colaborador" : `turnos: ${p.turno}`}: ${p.horario ? "vale o horário padrão do Prestadores" : "sem horário padrão, não está disponível"}` : `turnos: ${p.turno}`}${p.dono ? " · utilizadora do CRM" : " · não é utilizadora do CRM (as Reuniões não contam para ela)"}`}</p>`).join("")}`;
         } catch (err) { blocoDia = `<p class="erro">Não consegui ler a agenda deste dia: ${e(err.message)}</p>`; }
+        try {
+          const m = await camposMarcacoes(instanteLisboa(dia, "00:00").iso, instanteLisboa(dia, "23:59").iso);
+          blocoDia += `<p class="nota" style="margin-top:14px"><b>Campos preenchidos de cada marcação</b></p>${m.map((x) => `<p class="nota" style="margin:4px 0"><b>${hm(x.inicio)} · ${e(x.nome)}</b><br>${e(x.campos.join(" · "))}</p>`).join("") || `<p class="nota">Nenhuma marcação neste dia.</p>`}`;
+        } catch (err) { blocoDia += `<p class="erro">Campos das marcações: ${e(err.message)}</p>`; }
         try {
           const t = await procurarTurnos(dia);
           blocoDia += `<p class="nota" style="margin-top:14px"><b>Turnos: módulos que podem ter o horário de cada dia</b></p>${t.map((l) => `<p class="nota" style="margin:4px 0"><b>${l.ok ? "✓" : "✗"} ${e(l.titulo)}</b><br>${e(l.detalhe)}</p>`).join("")}`;

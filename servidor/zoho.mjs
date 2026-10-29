@@ -316,6 +316,24 @@ export async function turnos(datas, nomes) {
 // na agenda) não está disponível. Enquanto não se sabe em que módulo estão, mostra os módulos candidatos,
 // os campos e os registos desse dia, para a página de verificação.
 const CANDIDATO = /turno|horario|escala|disponib|ausenc|folga|feria|bloque|presenc|agenda/;
+// Para a verificação: todos os campos preenchidos de cada marcação do dia, para ver onde está cada sinal
+// da agenda (ex.: o coração da preferência pela terapeuta, Pedro 29/10/2026).
+export async function camposMarcacoes(de, ate) {
+  const mm = await moduloMarcacoes();
+  if (!mm) return [];
+  const c = mm.campos, rot = Object.fromEntries((mm.todos || []).map((f) => [f.api, f.rotulo]));
+  const q = `select id, Name, ${c.inicio.api} from ${mm.modulo} where ${c.inicio.api} between '${de}' and '${ate}' order by ${c.inicio.api} limit 0, 30`;
+  const out = [];
+  for (const r of (await crm("POST", "/coql", { select_query: q }))?.data || []) {
+    const x = (await crm("GET", `/${mm.modulo}/${r.id}`))?.data?.[0] || {};
+    const val = (v) => (v && typeof v === "object" ? (Array.isArray(v) ? v.map(val).join(", ") : v.name ?? "") : String(v ?? ""));
+    const campos = Object.entries(x).filter(([k, v]) => rot[k] && !SISTEMA.test(k) && v !== null && v !== false && v !== "" && !(Array.isArray(v) && !v.length))
+      .map(([k, v]) => `${rot[k]} (${k}): ${v === true ? "sim" : val(v).slice(0, 80)}`);
+    out.push({ inicio: Date.parse(r[c.inicio.api]), nome: r.Name || "", campos });
+  }
+  return out;
+}
+
 export async function procurarTurnos(dia) {
   const out = [], add = (ok, titulo, detalhe) => out.push({ ok, titulo, detalhe });
   const mods = (await crm("GET", "/settings/modules"))?.modules || [];

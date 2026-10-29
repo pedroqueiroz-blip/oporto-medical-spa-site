@@ -91,6 +91,7 @@ function zoho(req, body, j, res, out) {
   if (cam === "/Prestadores") return out({ data: Z.prestadores.map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => u.searchParams.get("fields").split(",").includes(k)))), info: { more_records: false } });
   if (cam === "/settings/fields" && u.searchParams.get("module") === "Tratamentos_SPA") return out({ fields: CAMPOS_TRAT });
   if (cam === "/coql" && /from Tratamentos_SPA/.test(j.select_query)) return out({ data: Z.marcacoes, info: { more_records: false } });
+  if (cam.startsWith("/Tratamentos_SPA/") && req.method === "GET") return out({ data: Z.marcacoes.filter((m) => m.id === cam.split("/")[2]) });
   if (cam === "/Products/search") return out({ data: Z.produtos.filter((x) => x.Product_Name === u.searchParams.get("word")) });
   if (cam === "/Tratamentos_SPA" && req.method === "POST") { if (Z.falhaMarcacao) return out({ data: [{ status: "error", message: "required field not found" }] }); const m = { id: "t" + (Z.marcacoes.length + 1), ...j.data[0] }; Z.marcacoes.push(m); return out({ data: [{ status: "success", details: { id: m.id } }] }); }
   if (cam === "/settings/fields") return out({ fields: u.searchParams.get("module") === "Contacts"
@@ -428,6 +429,8 @@ try {
   ok(r.status === 400, "uma hora fora dos turnos é recusada antes de pagar, mesmo sem outra marcação");
   pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D2 });
   ok(pg.txt.includes("turnos: 09:00-11:00, 15:00-18:00"), "a verificação mostra os turnos de cada pessoa no dia");
+  pg = await pagina("/api/zoho/verificar", { ...form("senha-certa"), body: "senha=senha-certa&dia=" + D });
+  ok(pg.txt.includes("Campos preenchidos de cada marcação") && pg.txt.includes("(Estado): Agendado"), "a verificação mostra os campos preenchidos de cada marcação do dia");
 
   console.log("\nTudo certo.");
 } finally {
