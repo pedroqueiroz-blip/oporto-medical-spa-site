@@ -7,7 +7,7 @@
     "Aromaterapia (óleos essenciais)"
   ],
   "inicio": "2026-11-01",
-  "so_vouchers": true,
+  "so_vouchers": false,
   "titulo_destaque": "Aromaterapia",
   "en": {
     "etiqueta": "Offer of the month",
