@@ -347,7 +347,7 @@
       return '<div class="vc-card' + (v.format === 'caixa' ? ' vc-card--box' : '') + '" aria-live="polite">' +
         '<img class="vc-card__logo" src="/logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
         '<div class="vc-card__top"><span class="vc-card__kind">' + L('Voucher oferta', 'Gift voucher') + '</span></div>' +
-        (t.camp ? '<p class="vc-card__camp">' + esc(t.label || L('Em campanha', 'On offer')) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
+        '<p class="vc-card__name">' + esc(t.name) + '</p>' +
         '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? L(' (Reserve ', ' (Allow ') + t.min + ' min.)' : '') + '</p>' +
         '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : L('A sua mensagem aparece aqui.', 'Your message appears here.')) + '</p>' +
         '<div class="vc-card__foot"><span>' + L('Para ', 'To ') + esc(v.to || '…') + '</span><span>' + L('De ', 'From ') + esc(v.from || '…') + '</span></div>' +
