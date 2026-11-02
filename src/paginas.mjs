@@ -112,8 +112,7 @@ export function home(m) {
         </article>`;
   /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */
   const rituals = m.groups.map((g, gi) => {
-    /* Os tratamentos em campanha passam para o início da área, para o selo dourado ficar à vista */
-    const all = [...m.inGroup(g).filter((x) => m.inCampaign(x.id)), ...m.inGroup(g).filter((x) => !m.inCampaign(x.id))], n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
+    const all = m.inGroup(g), n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
     const shown = all.slice(0, n), rest = all.slice(n), id = 'mais-' + gi;
     const pg = m.pageFor(g);
     return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(m.groupName(g))}${pg ? ' <a class="group-t__link" href="' + esc(pg.path) + '">' + esc(pg.nome_menu) + ' →</a>' : ''}</p>
