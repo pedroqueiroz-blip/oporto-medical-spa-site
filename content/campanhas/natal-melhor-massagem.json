@@ -7,7 +7,7 @@
   "ativa": false,
   "texto": "**A Melhor Massagem do Mundo®.** Um ritual exclusivo que combina técnicas de massagem para uma experiência única de relaxamento.",
   "inclui": [],
-  "inicio": "2026-11-01",
+  "inicio": "",
   "selo_numero": "",
   "so_vouchers": true,
   "titulo_destaque": "momentos que cuidam",
@@ -25,7 +25,7 @@
     "tipo_servico": "Signature massage"
   },
   "ordem": 4,
-  "fim": "2026-12-31",
+  "fim": "",
   "assinatura": "",
   "preco": 65,
   "duracao": 75,
