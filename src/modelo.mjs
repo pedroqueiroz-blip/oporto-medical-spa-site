@@ -199,9 +199,10 @@ export function loadModel(today = new Date(), lang = 'pt') {
   const campaign = campaignOn ? withTreatment(camp) : null;
   const extraCampaigns = (camp.extras || []).filter(live).map(withTreatment);
   /* Tratamentos da lista com o selo "Em campanha" (só com alguma campanha no site) e o preço de campanha de cada um */
-  const destaques = campaign || extraCampaigns.length ? camp.destaques || {} : {};
+  const onSite = !!(campaign || extraCampaigns.length);
+  const destaques = onSite ? camp.destaques || {} : {}, precos = onSite ? camp.precos || {} : {};
   const inCampaign = (id) => id in destaques;
-  const campaignPrice = (id) => destaques[id] || null;
+  const campaignPrice = (id) => precos[id] || null;
 
   /* Campanhas que entram no Google e no llms.txt: as que estão no site e não têm nada [[a confirmar]] */
   const campaigns = [campaign, ...extraCampaigns].filter((c) => c && ![c.titulo, c.titulo_destaque, c.texto].some(text.hasTbc));

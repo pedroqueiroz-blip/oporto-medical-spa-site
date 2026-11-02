@@ -668,7 +668,7 @@ blockquote.d, .trust p { font-style: italic; }
 
 /* Selo "Em campanha" na lista de rituais */
 .camp-badge { display: table; margin-top: 10px; padding: 4px 9px 3px; border-radius: 2px; background: var(--flame); color: var(--night); font: 600 10px var(--body); letter-spacing: .2em; text-transform: uppercase; text-decoration: none; white-space: nowrap; }
-.ritual h3 a.camp-badge:hover { color: var(--night); background: var(--linen); }
+.ritual a.camp-badge:hover { color: var(--night); background: var(--linen); }
 
 /* Campanhas extra do mês */
 .camp-more-btn { margin-top: 48px; text-align: center; }

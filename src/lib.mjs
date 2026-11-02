@@ -45,16 +45,19 @@ export function readList(name, lang = 'pt') {
 }
 
 /* Campanhas (content/campanhas/): a primeira em vigor pela ordem é a principal, as outras rodam por baixo.
-   O selo dourado «Em campanha» vai para o tratamento de cada campanha ligada que o tenha pedido
-   (as campanhas só de vouchers não contam: o preço delas é só para vouchers). */
+   O selo dourado «Em campanha» vai para o tratamento de cada campanha ligada que o tenha pedido;
+   o preço de campanha vale para o tratamento de qualquer campanha em vigor (marcação e voucher).
+   As campanhas só de vouchers não contam: o preço delas é só para os vouchers dessa campanha. */
 export function readCampaigns(isLive, lang = 'pt') {
   const all = readList('campanhas', lang);
   const [main = {}, ...extras] = [...all.filter(isLive), ...all.filter((c) => !isLive(c))];
-  const destaques = {};
+  const destaques = {}, precos = {};
   for (const c of [main, ...extras]) {
-    if (c.selo_em_campanha && c.tratamento && !c.so_vouchers && isLive(c) && !(c.tratamento in destaques)) destaques[c.tratamento] = Number(c.preco) > 0 ? Number(c.preco) : null;
+    if (!c.tratamento || c.so_vouchers || !isLive(c)) continue;
+    if (c.selo_em_campanha && !(c.tratamento in destaques)) destaques[c.tratamento] = true;
+    if (Number(c.preco) > 0 && !(c.tratamento in precos)) precos[c.tratamento] = Number(c.preco);
   }
-  return { ...main, extras, destaques };
+  return { ...main, extras, destaques, precos };
 }
 
 export function esc(s) {

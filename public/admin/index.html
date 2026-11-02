@@ -105,6 +105,25 @@
   .atalhos a { padding: 9px 18px; border-radius: 999px; background: var(--night); border: 1px solid var(--flame); color: var(--linen) !important; font: 500 13px var(--body); letter-spacing: .02em; text-decoration: none; box-shadow: 0 8px 24px -12px rgba(13, 10, 8, .6); }
   .atalhos a:first-child { background: var(--flame); color: var(--night) !important; }
   .atalhos a:hover { border-color: var(--linen); }
+  /* Campanhas: ordem no site, arrastando na lista */
+  .ordem-camp { margin: 0 0 24px; padding: 20px 24px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; font-family: var(--body, Manrope, sans-serif); color: var(--ink); }
+  .ordem-camp h2 { margin: 0 0 4px; font: 500 15px var(--body, Manrope, sans-serif); letter-spacing: .02em; }
+  .ordem-camp > p { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .ordem-camp ol { list-style: none; margin: 0; padding: 0; counter-reset: oc; }
+  .ordem-camp li { counter-increment: oc; display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; cursor: grab; user-select: none; }
+  .ordem-camp li::before { content: counter(oc); min-width: 20px; font-weight: 600; color: var(--muted); }
+  .ordem-camp li.is-drag { opacity: .4; }
+  .ordem-camp li.is-over { border-color: var(--flame); box-shadow: 0 -2px 0 var(--flame); }
+  .ordem-camp li.is-off { opacity: .6; }
+  .ordem-camp .oc-t { flex: 1; font-size: 14px; }
+  .ordem-camp .oc-t small { display: block; color: var(--muted); font-size: 12px; }
+  .ordem-camp .oc-pega { color: var(--muted); font-size: 18px; line-height: 1; }
+  .ordem-camp li button { width: 30px; height: 30px; border: 1px solid var(--line); border-radius: 50%; background: var(--card); color: var(--ink); cursor: pointer; }
+  .ordem-camp li button:disabled { opacity: .3; cursor: default; }
+  .ordem-camp .oc-acoes { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .ordem-camp .oc-guardar { padding: 10px 22px; border: 0; border-radius: 999px; background: var(--flame); color: var(--night); font: 600 12px var(--body, Manrope, sans-serif); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+  .ordem-camp .oc-guardar:disabled { background: var(--line); color: var(--muted); cursor: default; }
+  .ordem-camp .oc-msg { font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -320,6 +339,119 @@
         iniciar();
       }, function () { botao.disabled = false; erro.textContent = 'Sem ligação. Tente de novo.'; });
     });
+  })();
+  /* Campanhas: na lista do separador, a ordem no site muda-se arrastando cada campanha (ou com ↑ ↓).
+     «Guardar ordem» grava o campo «ordem» de cada campanha (10, 20, 30…) num só commit em main, e o site
+     atualiza-se sozinho. A primeira campanha ligada e em vigor é a principal. */
+  (function () {
+    var REPO = 'pedroqueiroz-blip/oporto-medical-spa-site', RAMO = 'main', PASTA = 'content/campanhas';
+    var API = 'https://api.github.com/repos/' + REPO;
+    var lista = null, original = '', painel = null, aCarregar = false, falhou = false;
+    function token() { try { return (JSON.parse(localStorage.getItem('decap-cms-user') || 'null') || {}).token || ''; } catch (e) { return ''; } }
+    function gh(caminho, opc) {
+      opc = opc || {};
+      return fetch(API + caminho, { method: opc.method || 'GET', cache: 'no-store', headers: { Authorization: 'token ' + token(), Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' }, body: opc.body ? JSON.stringify(opc.body) : undefined })
+        .then(function (r) { if (!r.ok) throw new Error('GitHub ' + r.status); return r.json(); });
+    }
+    function texto64(b) { var bin = atob(b.replace(/\n/g, '')), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return new TextDecoder().decode(u); }
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+    function dataPT(d) { return d ? String(d).slice(0, 10).split('-').reverse().join('/') : ''; }
+    function chave() { return lista.map(function (c) { return c.path; }).join('|'); }
+
+    function carregar() {
+      aCarregar = true;
+      return gh('/contents/' + PASTA + '?ref=' + RAMO).then(function (fs) {
+        fs = fs.filter(function (f) { return f.type === 'file' && /\.json$/.test(f.name); });
+        return Promise.all(fs.map(function (f) {
+          return gh('/contents/' + f.path + '?ref=' + RAMO).then(function (x) {
+            var txt = texto64(x.content), d = {};
+            try { d = JSON.parse(txt); } catch (e) {}
+            return { path: f.path, txt: txt, d: d };
+          });
+        }));
+      }).then(function (cs) {
+        cs.sort(function (a, b) { return (Number(a.d.ordem) || 0) - (Number(b.d.ordem) || 0) || a.path.localeCompare(b.path); });
+        lista = cs; original = chave(); aCarregar = false; desenhar();
+      }, function (e) { aCarregar = false; falhou = true; mensagem('Não foi possível ler as campanhas (' + e.message + ').'); });
+    }
+
+    function mensagem(t) { var m = painel && painel.querySelector('.oc-msg'); if (m) m.textContent = t; }
+
+    function desenhar(msg) {
+      if (!painel) return;
+      if (!lista) { painel.querySelector('ol').innerHTML = '<li style="cursor:default">A carregar…</li>'; return; }
+      var mudou = chave() !== original;
+      painel.querySelector('ol').innerHTML = lista.map(function (c, i) {
+        var d = c.d, quando = d.inicio || d.fim ? ' · ' + (d.inicio ? 'de ' + dataPT(d.inicio) : '') + (d.fim ? ' até ' + dataPT(d.fim) : '') : '';
+        return '<li draggable="true" data-i="' + i + '"' + (d.ativa === false ? ' class="is-off"' : '') + '><span class="oc-pega" aria-hidden="true">⠿</span>' +
+          '<span class="oc-t">' + esc([d.titulo, d.titulo_destaque].filter(Boolean).join(' ') || c.path.split('/').pop()) +
+          '<small>' + (d.ativa === false ? 'Desligada' : 'Ligada') + (d.so_vouchers ? ' · só vouchers' : '') + esc((d.tratamento ? ' · ' + d.tratamento : '') + (d.preco ? ' · ' + d.preco + ' €' : '') + quando) + '</small></span>' +
+          '<button type="button" data-mover="-1" aria-label="Subir"' + (i ? '' : ' disabled') + '>↑</button>' +
+          '<button type="button" data-mover="1" aria-label="Descer"' + (i < lista.length - 1 ? '' : ' disabled') + '>↓</button></li>';
+      }).join('');
+      painel.querySelector('.oc-guardar').disabled = !mudou;
+      mensagem(msg || (mudou ? 'Ordem alterada. Carregue em «Guardar ordem» para passar ao site.' : ''));
+    }
+
+    function mover(de, para) {
+      if (para < 0 || para >= lista.length || de === para) return;
+      var c = lista.splice(de, 1)[0]; lista.splice(para, 0, c); desenhar();
+    }
+
+    function guardar() {
+      var botao = painel.querySelector('.oc-guardar'); botao.disabled = true; mensagem('A guardar…');
+      var mudas = [];
+      lista.forEach(function (c, i) {
+        var n = (i + 1) * 10;
+        if (Number(c.d.ordem) === n) return;
+        var txt = /"ordem"\s*:\s*-?[\d.]+/.test(c.txt) ? c.txt.replace(/"ordem"\s*:\s*-?[\d.]+/, '"ordem": ' + n)
+          : JSON.stringify(Object.assign({ ordem: n }, c.d), null, 2) + '\n';
+        mudas.push({ path: c.path, mode: '100644', type: 'blob', content: txt });
+      });
+      if (!mudas.length) { original = chave(); return desenhar('Nada a guardar.'); }
+      var base;
+      gh('/git/ref/heads/' + RAMO).then(function (ref) { base = ref.object.sha; return gh('/git/commits/' + base); })
+        .then(function (cm) { return gh('/git/trees', { method: 'POST', body: { base_tree: cm.tree.sha, tree: mudas } }); })
+        .then(function (tr) { return gh('/git/commits', { method: 'POST', body: { message: 'Backoffice: ordem das campanhas', tree: tr.sha, parents: [base] } }); })
+        .then(function (cm) { return gh('/git/refs/heads/' + RAMO, { method: 'PATCH', body: { sha: cm.sha } }); })
+        .then(function () { lista = null; desenhar(); return carregar(); })
+        .then(function () { desenhar('Ordem guardada. O site atualiza-se dentro de 1 a 2 minutos.'); },
+          function (e) { botao.disabled = false; mensagem('Não foi possível guardar (' + e.message + '). Tente de novo.'); });
+    }
+
+    function criarPainel() {
+      var p = document.createElement('section');
+      p.className = 'ordem-camp';
+      p.innerHTML = '<h2>Ordem das campanhas no site</h2><p>Arraste cada campanha para a posição que quer (ou use ↑ ↓) e carregue em «Guardar ordem». A primeira ligada e em vigor é a principal; as outras rodam a seguir, por esta ordem.</p>' +
+        '<ol></ol><div class="oc-acoes"><button type="button" class="oc-guardar" disabled>Guardar ordem</button><span class="oc-msg" aria-live="polite"></span></div>';
+      var arrastar = null;
+      p.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        if (b.classList.contains('oc-guardar')) return guardar();
+        var li = b.closest('li'); if (li && b.dataset.mover) mover(+li.dataset.i, +li.dataset.i + +b.dataset.mover);
+      });
+      p.addEventListener('dragstart', function (e) { var li = e.target.closest('li[data-i]'); if (!li) return; arrastar = +li.dataset.i; li.classList.add('is-drag'); e.dataTransfer.effectAllowed = 'move'; try { e.dataTransfer.setData('text/plain', String(arrastar)); } catch (x) {} });
+      p.addEventListener('dragover', function (e) {
+        var li = e.target.closest('li[data-i]'); if (!li || arrastar === null) return; e.preventDefault();
+        p.querySelectorAll('.is-over').forEach(function (x) { x.classList.remove('is-over'); }); li.classList.add('is-over');
+      });
+      p.addEventListener('drop', function (e) { var li = e.target.closest('li[data-i]'); if (!li || arrastar === null) return; e.preventDefault(); var de = arrastar; arrastar = null; mover(de, +li.dataset.i); });
+      p.addEventListener('dragend', function () { arrastar = null; p.querySelectorAll('.is-drag,.is-over').forEach(function (x) { x.classList.remove('is-drag', 'is-over'); }); });
+      return p;
+    }
+
+    // Aparece no topo da lista de Campanhas (o Decap redesenha a página, por isso confirma-se sempre que muda)
+    function colocar() {
+      if (!/^#\/collections\/campanhas(\/filter\/[^/]*)?\/?(\?|$)/.test(location.hash) || !token()) { if (painel && painel.parentNode) painel.remove(); return; }
+      var titulo = document.querySelector('[class*="-CollectionTopHeading"]');
+      var topo = titulo && (titulo.closest('[class*="-CollectionTopContainer"]') || titulo.parentElement.parentElement);
+      if (!topo || !topo.parentNode) return;
+      if (!painel) painel = criarPainel();
+      if (painel.previousElementSibling !== topo) { topo.parentNode.insertBefore(painel, topo.nextSibling); desenhar(); }
+      if (!lista && !aCarregar && !falhou) carregar();
+    }
+    new MutationObserver(colocar).observe(document.body, { childList: true, subtree: true });
+    window.addEventListener('hashchange', function () { lista = null; falhou = false; colocar(); });
   })();
 </script>
 </body>
