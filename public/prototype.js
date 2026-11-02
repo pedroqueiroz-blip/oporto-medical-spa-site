@@ -354,13 +354,16 @@
         '<p class="vc-card__info">' + L('Válido até ', 'Valid until ') + validUntil() + '.' + (S.telefone ? '<br>' + esc(S.telefone) : '') + '</p></div>';
     }
 
+    // Preço antigo riscado dentro da lista (uma <option> não aceita <s>: usa-se o traço Unicode sobre cada letra)
+    function riscado(txt) { return Array.from(txt).map(function (ch) { return ch + '\u0336'; }).join(''); }
+
     function form() {
       var t = cur();
       return '<div class="vc-form">' +
         '<div class="vc-row"><label class="vc-label" for="vc-exp">' + L('Massagem ou ritual a oferecer', 'Massage or ritual to give') + '</label><select id="vc-exp" class="vc-select">' + (CAMPS.length ? '<optgroup label="' + L('Campanhas', 'Offers') + '">' + CAMPS.map(function (x) {
-          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.label) + ' · ' + esc(x.name) + ' ' + x.min + ' min · ' + eur(x.price) + (x.oldPrice ? L(' (em vez de ', ' (instead of ') + eur(x.oldPrice) + ')' : '') + '</option>';
+          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.label) + ' · ' + esc(x.name) + ' ' + x.min + ' min · ' + eur(x.price) + (x.oldPrice ? '  ' + riscado(eur(x.oldPrice)) : '') + '</option>';
         }).join('') + '</optgroup><optgroup label="' + L('Massagens e tratamentos', 'Massages and treatments') + '">' : '') + TREATMENTS.map(function (x) {
-          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + (x.oldPrice ? L(' (em vez de ', ' (instead of ') + eur(x.oldPrice) + ')' : '') + '</option>';
+          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + (x.oldPrice ? '  ' + riscado(eur(x.oldPrice)) : '') + '</option>';
         }).join('') + (CAMPS.length ? '</optgroup>' : '') + '</select><p class="vc-desc">' + esc(t.text || '') + '</p></div>' +
         '<div class="vc-row"><p class="vc-label">' + L('Entrega', 'Delivery') + '</p><div class="vc-seg" role="group">' +
         '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">' + L('Digital, por email', 'Digital, by email') + '</button>' +
