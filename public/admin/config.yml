@@ -34,7 +34,7 @@ collections:
   - name: campanhas
     label: Campanhas
     label_singular: campanha
-    description: 'As campanhas do mês na página inicial. A primeira pela ordem é a principal; as outras rodam por baixo, de 3 em 3 segundos. Ligue ou desligue cada uma sem a apagar. O Google e os assistentes de IA passam a mostrar as campanhas ligadas.'
+    description: 'As campanhas do mês na página inicial. Mude a ordem arrastando cada campanha no quadro «Ordem das campanhas no site», por cima da lista. A primeira pela ordem é a principal; as outras rodam por baixo, de 3 em 3 segundos. Ligue ou desligue cada uma sem a apagar. O Google e os assistentes de IA passam a mostrar as campanhas ligadas.'
     folder: content/campanhas
     extension: json
     format: json
@@ -49,7 +49,7 @@ collections:
       - { label: Desligadas, field: ativa, pattern: false }
     editor: { preview: true }
     fields:
-      - { name: ordem, label: Ordem, widget: number, value_type: int, default: 50, hint: 'Das campanhas em vigor, a de número mais baixo é a principal. As outras rodam por baixo.' }
+      - { name: ordem, label: Ordem, widget: number, value_type: int, default: 50, hint: 'Das campanhas em vigor, a de número mais baixo é a principal. As outras rodam por baixo. Mais fácil: arraste as campanhas no quadro «Ordem das campanhas no site», na lista do separador.' }
       - { name: ativa, label: Campanha ligada (aparece no site), widget: boolean, required: false, default: true }
       - { name: inicio, label: Começa em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = já em vigor.' }
       - { name: fim, label: Termina em, widget: datetime, format: YYYY-MM-DD, date_format: DD/MM/YYYY, time_format: false, required: false, hint: 'Vazio = sem data de fim. A campanha entra e sai do site sozinha nas datas marcadas.' }
