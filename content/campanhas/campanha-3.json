@@ -5,19 +5,8 @@
   "inclui": [
     "Deslizamentos com óleo, alongamentos suaves e trações corporais."
   ],
-  "inicio": "",
+  "inicio": "2026-11-01",
   "titulo_destaque": "Ayurvédica e Alongamento",
-  "ordem": 30,
-  "fim": "",
-  "assinatura": "inspirada na tradição ayurvédica",
-  "preco": 49,
-  "duracao": 60,
-  "imagem": "/img/uploads/massagem-ayurvedica.jpg",
-  "etiqueta": "Campanha do mês",
-  "selo_em_campanha": true,
-  "titulo": "Massagem Manual",
-  "preco_antigo": 74,
-  "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular.",
   "en": {
     "etiqueta": "Offer of the month",
     "titulo": "Ayurvedic Massage",
@@ -28,5 +17,16 @@
       "Gliding strokes with oil, gentle stretches and body traction."
     ],
     "imagem_alt": "A therapist gently stretching a woman’s neck by hand, improving mobility and relaxing the muscles"
-  }
+  },
+  "ordem": 30,
+  "fim": "2026-12-31",
+  "assinatura": "inspirada na tradição ayurvédica",
+  "preco": 49,
+  "duracao": 60,
+  "imagem": "/img/uploads/massagem-ayurvedica.jpg",
+  "etiqueta": "Campanha do mês",
+  "selo_em_campanha": true,
+  "titulo": "Massagem Manual",
+  "preco_antigo": 74,
+  "imagem_alt": "terapeuta realiza um alongamento manual suave da região cervical de uma mulher, promovendo a mobilidade do pescoço e o relaxamento muscular."
 }
