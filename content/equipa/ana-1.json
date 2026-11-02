@@ -1,0 +1,30 @@
+{
+  "mostrar_foto": true,
+  "bio": "Fisioterapeut. Relaxamento",
+  "ordem": 50,
+  "confirmado": false,
+  "funcao": "Fisioterapeura",
+  "foco": "Fisioterapeura",
+  "nome": "Ana Rita",
+  "id": "ana",
+  "faz": [
+    "aroma",
+    "ayurvedica",
+    "body-mind",
+    "dren",
+    "energizante",
+    "fisio",
+    "evasoes",
+    "esfoliacao",
+    "indian-head",
+    "geotermal",
+    "localizada",
+    "modelador",
+    "oil",
+    "pilates-aparelhos",
+    "pilates",
+    "pos-cirurgico",
+    "pos-parto",
+    "postura"
+  ]
+}
