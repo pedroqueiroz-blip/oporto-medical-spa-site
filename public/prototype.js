@@ -347,7 +347,7 @@
       return '<div class="vc-card' + (v.format === 'caixa' ? ' vc-card--box' : '') + '" aria-live="polite">' +
         '<img class="vc-card__logo" src="/logo-brown.svg" alt="Oporto Medical Spa" width="140" height="258">' +
         '<div class="vc-card__top"><span class="vc-card__kind">' + L('Voucher oferta', 'Gift voucher') + '</span></div>' +
-        (t.camp ? '<p class="vc-card__camp">' + esc(t.label) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
+        (t.camp ? '<p class="vc-card__camp">' + esc(t.label || L('Em campanha', 'On offer')) + '</p>' : '') + '<p class="vc-card__name">' + esc(t.name) + '</p>' +
         '<p class="vc-card__desc">' + esc(t.text || '') + (t.min ? L(' (Reserve ', ' (Allow ') + t.min + ' min.)' : '') + '</p>' +
         '<p class="vc-card__msg">' + (v.msg ? '“' + esc(v.msg) + '”' : L('A sua mensagem aparece aqui.', 'Your message appears here.')) + '</p>' +
         '<div class="vc-card__foot"><span>' + L('Para ', 'To ') + esc(v.to || '…') + '</span><span>' + L('De ', 'From ') + esc(v.from || '…') + '</span></div>' +
@@ -360,7 +360,7 @@
         '<div class="vc-row"><label class="vc-label" for="vc-exp">' + L('Massagem ou ritual a oferecer', 'Massage or ritual to give') + '</label><select id="vc-exp" class="vc-select">' + (CAMPS.length ? '<optgroup label="' + L('Campanhas', 'Offers') + '">' + CAMPS.map(function (x) {
           return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.label) + ' · ' + esc(x.name) + ' ' + x.min + ' min · ' + eur(x.price) + (x.oldPrice ? L(' (em vez de ', ' (instead of ') + eur(x.oldPrice) + ')' : '') + '</option>';
         }).join('') + '</optgroup><optgroup label="' + L('Massagens e tratamentos', 'Massages and treatments') + '">' : '') + TREATMENTS.map(function (x) {
-          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + '</option>';
+          return '<option value="' + x.id + '"' + (v.exp === x.id ? ' selected' : '') + '>' + esc(x.name) + ' · ' + eur(x.price) + (x.oldPrice ? L(' (em vez de ', ' (instead of ') + eur(x.oldPrice) + ')' : '') + '</option>';
         }).join('') + (CAMPS.length ? '</optgroup>' : '') + '</select><p class="vc-desc">' + esc(t.text || '') + '</p></div>' +
         '<div class="vc-row"><p class="vc-label">' + L('Entrega', 'Delivery') + '</p><div class="vc-seg" role="group">' +
         '<button type="button" data-format="digital" aria-pressed="' + (v.format === 'digital') + '">' + L('Digital, por email', 'Digital, by email') + '</button>' +
@@ -393,8 +393,10 @@
       else if (b.hasAttribute('data-buy')) {
         // Pagamento (public/pagar.js): o voucher é sempre de um tratamento; o código segue só por email
         if (window.OMS_PAGAR && v.mode !== 'valor') {
-          var tr = cur();
-          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: tr.camp || '', nomeTratamento: tr.name + (tr.camp ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!tr.camp });
+          // Voucher de uma campanha só de vouchers (tr.treatment) leva o id da campanha; um tratamento em campanha
+          // já vem com o preço de campanha no catálogo, sem id de campanha
+          var tr = cur(), cv = tr.treatment ? tr.camp : '';
+          OMS_PAGAR.abrir(root, { tipo: 'voucher', tratamento: tr.treatment || tr.id, campanha: cv, nomeTratamento: tr.name + (cv ? ' · ' + tr.min + ' min' : ''), para: v.to, de: v.from, mensagem: v.msg, formato: v.format }, { voltar: render, semCodigo: !!(cv || tr.oldPrice) });
           return;
         }
         root.querySelector('[data-bought]').hidden = false;

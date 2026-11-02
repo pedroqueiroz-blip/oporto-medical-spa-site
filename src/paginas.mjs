@@ -30,6 +30,15 @@ function faqHtml(m, items, { id, firstOpen = true, collapse = true, visible = 3 
       </div>`;
 }
 
+/* Selo dourado «Em campanha» e preço de campanha (com o normal riscado) de um tratamento da lista */
+function campBadge(m, x, href) {
+  return m.inCampaign(x.id) ? ' <a class="camp-badge" href="' + href + '">' + m.t('Em campanha') + '</a>' : '';
+}
+function ritualPrice(m, x) {
+  const p = m.campaignPrice(x.id);
+  return p && p !== x.preco ? '<b class="price-camp">' + eur(p) + '<s><span class="sr-only">' + m.t('Preço normal') + ' </span>' + eur(x.preco) + '</s></b>' : eur(x.preco);
+}
+
 function campaignBlock(m, c, extra) {
   const t = m.text;
   const img = c.imagem
@@ -55,7 +64,7 @@ function campaignBlock(m, c, extra) {
         <div style="display:flex;flex-wrap:wrap;align-items:center;gap:18px 28px">
           <span class="price-d">${c.preco ? esc(eur(c.preco)) + (c.preco_antigo ? '<s><span class="sr-only">' + m.t('Preço normal') + ' </span>' + esc(eur(c.preco_antigo)) + '</s>' : '') : '<mark class="tbc">' + m.t('preço a confirmar') + '</mark>'}</span>
           ${book}
-          ${c.so_vouchers ? '' : `<a href="#oferecer" style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">${m.t('Oferecer')}</a>`}
+          ${c.so_vouchers ? '' : `<a href="#oferecer"${c.tratamento ? ' data-voucher="' + esc(c.tratamento) + '"' : ''} style="font-size:12px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--flame);padding-bottom:3px">${m.t('Oferecer')}</a>`}
         </div>
         ${cond.length ? '<ul class="camp-cond">' + cond.map((x) => '<li>' + t.inline(x) + '</li>').join('') + '</ul>' : ''}
       </div>
@@ -96,14 +105,15 @@ export function home(m) {
   const names = m.treatments.map((x) => '<span>' + esc(x.nome) + '</span><i>✦</i>').join('');
   const marquee = m.campaign ? names + '<span>' + esc([m.campaign.titulo, m.campaign.titulo_destaque].filter(Boolean).join(' ')) + '</span><i>✦</i>' : names;
   const ritual = (x) => `<article class="ritual" id="t-${esc(x.id)}">
-          <h3>${esc(x.nome)}${m.inCampaign(x.id) ? ' <a class="camp-badge" href="#campanha">' + m.t('Em campanha') + '</a>' : ''}</h3>
+          <h3>${esc(x.nome)}${campBadge(m, x, '#campanha')}</h3>
           <p>${t.inline(x.texto)}</p>
-          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${m.inCampaign(x.id) && m.campaignPrice(x.id) && m.campaignPrice(x.id) !== x.preco ? '<b class="price-camp">' + eur(m.campaignPrice(x.id)) + '<s><span class="sr-only">' + m.t('Preço normal') + ' </span>' + eur(x.preco) + '</s></b>' : eur(x.preco)}</p>
+          <p class="ritual__price"><span>${minutes(x.duracao)}</span>${ritualPrice(m, x)}</p>
           <button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button>
         </article>`;
   /* Em cada área mostram-se os primeiros; os restantes abrem com «Descubra todos» */
   const rituals = m.groups.map((g, gi) => {
-    const all = m.inGroup(g), n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
+    /* Os tratamentos em campanha passam para o início da área, para o selo dourado ficar à vista */
+    const all = [...m.inGroup(g).filter((x) => m.inCampaign(x.id)), ...m.inGroup(g).filter((x) => !m.inCampaign(x.id))], n = (g === 'Relaxar' ? I.rituais.mostrar_relaxar || 3 : I.rituais.mostrar || 2);
     const shown = all.slice(0, n), rest = all.slice(n), id = 'mais-' + gi;
     const pg = m.pageFor(g);
     return `<p class="group-t"${gi ? ' style="padding-top:40px"' : ''}>${esc(m.groupName(g))}${pg ? ' <a class="group-t__link" href="' + esc(pg.path) + '">' + esc(pg.nome_menu) + ' →</a>' : ''}</p>
@@ -378,7 +388,7 @@ export function massages(m) {
   <section class="section" style="padding-top:0">
     <div class="wrap">
       <div class="rituals" style="margin-top:0">
-        ${relax.map((x) => `<article class="ritual"><h2 class="d" style="font-size:clamp(26px,2.8vw,36px)">${esc(x.nome)}</h2><p>${t.inline(x.texto_massagens || x.texto)}</p><p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p><button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button></article>`).join('\n        ')}
+        ${relax.map((x) => `<article class="ritual"><h2 class="d" style="font-size:clamp(26px,2.8vw,36px)">${esc(x.nome)}${campBadge(m, x, m.href('/') + '#campanha')}</h2><p>${t.inline(x.texto_massagens || x.texto)}</p><p class="ritual__price"><span>${minutes(x.duracao)}</span>${ritualPrice(m, x)}</p><button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button></article>`).join('\n        ')}
       </div>
 
       <h2 class="d" style="font-size:clamp(30px,3.4vw,46px);margin-top:80px">${title(M.escolher_titulo, M.escolher_destaque)}</h2>
@@ -475,7 +485,7 @@ export function areaPage(m, P) {
   <section class="section" style="padding-top:0">
     <div class="wrap">
       <div class="rituals" style="margin-top:0">
-        ${list.map((x) => `<article class="ritual" id="t-${esc(x.id)}"><h2 class="d" style="font-size:clamp(26px,2.8vw,36px)">${esc(x.nome)}</h2><p>${t.inline(x.texto_pagina || x.texto)}</p><p class="ritual__price"><span>${minutes(x.duracao)}</span>${eur(x.preco)}</p><button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button></article>`).join('\n        ')}
+        ${list.map((x) => `<article class="ritual" id="t-${esc(x.id)}"><h2 class="d" style="font-size:clamp(26px,2.8vw,36px)">${esc(x.nome)}${campBadge(m, x, m.href('/') + '#campanha')}</h2><p>${t.inline(x.texto_pagina || x.texto)}</p><p class="ritual__price"><span>${minutes(x.duracao)}</span>${ritualPrice(m, x)}</p><button type="button" data-book="${esc(x.id)}" aria-label="${m.t('Reservar')} ${esc(x.nome)}">→</button></article>`).join('\n        ')}
       </div>
 
       ${list.length > 1 ? `<h2 class="d" style="font-size:clamp(30px,3.4vw,46px);margin-top:80px">${title(P.tabela_titulo || m.t('Que tratamento'), P.tabela_destaque || m.t('escolher?'))}</h2>
