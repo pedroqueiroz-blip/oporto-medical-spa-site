@@ -418,7 +418,7 @@ collections:
       - { name: foto, label: Retrato, widget: image, required: false, hint: 'Vertical (4:5). Sem retrato, o cartão mostra só o nome, a função e a especialidade.' }
       - { name: mostrar_foto, label: Mostrar o retrato no site, widget: boolean, required: false, default: true, hint: 'Desligue para esconder o retrato sem o apagar.' }
       - { name: zoho, label: Utilizador no Zoho CRM (email), widget: string, required: false, hint: 'Só se o nome no Zoho CRM for diferente do nome acima. A agenda online usa os eventos desta pessoa no CRM.' }
-      - { name: faz, label: Tratamentos que faz, widget: relation, collection: tratamentos, value_field: id, search_fields: [nome, nome_completo], display_fields: [nome], multiple: true }
+      - { name: faz, label: Tratamentos e massagens que faz, widget: permissoes, required: false, hint: 'Uma pessoa nova começa com todos marcados. Desmarque o que ela não faz: a marcação online só a mostra nos tratamentos marcados.' }
       - { name: conhece, label: Áreas de conhecimento (Google), widget: list, required: false, field: { name: area, label: Área, widget: string } }
       - { name: confirmado, label: Dados confirmados, widget: boolean, required: false, default: false, hint: 'Só com todas as pessoas confirmadas é que a equipa entra nos dados para o Google.' }
 

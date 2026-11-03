@@ -295,6 +295,71 @@
   });
   CMS.registerPreviewTemplate('equipa', PessoaPreview);
 
+  /* Equipa: «Tratamentos que faz» com uma caixa de seleção por tratamento, por área.
+     Pessoa nova = todos os tratamentos marcados (Pedro, 3/11/2026); depois desmarca-se o que não faz.
+     Guarda a lista de códigos em «faz», que a agenda online usa para mostrar só quem pode fazer cada tratamento. */
+  var ORDEM_AREAS = ['Relaxar', 'Recuperar', 'Fortalecer', 'Cuidar'];
+  var PermissoesControl = createClass({
+    getInitialState: function () { return { lista: null, erro: '' }; },
+    componentDidMount: function () {
+      var self = this;
+      Promise.resolve(this.props.query(this.props.forID, 'tratamentos', ['id'], '', undefined)).then(function (r) {
+        var hits = (r && r.payload && r.payload.hits) || [];
+        var lista = hits.map(function (x) { return js(x.data) || {}; }).filter(function (t) { return t.id; });
+        lista.sort(function (a, b) { return (a.ordem || 0) - (b.ordem || 0) || String(a.nome).localeCompare(String(b.nome)); });
+        self.setState({ lista: lista });
+        // Pessoa nova (ainda sem lista): começa com todos
+        if (self.props.value == null) self.props.onChange(lista.map(function (t) { return t.id; }));
+      }).catch(function () { self.setState({ erro: 'Não foi possível ler os tratamentos. Atualize a página.' }); });
+    },
+    marcados: function () { var v = js(this.props.value); return Array.isArray(v) ? v : []; },
+    mudar: function (ids, ligar) {
+      var atual = this.marcados(), todos = this.state.lista.map(function (t) { return t.id; });
+      var novo = todos.filter(function (id) { return ids.indexOf(id) > -1 ? ligar : atual.indexOf(id) > -1; });
+      this.props.onChange(novo);
+    },
+    render: function () {
+      var self = this, lista = this.state.lista, sel = this.marcados();
+      var caixa = { padding: '14px 18px 18px' };
+      if (this.state.erro) return h('div', { className: this.props.classNameWrapper, style: caixa }, this.state.erro);
+      if (!lista) return h('div', { className: this.props.classNameWrapper, style: caixa }, 'A carregar os tratamentos…');
+      var areas = {};
+      lista.forEach(function (t) { var g = t.grupo || 'Outros'; (areas[g] = areas[g] || []).push(t); });
+      var nomes = Object.keys(areas).sort(function (a, b) {
+        var ia = ORDEM_AREAS.indexOf(a), ib = ORDEM_AREAS.indexOf(b);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+      });
+      var ids = function (ts) { return ts.map(function (t) { return t.id; }); };
+      var botao = function (texto, fn) {
+        return h('button', { type: 'button', onClick: fn, style: { background: 'none', border: '1px solid var(--line)', borderRadius: '999px', padding: '4px 12px', fontSize: '12px', color: 'var(--muted)', cursor: 'pointer', marginLeft: '8px' } }, texto);
+      };
+      var n = lista.filter(function (t) { return sel.indexOf(t.id) > -1; }).length;
+      return h('div', { className: this.props.classNameWrapper, style: caixa, id: this.props.forID },
+        h('div', { style: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '6px', marginBottom: '6px' } },
+          h('span', { style: { fontSize: '14px', color: 'var(--muted)', marginRight: 'auto' } }, n + ' de ' + lista.length + ' tratamentos'),
+          botao('Marcar todos', function () { self.mudar(ids(lista), true); }),
+          botao('Desmarcar todos', function () { self.mudar(ids(lista), false); })),
+        nomes.map(function (g) {
+          var ts = areas[g], todosG = ts.every(function (t) { return sel.indexOf(t.id) > -1; });
+          return h('fieldset', { key: g, style: { border: 0, borderTop: '1px solid var(--line)', margin: '12px 0 0', padding: '12px 0 0' } },
+            h('legend', { style: { display: 'contents' } },
+              h('div', { style: { display: 'flex', alignItems: 'center', marginBottom: '8px' } },
+                h('b', { style: { fontFamily: 'var(--display)', fontSize: '20px', fontWeight: 400, marginRight: 'auto' } }, g),
+                botao(todosG ? 'Desmarcar ' + g.toLowerCase() : 'Marcar ' + g.toLowerCase(), function () { self.mudar(ids(ts), !todosG); }))),
+            h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '4px 18px' } },
+              ts.map(function (t) {
+                var on = sel.indexOf(t.id) > -1;
+                return h('label', { key: t.id, style: { display: 'flex', alignItems: 'center', gap: '10px', padding: '5px 0', fontSize: '15px', cursor: 'pointer', color: on ? 'var(--ink)' : 'var(--muted)' } },
+                  h('input', { type: 'checkbox', checked: on, onChange: function (e) { self.mudar([t.id], e.target.checked); }, style: { width: '18px', height: '18px', accentColor: '#3B2919', margin: 0, flex: 'none' } }),
+                  h('span', {}, t.nome_completo || t.nome || t.id, t.visivel === false ? h('span', { style: { color: 'var(--muted)', fontSize: '12px' } }, ' · escondido no site') : null));
+              })));
+        }));
+    }
+  });
+  CMS.registerWidget('permissoes', PermissoesControl, createClass({
+    render: function () { var v = js(this.props.value); return h('p', {}, (Array.isArray(v) ? v.length : 0) + ' tratamentos'); }
+  }));
+
   /* Entrada com a palavra-passe da equipa (netlify/functions/admin-entrar.mjs), logo nesta página, sem o botão do GitHub.
      A chave devolvida fica onde o Decap guarda a sessão (decap-cms-user). Sem a palavra-passe definida no Netlify,
      aparece a entrada do Decap com conta GitHub, como antes. */
