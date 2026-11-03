@@ -1,21 +1,26 @@
 {
-  "ordem": 80,
-  "ativa": false,
-  "inicio": "",
-  "fim": "",
-  "etiqueta": "Campanha do mês",
-  "titulo": "Quarta campanha",
-  "titulo_destaque": "",
-  "texto": "",
-  "imagem": "",
-  "imagem_alt": "",
-  "inclui": [],
   "tratamento": "",
-  "duracao": null,
-  "preco": null,
-  "selo_em_campanha": false,
+  "ativa": false,
+  "texto": "Massagem especialmente adaptada à gravidez, que promove o relaxamento, alivia tensões e proporciona conforto e bem-estar à futura mamã.",
+  "inclui": [
+    "Alívio dor lombar, tensão no pescoço e ombros e sensação de perna cansada",
+    "Realizada em posição lateral ou de barriga para baixo, com apoio de almofadas para maior conforto."
+  ],
+  "inicio": "",
+  "titulo_destaque": "Pré-Mamã",
   "en": {
     "etiqueta": "Offer of the month",
     "titulo": "Fourth offer"
-  }
+  },
+  "ordem": 80,
+  "fim": "",
+  "assinatura": "Um momento de cuidado para a futura mamã",
+  "preco": 45,
+  "duracao": 60,
+  "imagem": "",
+  "etiqueta": "Destaque do mês | Campanha Natal",
+  "selo_em_campanha": false,
+  "titulo": "Massagem Manual",
+  "preco_antigo": 70,
+  "imagem_alt": ""
 }
