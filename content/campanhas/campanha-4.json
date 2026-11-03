@@ -1,26 +1,29 @@
 {
-  "tratamento": "",
-  "ativa": false,
+  "condicoes": [
+    "Campanha válida até 31 Dezembro de 2026"
+  ],
+  "tratamento": "pre-mama",
+  "ativa": true,
   "texto": "Massagem especialmente adaptada à gravidez, que promove o relaxamento, alivia tensões e proporciona conforto e bem-estar à futura mamã.",
   "inclui": [
     "Alívio dor lombar, tensão no pescoço e ombros e sensação de perna cansada",
     "Realizada em posição lateral ou de barriga para baixo, com apoio de almofadas para maior conforto."
   ],
-  "inicio": "",
+  "inicio": "2026-11-03",
   "titulo_destaque": "Pré-Mamã",
   "en": {
     "etiqueta": "Offer of the month",
     "titulo": "Fourth offer"
   },
   "ordem": 80,
-  "fim": "",
+  "fim": "2026-12-31",
   "assinatura": "Um momento de cuidado para a futura mamã",
   "preco": 45,
   "duracao": 60,
-  "imagem": "",
+  "imagem": "/img/uploads/adobestock_158334733-1-.jpg",
   "etiqueta": "Destaque do mês | Campanha Natal",
   "selo_em_campanha": false,
   "titulo": "Massagem Manual",
   "preco_antigo": 70,
-  "imagem_alt": ""
+  "imagem_alt": "massagem relaxamento a mulher grávida numa marquesa"
 }
